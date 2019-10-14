@@ -626,6 +626,62 @@ STDMETHODIMP COutPin::ProcessOutput(_In_  DWORD dwFlags,
     // keep a reference on the sample. The pipeline is not releasing a reference when the sample
     // is fed in ProcessInput. We are explicitly releasing it for the pipeline.
     //
+
+	// -------------------
+	// mnishiyama
+	// Referring to CMft0::OnProcessOutput in Driver MFT sample.
+	//
+	DWORD error = 0;
+	IMFSample** ppSample = spSample.GetAddressOf();
+	DWORD dwBufferCount = 0;
+	(*ppSample)->GetBufferCount(&dwBufferCount); // dwBufferCount: 1
+	if (dwBufferCount == 1)
+	{
+		IMFMediaBuffer* pMediaBuffer = NULL;
+		if ((*ppSample)->GetBufferByIndex(1, &pMediaBuffer) == S_OK)
+		{
+			//DWORD cbCurrentLength = 0;
+			//pMediaBuffer->GetCurrentLength(&cbCurrentLength);
+
+			LONG lDefaultStride = 0x00000a00;
+			LONG lDestStride = 0;
+			UINT uiHeight = 0x000002d0;
+			long lines = 0x00000168;
+			BYTE* pDest = NULL;
+			VideoBufferLock outputLock(pMediaBuffer);
+
+			DWORD cbBuffer = 0;
+			outputLock.LockBuffer(lDefaultStride, uiHeight, &pDest, &lDestStride, &cbBuffer, FALSE);
+
+			for (long i = 0; i < (long)uiHeight; i++) 
+			{
+				if (lDestStride < 0) {
+					if (i >= lines) {
+						memset(pDest + i * lDestStride, 0, abs(lDefaultStride));
+					}
+					//else {
+					//	memcpy(pDest + i * lDestStride, pSrc + i * lDefaultStride, abs(lDefaultStride));
+					//}
+				}
+				else {
+					if (i >= lines) {
+						memset(pDest + i * lDestStride, 0, lDestStride);
+					}
+					//else {
+					//	memcpy(pDest + i * lDestStride, pSrc + i * lDestStride, lDestStride);
+					//}
+				}
+			}
+		}
+		else
+		{
+			error = GetLastError();
+		}
+	}
+
+
+	// -------------------
+
     pOutputSample->pSample = spSample.Detach();
     pOutputSample->dwStatus = S_OK;
 done:

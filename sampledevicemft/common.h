@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <stdexcept>
+
 #define GUID_STRING_LENGTH  36
 #define GUID_BUFFER_SIZE    37
 #define SLEEP_5MILLISEC 5
