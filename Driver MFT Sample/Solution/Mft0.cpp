@@ -7,6 +7,17 @@
 
 #include <samples/ocv_common.hpp>
 #include <samples/slog.hpp>
+#include "detectors.hpp"
+#include <string>
+#include <inference_engine.hpp>
+#include <ie_iextension.h>
+#include <ie_blob.h>
+#include <ext_list.hpp>
+
+using namespace InferenceEngine;
+using namespace Extensions;
+using namespace Cpu;
+
 
 // CMft0
 STDMETHODIMP CMft0::UpdateDsp(UINT32 uiPercentOfScreen)
@@ -797,8 +808,39 @@ STDMETHODIMP CMft0::OnProcessOutput(IMFMediaBuffer *pIn, IMFMediaBuffer *pOut)
 						// https://docs.opencv.org/3.4/d3/d63/classcv_1_1Mat.html#a51615ebf17a64c968df0bf49b4de6a3a
 						cv::Mat frame(720, 1280, CV_8UC3, pSrc);
 
-						//FaceDetection faceDetector(FLAGS_m, FLAGS_d, 1, false, FLAGS_async, FLAGS_t, FLAGS_r,
-						//	static_cast<float>(FLAGS_bb_enlarge_coef), static_cast<float>(FLAGS_dx_coef), static_cast<float>(FLAGS_dy_coef));
+						//pathToModel "c:\\Users\\masarun\\Downloads\\OpenVINO\\face-detection-adas-0001.xml"
+						//deviceForInference = "CPU"
+						//maxBatch = 1
+						//isBatchDynamic = false
+						//isAsync = false
+						//detectionThreshold = 0.50000000000000000
+						//doRawOutputMessages = false
+						//bb_enlarge_coefficient = 1.20000005
+						//bb_dx_coefficient = 1.00000000
+						//bb_dy_coefficient = 1.00000000
+
+						Core ie;
+
+						FaceDetection faceDetector(
+							//std::string("c:\\Users\\masarun\\Downloads\\OpenVINO\\face-detection-adas-0001.xml"), 
+							std::string("C:\\Program Files\\SampleMft0\\face-detection-adas-0001.xml"),
+							std::string("CPU"), 
+							1, 
+							false, 
+							false, 
+							0.50000000000000000, 
+							false,
+							(float)1.20000005, (float)1.00000000, (float)1.00000000);
+						
+						//ie.AddExtension(std::make_shared<Extensions::Cpu::CpuExtensions>(), "CPU");
+
+						Load(faceDetector).into(ie, std::string("CPU"), false);
+
+						faceDetector.enqueue(frame);
+						faceDetector.submitRequest();
+
+						faceDetector.wait();
+						faceDetector.fetchResults();
 					}
 				}
 
@@ -1001,4 +1043,245 @@ STDMETHODIMP CMft0::GenerateMFMediaTypeListFromDevice(UINT uiStreamId)
     }
 
     return hr;
+}
+
+
+BaseDetection::BaseDetection(std::string topoName,
+	const std::string& pathToModel,
+	const std::string& deviceForInference,
+	int maxBatch, bool isBatchDynamic, bool isAsync,
+	bool doRawOutputMessages)
+	: topoName(topoName), pathToModel(pathToModel), deviceForInference(deviceForInference),
+	maxBatch(maxBatch), isBatchDynamic(isBatchDynamic), isAsync(isAsync),
+	enablingChecked(false), _enabled(false), doRawOutputMessages(doRawOutputMessages) {
+	if (isAsync) {
+		slog::info << "Use async mode for " << topoName << slog::endl;
+	}
+}
+
+BaseDetection::~BaseDetection() {}
+
+ExecutableNetwork* BaseDetection::operator ->() {
+	return &net;
+}
+
+void BaseDetection::submitRequest() {
+	if (!enabled() || request == nullptr) return;
+	if (isAsync) {
+		request->StartAsync();
+	}
+	else {
+		request->Infer();
+	}
+}
+
+void BaseDetection::wait() {
+	if (!enabled() || !request || !isAsync)
+		return;
+	request->Wait(IInferRequest::WaitMode::RESULT_READY);
+}
+
+bool BaseDetection::enabled() const {
+	if (!enablingChecked) {
+		_enabled = !pathToModel.empty();
+		if (!_enabled) {
+			slog::info << topoName << " DISABLED" << slog::endl;
+		}
+		enablingChecked = true;
+	}
+	return _enabled;
+}
+
+void BaseDetection::printPerformanceCounts(std::string fullDeviceName) {
+	if (!enabled()) {
+		return;
+	}
+	slog::info << "Performance counts for " << topoName << slog::endl << slog::endl;
+	::printPerformanceCounts(*request, std::cout, fullDeviceName, false);
+}
+
+
+FaceDetection::FaceDetection(const std::string& pathToModel,
+	const std::string& deviceForInference,
+	int maxBatch, bool isBatchDynamic, bool isAsync,
+	double detectionThreshold, bool doRawOutputMessages,
+	float bb_enlarge_coefficient, float bb_dx_coefficient, float bb_dy_coefficient)
+	: BaseDetection("Face Detection", pathToModel, deviceForInference, maxBatch, isBatchDynamic, isAsync, doRawOutputMessages),
+	detectionThreshold(detectionThreshold),
+	maxProposalCount(0), objectSize(0), enquedFrames(0), width(0), height(0),
+	bb_enlarge_coefficient(bb_enlarge_coefficient), bb_dx_coefficient(bb_dx_coefficient),
+	bb_dy_coefficient(bb_dy_coefficient), resultsFetched(false) 
+{
+}
+
+void FaceDetection::submitRequest() {
+	if (!enquedFrames) return;
+	enquedFrames = 0;
+	resultsFetched = false;
+	results.clear();
+	BaseDetection::submitRequest();
+}
+
+void FaceDetection::enqueue(const cv::Mat& frame) {
+	if (!enabled()) return;
+
+	if (!request) {
+		request = net.CreateInferRequestPtr();
+	}
+
+	width = static_cast<float>(frame.cols);
+	height = static_cast<float>(frame.rows);
+
+	Blob::Ptr  inputBlob = request->GetBlob(input);
+
+	matU8ToBlob<uint8_t>(frame, inputBlob);
+
+	enquedFrames = 1;
+}
+
+CNNNetwork FaceDetection::read() {
+	slog::info << "Loading network files for Face Detection" << slog::endl;
+	CNNNetReader netReader;
+	/** Read network model **/
+	netReader.ReadNetwork(pathToModel);
+	/** Set batch size to 1 **/
+	slog::info << "Batch size is set to " << maxBatch << slog::endl;
+	netReader.getNetwork().setBatchSize(maxBatch);
+	/** Extract model name and load its weights **/
+	std::string binFileName = fileNameNoExt(pathToModel) + ".bin";
+	netReader.ReadWeights(binFileName);
+	/** Read labels (if any)**/
+	std::string labelFileName = fileNameNoExt(pathToModel) + ".labels";
+
+	std::ifstream inputFile(labelFileName);
+	std::copy(std::istream_iterator<std::string>(inputFile),
+		std::istream_iterator<std::string>(),
+		std::back_inserter(labels));
+	// -----------------------------------------------------------------------------------------------------
+
+	/** SSD-based network should have one input and one output **/
+	// ---------------------------Check inputs -------------------------------------------------------------
+	slog::info << "Checking Face Detection network inputs" << slog::endl;
+	InputsDataMap inputInfo(netReader.getNetwork().getInputsInfo());
+	if (inputInfo.size() != 1) {
+		throw std::logic_error("Face Detection network should have only one input");
+	}
+	InputInfo::Ptr inputInfoFirst = inputInfo.begin()->second;
+	inputInfoFirst->setPrecision(Precision::U8);
+	// -----------------------------------------------------------------------------------------------------
+
+	// ---------------------------Check outputs ------------------------------------------------------------
+	slog::info << "Checking Face Detection network outputs" << slog::endl;
+	OutputsDataMap outputInfo(netReader.getNetwork().getOutputsInfo());
+	if (outputInfo.size() != 1) {
+		throw std::logic_error("Face Detection network should have only one output");
+	}
+	DataPtr& _output = outputInfo.begin()->second;
+	output = outputInfo.begin()->first;
+
+	const CNNLayerPtr outputLayer = netReader.getNetwork().getLayerByName(output.c_str());
+	if (outputLayer->type != "DetectionOutput") {
+		throw std::logic_error("Face Detection network output layer(" + outputLayer->name +
+			") should be DetectionOutput, but was " + outputLayer->type);
+	}
+
+	if (outputLayer->params.find("num_classes") == outputLayer->params.end()) {
+		throw std::logic_error("Face Detection network output layer (" +
+			output + ") should have num_classes integer attribute");
+	}
+
+	const size_t num_classes = outputLayer->GetParamAsUInt("num_classes");
+	if (labels.size() != num_classes) {
+		if (labels.size() == (num_classes - 1))  // if network assumes default "background" class, which has no label
+			labels.insert(labels.begin(), "fake");
+		else
+			labels.clear();
+	}
+	const SizeVector outputDims = _output->getTensorDesc().getDims();
+	maxProposalCount = outputDims[2];
+	objectSize = outputDims[3];
+	if (objectSize != 7) {
+		throw std::logic_error("Face Detection network output layer should have 7 as a last dimension");
+	}
+	if (outputDims.size() != 4) {
+		throw std::logic_error("Face Detection network output dimensions not compatible shoulld be 4, but was " +
+			std::to_string(outputDims.size()));
+	}
+	_output->setPrecision(Precision::FP32);
+
+	slog::info << "Loading Face Detection model to the " << deviceForInference << " device" << slog::endl;
+	input = inputInfo.begin()->first;
+	return netReader.getNetwork();
+}
+
+void FaceDetection::fetchResults() {
+	if (!enabled()) return;
+	results.clear();
+	if (resultsFetched) return;
+	resultsFetched = true;
+	const float* detections = request->GetBlob(output)->buffer().as<float*>();
+
+	for (int i = 0; i < maxProposalCount; i++) {
+		float image_id = detections[i * objectSize + 0];
+		if (image_id < 0) {
+			break;
+		}
+		Result r;
+		r.label = static_cast<int>(detections[i * objectSize + 1]);
+		r.confidence = detections[i * objectSize + 2];
+
+		if (r.confidence <= detectionThreshold && !doRawOutputMessages) {
+			continue;
+		}
+
+		r.location.x = static_cast<int>(detections[i * objectSize + 3] * width);
+		r.location.y = static_cast<int>(detections[i * objectSize + 4] * height);
+		r.location.width = static_cast<int>(detections[i * objectSize + 5] * width - r.location.x);
+		r.location.height = static_cast<int>(detections[i * objectSize + 6] * height - r.location.y);
+
+		// Make square and enlarge face bounding box for more robust operation of face analytics networks
+		int bb_width = r.location.width;
+		int bb_height = r.location.height;
+
+		int bb_center_x = r.location.x + bb_width / 2;
+		int bb_center_y = r.location.y + bb_height / 2;
+
+		int max_of_sizes = std::max(bb_width, bb_height);
+
+		int bb_new_width = static_cast<int>(bb_enlarge_coefficient * max_of_sizes);
+		int bb_new_height = static_cast<int>(bb_enlarge_coefficient * max_of_sizes);
+
+		r.location.x = bb_center_x - static_cast<int>(std::floor(bb_dx_coefficient * bb_new_width / 2));
+		r.location.y = bb_center_y - static_cast<int>(std::floor(bb_dy_coefficient * bb_new_height / 2));
+
+		r.location.width = bb_new_width;
+		r.location.height = bb_new_height;
+
+		if (doRawOutputMessages) {
+			std::cout << "[" << i << "," << r.label << "] element, prob = " << r.confidence <<
+				"    (" << r.location.x << "," << r.location.y << ")-(" << r.location.width << ","
+				<< r.location.height << ")"
+				<< ((r.confidence > detectionThreshold) ? " WILL BE RENDERED!" : "") << std::endl;
+		}
+		if (r.confidence > detectionThreshold) {
+			results.push_back(r);
+		}
+	}
+}
+
+Load::Load(BaseDetection& detector) : detector(detector) {
+}
+
+void Load::into(InferenceEngine::Core& ie, const std::string& deviceName, bool enable_dynamic_batch) const {
+	if (detector.enabled()) {
+		std::map<std::string, std::string> config = { };
+		bool isPossibleDynBatch = deviceName.find("CPU") != std::string::npos ||
+			deviceName.find("GPU") != std::string::npos;
+
+		if (enable_dynamic_batch && isPossibleDynBatch) {
+			config[PluginConfigParams::KEY_DYN_BATCH_ENABLED] = PluginConfigParams::YES;
+		}
+
+		detector.net = ie.LoadNetwork(detector.read(), deviceName, config);
+	}
 }
