@@ -87,7 +87,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SDK_INC_PATH);$(IntDir)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <ClCompile>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SDK_INC_PATH);$(IntDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\IntelSWTools\openvino\inference_engine\samples\common;C:\Program Files (x86)\IntelSWTools\openvino\deployment_tools\inference_engine\include;C:\Program Files (x86)\IntelSWTools\openvino\opencv\include;%(AdditionalIncludeDirectories);$(SDK_INC_PATH);$(IntDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Midl>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SDK_INC_PATH);$(IntDir)</AdditionalIncludeDirectories>
@@ -95,12 +95,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies);kernel32.lib;gdi32.lib;ntdll.lib;user32.lib;advapi32.lib;ole32.lib;uuid.lib;version.lib;winmm.lib;comdlg32.lib;Oleaut32.lib;Shlwapi.lib;comctl32.lib;mfuuid.lib;mf.lib;mfplat.lib;runtimeobject.lib</AdditionalDependencies>
+      <AdditionalDependencies>C:\Program Files (x86)\IntelSWTools\openvino\deployment_tools\inference_engine\lib\intel64\Debug\inference_engined.lib;C:\Program Files (x86)\IntelSWTools\openvino\deployment_tools\inference_engine\lib\intel64\Debug\tbb_debug.lib;C:\Program Files (x86)\IntelSWTools\openvino\opencv\lib\opencv_videoio412d.lib;C:\Program Files (x86)\IntelSWTools\openvino\opencv\lib\opencv_imgcodecs412d.lib;C:\Program Files (x86)\IntelSWTools\openvino\opencv\lib\opencv_imgproc412d.lib;C:\Program Files (x86)\IntelSWTools\openvino\opencv\lib\opencv_core412d.lib;%(AdditionalDependencies);kernel32.lib;gdi32.lib;ntdll.lib;user32.lib;advapi32.lib;ole32.lib;uuid.lib;version.lib;winmm.lib;comdlg32.lib;Oleaut32.lib;Shlwapi.lib;comctl32.lib;mfuuid.lib;mf.lib;mfplat.lib;runtimeobject.lib</AdditionalDependencies>
       <ModuleDefinitionFile>SampleMft0.def</ModuleDefinitionFile>
     </Link>
     <ClCompile>
       <ExceptionHandling>
       </ExceptionHandling>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Win8 Debug|x64'">4275;4530;4251;4242;4244;4267</DisableSpecificWarnings>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

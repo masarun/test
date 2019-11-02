@@ -5,6 +5,9 @@
 #include "SampleHelpers.h"
 #include <WinString.h>
 
+#include <samples/ocv_common.hpp>
+#include <samples/slog.hpp>
+
 // CMft0
 STDMETHODIMP CMft0::UpdateDsp(UINT32 uiPercentOfScreen)
 {
@@ -780,6 +783,29 @@ STDMETHODIMP CMft0::OnProcessOutput(IMFMediaBuffer *pIn, IMFMediaBuffer *pOut)
             // Lock the input buffer.
             CHK_LOG_BRK(inputLock.LockBuffer(lDefaultStride, uiHeight, &pSrc, &lSrcStride));
 
+			HKEY hKey;
+			if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"Software\\Temp", NULL, KEY_READ, &hKey) == ERROR_SUCCESS)
+			{
+
+				DWORD value = 0;
+				DWORD size = sizeof(value);
+				DWORD type;
+				if (RegQueryValueExW(hKey, L"Debug", 0, &type, (LPBYTE)&value, &size) == ERROR_SUCCESS)
+				{
+					if (value != 0)
+					{
+						// https://docs.opencv.org/3.4/d3/d63/classcv_1_1Mat.html#a51615ebf17a64c968df0bf49b4de6a3a
+						cv::Mat frame(720, 1280, CV_8UC3, pSrc);
+
+						//FaceDetection faceDetector(FLAGS_m, FLAGS_d, 1, false, FLAGS_async, FLAGS_t, FLAGS_r,
+						//	static_cast<float>(FLAGS_bb_enlarge_coef), static_cast<float>(FLAGS_dx_coef), static_cast<float>(FLAGS_dy_coef));
+					}
+				}
+
+				RegCloseKey(hKey);
+			}
+
+
             // Lock the output buffer.
             CHK_LOG_BRK(outputLock.LockBuffer(lDefaultStride, uiHeight, &pDest, &lDestStride));
             long lines =  uiHeight;
@@ -789,6 +815,13 @@ STDMETHODIMP CMft0::OnProcessOutput(IMFMediaBuffer *pIn, IMFMediaBuffer *pOut)
             for(long i = 0; i < (long)uiHeight; i++) {
                 if(lDestStride < 0) {
                     if(i >= lines) {
+						// Fill the byte of the line with 128 (0x80).
+						// So, the line is filled by 128, 128, 128, 128, 128, ...
+						// RGB (128, 128, 128) -> Gray
+						//memset(pDest+i*lDestStride, 128, lDestStride);
+
+						// Fill the byte of the line with 0x00.
+						// Why the line filled by 0x00 is displayed in green?
                         memset(pDest+i*lDestStride, 0, abs(lDefaultStride));
                     } else {
                         memcpy(pDest+i*lDestStride, pSrc+i*lDefaultStride, abs(lDefaultStride));
