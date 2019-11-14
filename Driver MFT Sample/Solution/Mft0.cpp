@@ -806,7 +806,8 @@ STDMETHODIMP CMft0::OnProcessOutput(IMFMediaBuffer *pIn, IMFMediaBuffer *pOut)
 					if (value != 0)
 					{
 						// https://docs.opencv.org/3.4/d3/d63/classcv_1_1Mat.html#a51615ebf17a64c968df0bf49b4de6a3a
-						cv::Mat frame(720, 1280, CV_8UC3, pSrc);
+						//cv::Mat frame(720, 1280, CV_8UC3, pSrc);
+						cv::Mat frame(480, 640, CV_8UC3, pSrc);
 
 						//pathToModel "c:\\Users\\masarun\\Downloads\\OpenVINO\\face-detection-adas-0001.xml"
 						//deviceForInference = "CPU"
@@ -831,8 +832,11 @@ STDMETHODIMP CMft0::OnProcessOutput(IMFMediaBuffer *pIn, IMFMediaBuffer *pOut)
 							0.50000000000000000, 
 							false,
 							(float)1.20000005, (float)1.00000000, (float)1.00000000);
-						
+						//ie.GetVersions(std::string("CPU"));
+						//IExtensionPtr pExtension = std::shared_ptr<IExtension>(new CpuExtensions());
+						IExtensionPtr pExtension = std::make_shared<Extensions::Cpu::CpuExtensions>();
 						//ie.AddExtension(std::make_shared<Extensions::Cpu::CpuExtensions>(), "CPU");
+						ie.AddExtension(pExtension, std::string("CPU"));
 
 						Load(faceDetector).into(ie, std::string("CPU"), false);
 
