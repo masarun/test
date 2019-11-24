@@ -7,16 +7,16 @@
 
 #include <samples/ocv_common.hpp>
 #include <samples/slog.hpp>
-#include "detectors.hpp"
-#include <string>
-#include <inference_engine.hpp>
-#include <ie_iextension.h>
-#include <ie_blob.h>
-#include <ext_list.hpp>
 
-using namespace InferenceEngine;
-using namespace Extensions;
-using namespace Cpu;
+FaceDetection m_faceDetector(
+	std::string("C:\\Program Files\\SampleMft0\\face-detection-adas-0001.xml"),
+	std::string("CPU"),
+	1,
+	false,
+	false,
+	0.50000000000000000,
+	false,
+	(float)1.20000005, (float)1.00000000, (float)1.00000000);
 
 
 // CMft0
@@ -764,6 +764,16 @@ STDMETHODIMP CMft0::OnProcessOutput(IMFMediaBuffer *pIn, IMFMediaBuffer *pOut)
     //BOOL bCompressed = TRUE;
     GUID stSubType = {0};
 
+	if (!m_init)
+	{
+		IExtensionPtr pExtension = std::make_shared<Extensions::Cpu::CpuExtensions>();
+		m_ie.AddExtension(pExtension, std::string("CPU"));
+
+		Load(m_faceDetector).into(m_ie, std::string("CPU"), false);
+
+		m_init = true;
+	}
+
     do {
         CHK_NULL_PTR_BRK(m_pSample);
         CHK_NULL_PTR_BRK(m_pInputType);
@@ -806,22 +816,10 @@ STDMETHODIMP CMft0::OnProcessOutput(IMFMediaBuffer *pIn, IMFMediaBuffer *pOut)
 					if (value != 0)
 					{
 						// https://docs.opencv.org/3.4/d3/d63/classcv_1_1Mat.html#a51615ebf17a64c968df0bf49b4de6a3a
-						//cv::Mat frame(720, 1280, CV_8UC3, pSrc);
 						cv::Mat frame(480, 640, CV_8UC3, pSrc);
 
-						//pathToModel "c:\\Users\\masarun\\Downloads\\OpenVINO\\face-detection-adas-0001.xml"
-						//deviceForInference = "CPU"
-						//maxBatch = 1
-						//isBatchDynamic = false
-						//isAsync = false
-						//detectionThreshold = 0.50000000000000000
-						//doRawOutputMessages = false
-						//bb_enlarge_coefficient = 1.20000005
-						//bb_dx_coefficient = 1.00000000
-						//bb_dy_coefficient = 1.00000000
-
+						/*
 						Core ie;
-
 						FaceDetection faceDetector(
 							//std::string("c:\\Users\\masarun\\Downloads\\OpenVINO\\face-detection-adas-0001.xml"), 
 							std::string("C:\\Program Files\\SampleMft0\\face-detection-adas-0001.xml"),
@@ -832,19 +830,17 @@ STDMETHODIMP CMft0::OnProcessOutput(IMFMediaBuffer *pIn, IMFMediaBuffer *pOut)
 							0.50000000000000000, 
 							false,
 							(float)1.20000005, (float)1.00000000, (float)1.00000000);
-						//ie.GetVersions(std::string("CPU"));
-						//IExtensionPtr pExtension = std::shared_ptr<IExtension>(new CpuExtensions());
 						IExtensionPtr pExtension = std::make_shared<Extensions::Cpu::CpuExtensions>();
-						//ie.AddExtension(std::make_shared<Extensions::Cpu::CpuExtensions>(), "CPU");
 						ie.AddExtension(pExtension, std::string("CPU"));
 
 						Load(faceDetector).into(ie, std::string("CPU"), false);
+						*/
 
-						faceDetector.enqueue(frame);
-						faceDetector.submitRequest();
+						m_faceDetector.enqueue(frame);
+						m_faceDetector.submitRequest();
 
-						faceDetector.wait();
-						faceDetector.fetchResults();
+						m_faceDetector.wait();
+						m_faceDetector.fetchResults();
 					}
 				}
 
