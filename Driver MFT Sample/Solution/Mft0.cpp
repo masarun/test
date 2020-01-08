@@ -817,6 +817,14 @@ STDMETHODIMP CMft0::OnProcessOutput(IMFMediaBuffer *pIn, IMFMediaBuffer *pOut)
 					{
 						// https://docs.opencv.org/3.4/d3/d63/classcv_1_1Mat.html#a51615ebf17a64c968df0bf49b4de6a3a
 						cv::Mat frame(480, 640, CV_8UC3, pSrc);
+						
+						//cv::Mat frame(720, 1280, CV_8SC3, pSrc); // uiWidth: 1280, uiHeight: 720
+
+						//cv::Mat frame(cv::Size(640, 480), CV_8UC3, cv::Scalar(255, 0, 0));
+						//cv::Mat frame = cv::imdecode(pSrc, CV_8UC3);
+
+						//bool result = false;
+						//result = cv::imwrite(std::string("C:\\Users\\Public\\Pictures\\hoge.jpg"), frame);
 
 						/*
 						Core ie;
