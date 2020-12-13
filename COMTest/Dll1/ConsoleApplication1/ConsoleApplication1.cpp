@@ -26,6 +26,8 @@ int main()
     if (FAILED(hr))
     {
         cout << "CoGetClassObject failed\n";
+
+        CoUninitialize();
         return 1;
     }
 
@@ -33,6 +35,8 @@ int main()
     if (FAILED(hr))
     {
         cout << "CreateInstance failed\n";
+
+        CoUninitialize();
         return 1;
     }
 
@@ -44,8 +48,8 @@ int main()
     if (SUCCEEDED(hr))
     {
         cout << "GetFortune scceeded!\n";
-
-        cout << bstrFortune;
+        cout << "Fortune: ";
+        wcout << bstrFortune;
 
         SysFreeString(bstrFortune);
     }
