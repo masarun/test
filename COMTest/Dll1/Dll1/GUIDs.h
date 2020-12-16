@@ -11,3 +11,4 @@ DEFINE_GUID(CLSID_FortuneTeller,
 DEFINE_GUID(IID_IFortuneTeller,
     0x7100933f, 0xf990, 0x443b, 0x86, 0xe3, 0x87, 0xb9, 0x3c, 0x2, 0xac, 0xfd);
 
+#define GUID L"{04AC1AAF-F6B9-4F15-A5C5-0BE72221B779}"

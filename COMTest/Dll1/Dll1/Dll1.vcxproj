@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Counts.h" />
+    <ClInclude Include="CRegistry.h" />
     <ClInclude Include="Factory2.h" />
     <ClInclude Include="Fortune2.h" />
     <ClInclude Include="framework.h" />
@@ -165,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Counts.cpp" />
+    <ClCompile Include="CRegistry.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="DllServ.cpp" />
     <ClCompile Include="Factory2.cpp" />
