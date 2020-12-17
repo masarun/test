@@ -14,6 +14,13 @@ How to dump debug log to a text file.
        tracefmt Log_xxxxxx.etl -p . -o output.txt
   4. output.txt contains TraceEvents text data.
 
+How to read TraceEvents at runtime.
+  1. Launch Traceview.exe.
+  2. [File] - [Create New Log Session]
+  3. Choose [PDB] and set Dll1.pdb.
+  4. Launch ConsoleApplication1.exe.
+  5. "DLL Loaded" message is displayed at the bottom half of the Window.
+
 Reference:
   https://monoist.atmarkit.co.jp/mn/articles/1310/10/news001_2.html
   https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/adding-wpp-software-tracing-to-a-windows-driver#step-1-define-the-control-guid-and-trace-flags
