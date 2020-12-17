@@ -162,6 +162,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="GUIDs.h" />
     <ClInclude Include="IFortune.h" />
+    <ClInclude Include="MyMFT.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -171,6 +172,7 @@
     <ClCompile Include="DllServ.cpp" />
     <ClCompile Include="Factory2.cpp" />
     <ClCompile Include="Fortune2.cpp" />
+    <ClCompile Include="MyMFT.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
