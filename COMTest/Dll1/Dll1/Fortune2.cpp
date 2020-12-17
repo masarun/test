@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Fortune2.tmh"
 #include "Fortune2.h"
 #include "Counts.h"
 
@@ -64,6 +65,8 @@ STDMETHODIMP_(ULONG __stdcall) ComFortuneTeller::Release()
 
 STDMETHODIMP_(HRESULT __stdcall) ComFortuneTeller::GetFortune(BSTR* pBstrFortune)
 {
+    //DoTrace
+
     *pBstrFortune = NULL;
 
     *pBstrFortune = SysAllocString(g_rgWstrFortunes[0].c_str());

@@ -2,6 +2,7 @@
 
 #include "IFortune.h"
 //#include <Windows.h>
+#include "Trace.h"
 
 class ComFortuneTeller : public IFortuneTeller
 {
