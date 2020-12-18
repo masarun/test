@@ -1,9 +1,6 @@
 #include "pch.h"
-#include <iostream>
-#include <Windows.h>
-#include "Counts.h"
-#include "Factory2.h"
-#include "CRegistry.h"
+#include "DllServ.tmh"
+#include "DllServ.h"
 
 #define CLSID_PATH L"CLSID\\" GUID
 
@@ -56,6 +53,8 @@ bool AddRegistryValue(LPCTSTR szSubKey, LPCTSTR szValueName, LPCTSTR szValue)
 _Check_return_
 STDAPI DllRegisterServer()
 {
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DllRegisterServer Entry");
+
     HRESULT hr = E_FAIL;
     bool result = false;
 
@@ -88,12 +87,16 @@ STDAPI DllRegisterServer()
         registry.DeleteSubKey(CLSID_PATH);
     }
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DllRegisterServer Exit");
+
     return hr;
 }
 
 _Check_return_
 STDAPI DllUnregisterServer()
 {
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DllUnregisterServer Entry");
+
     HRESULT hr = E_FAIL;
 
     CRegistry registry(HKEY_CLASSES_ROOT);
@@ -102,6 +105,8 @@ STDAPI DllUnregisterServer()
         hr = S_OK;
     }
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DllUnregisterServer Exit");
+
     return hr;
 }
 
@@ -109,11 +114,15 @@ STDAPI DllUnregisterServer()
 _Check_return_
 STDAPI DllGetClassObject(_In_ REFCLSID rClsid, _In_ REFIID rIID, _Outptr_ VOID** ppInterface)
 {
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DllGetClassObject Entry");
+
 	HRESULT hr;
 	PComFortuneTellerFactory pFactory;
 
 	if (rClsid != CLSID_FortuneTeller)
 	{
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DllGetClassObject: rClsid != CLSID_FortuneTeller");
+
 		return E_FAIL;
 	}
 
@@ -131,13 +140,14 @@ STDAPI DllGetClassObject(_In_ REFCLSID rClsid, _In_ REFIID rIID, _Outptr_ VOID**
 		return hr;
 	}
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DllGetClassObject Exit");
 	return NOERROR;
 }
 
 __control_entrypoint(DllExport)
 STDAPI  DllCanUnloadNow(void)
 {
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DllCanUnloadNow");
+
 	return (((Counters::GetLockCount() == 0) && (Counters::GetObjectCount() == 0)) ? S_OK : S_FALSE);
 }
-
-

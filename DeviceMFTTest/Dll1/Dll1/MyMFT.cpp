@@ -2,6 +2,10 @@
 #include "MyMFT.h"
 #include "MyMFT.tmh"
 
+MyMFT::MyMFT()
+{
+}
+
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::QueryInterface(REFIID rIID, VOID** ppInterface)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::QueryInterface Entry");

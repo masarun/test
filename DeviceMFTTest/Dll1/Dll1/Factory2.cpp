@@ -1,4 +1,6 @@
 #include "pch.h"
+#include "MyMFT.h"
+#include "Factory2.tmh"
 #include "Factory2.h"
 #include "Fortune2.h"
 #include "Counts.h"
@@ -9,6 +11,8 @@ ComFortuneTellerFactory::ComFortuneTellerFactory() : m_cRef(0)
 
 STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::QueryInterface(REFIID rIID, VOID** ppInterface)
 {
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::QueryInterface Entry");
+
     *ppInterface = NULL;
 
     if (rIID == IID_IUnknown)
@@ -54,20 +58,27 @@ STDMETHODIMP_(ULONG __stdcall) ComFortuneTellerFactory::Release()
 
 STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::CreateInstance(LPUNKNOWN pUnkOuter, REFIID rIID, VOID** ppInterface)
 {
-    PComFortuneTeller pObj;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::CreateInstance Entry");
+
+    //PComFortuneTeller pObj;
+    PMyMFT pObj;
     HRESULT hr;
 
     *ppInterface = NULL;
 
     if (pUnkOuter && (rIID != IID_IUnknown))
     {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory: CLASS_E_NOAGGREGATION");
         return CLASS_E_NOAGGREGATION;
     }
 
-    pObj = new ComFortuneTeller();
+    //pObj = new ComFortuneTeller();
+    pObj = new MyMFT();
 
     if (!pObj)
     {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory: E_OUTOFMEMORY");
+
         return E_OUTOFMEMORY;
     }
 
@@ -80,6 +91,7 @@ STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::CreateInstance(LPUNKNO
 
     Counters::IncObjectCount();
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::CreateInstance Exit");
     return NOERROR;
 }
 

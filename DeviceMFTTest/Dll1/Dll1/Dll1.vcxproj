@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="Counts.h" />
     <ClInclude Include="CRegistry.h" />
+    <ClInclude Include="DllServ.h" />
     <ClInclude Include="Factory2.h" />
     <ClInclude Include="Fortune2.h" />
     <ClInclude Include="framework.h" />

@@ -6,6 +6,9 @@
 
 class MyMFT : public IMFRealTimeClientEx, public IKsControl, public IMFSampleAllocatorControl, public IMFDeviceTransform, public IMFShutdown, public IMFMediaEventGenerator
 {
+public:
+	MyMFT();
+
 	// IUknown
 	STDMETHODIMP QueryInterface(REFIID, VOID**);
 	STDMETHODIMP_(ULONG) AddRef();
@@ -57,3 +60,5 @@ class MyMFT : public IMFRealTimeClientEx, public IKsControl, public IMFSampleAll
 	STDMETHODIMP GetEvent(DWORD, IMFMediaEvent**);
 	STDMETHODIMP QueueEvent(MediaEventType, REFGUID, HRESULT, const PROPVARIANT*);
 };
+
+typedef MyMFT* PMyMFT;
