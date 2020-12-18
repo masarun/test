@@ -11,13 +11,16 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     {
     case DLL_PROCESS_ATTACH:
         WPP_INIT_TRACING(L"DeviceMFT Test Dll1");
-        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DLL Loaded");
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DLL_PROCESS_ATTACH");
         break;
     case DLL_THREAD_ATTACH:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DLL_THREAD_ATTACH");
         break;
     case DLL_THREAD_DETACH:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DLL_THREAD_DETACH");
         break;
     case DLL_PROCESS_DETACH:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DLL_PROCESS_DETACH");
         WPP_CLEANUP();
         break;
     }

@@ -2,10 +2,53 @@
 #include "MyMFT.h"
 #include "MyMFT.tmh"
 
-STDMETHODIMP_(HRESULT __stdcall) MyMFT::QueryInterface(REFIID, VOID**)
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::QueryInterface(REFIID rIID, VOID** ppInterface)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::QueryInterface");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::QueryInterface Entry");
+
+    if (rIID == __uuidof(IUnknown))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "IUnknown");
+        *ppInterface = static_cast<IMFDeviceTransform *>(this);
+    }
+    else if (rIID == __uuidof(IMFDeviceTransform))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "IMFDeviceTransform");
+        *ppInterface = static_cast<IMFDeviceTransform*>(this);
+    }
+    else if (rIID == __uuidof(IMFMediaEventGenerator))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "IMFMediaEventGenerator");
+        *ppInterface = static_cast<IMFMediaEventGenerator*>(this);
+    }
+    else if (rIID == __uuidof(IMFShutdown))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "IMFShutdown");
+        *ppInterface = static_cast<IMFShutdown*>(this);
+    }
+    else if (rIID == __uuidof(IKsControl))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "IKsControl");
+        *ppInterface = static_cast<IKsControl*>(this);
+    }
+    else if (rIID == __uuidof(IMFRealTimeClientEx))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "IMFRealTimeClientEx");
+        *ppInterface = static_cast<IMFRealTimeClientEx*>(this);
+    }
+    else
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "E_NOINTERFACE");
+
+        *ppInterface = NULL;
+
+        return E_NOINTERFACE;
+    }
+
+    ((LPUNKNOWN)*ppInterface)->AddRef();
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::QueryInterface Exit");
+    return NOERROR;
 }
 
 STDMETHODIMP_(ULONG __stdcall) MyMFT::AddRef()
