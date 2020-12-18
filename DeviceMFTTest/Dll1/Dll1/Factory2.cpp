@@ -17,14 +17,20 @@ STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::QueryInterface(REFIID 
 
     if (rIID == IID_IUnknown)
     {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::QueryInterface rIID == IID_IUnknown");
+
         *ppInterface = this;
     }
     else if (rIID == IID_IClassFactory)
     {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::QueryInterface rIID == IID_IClassFactory");
+
         *ppInterface = this;
     }
     else
     {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::QueryInterface E_NOINTERFACE");
+
         *ppInterface = NULL;
 
         return E_NOINTERFACE;
@@ -32,11 +38,14 @@ STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::QueryInterface(REFIID 
 
     ((LPUNKNOWN)*ppInterface)->AddRef();
 
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::QueryInterface Exit");
     return NOERROR;
 }
 
 STDMETHODIMP_(ULONG __stdcall) ComFortuneTellerFactory::AddRef()
 {
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::AddRef");
+
     m_cRef++;
 
     return m_cRef;
@@ -44,6 +53,8 @@ STDMETHODIMP_(ULONG __stdcall) ComFortuneTellerFactory::AddRef()
 
 STDMETHODIMP_(ULONG __stdcall) ComFortuneTellerFactory::Release()
 {
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::Release");
+
     m_cRef--;
 
     if (m_cRef)
@@ -68,7 +79,7 @@ STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::CreateInstance(LPUNKNO
 
     if (pUnkOuter && (rIID != IID_IUnknown))
     {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory: CLASS_E_NOAGGREGATION");
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::CreateInstance CLASS_E_NOAGGREGATION");
         return CLASS_E_NOAGGREGATION;
     }
 
@@ -77,7 +88,7 @@ STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::CreateInstance(LPUNKNO
 
     if (!pObj)
     {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory: E_OUTOFMEMORY");
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::CreateInstance E_OUTOFMEMORY");
 
         return E_OUTOFMEMORY;
     }
@@ -85,6 +96,8 @@ STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::CreateInstance(LPUNKNO
     hr = pObj->QueryInterface(rIID, ppInterface);
     if (FAILED(hr))
     {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::CreateInstance QueryInterface failed");
+
         delete pObj;
         return hr;
     }
@@ -97,12 +110,18 @@ STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::CreateInstance(LPUNKNO
 
 STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::LockServer(BOOL fLock)
 {
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::LockServer");
+
     if (fLock)
     {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::LockServer IncLockCount");
+
         Counters::IncLockCount();
     }
     else
     {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::LockServer DecLockCount");
+
         Counters::DecLockCount();
     }
 
