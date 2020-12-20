@@ -2,7 +2,15 @@
 //
 
 #include <iostream>
+#include <mftransform.h>
 #include "IFortune.h"
+
+#define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
+        EXTERN_C const GUID DECLSPEC_SELECTANY name \
+                = { l, w1, w2, { b1, b2,  b3,  b4,  b5,  b6,  b7,  b8 } }
+
+DEFINE_GUID(CLSID_MultiPinMFT,
+    0xe313280, 0x3169, 0x4f41, 0xa3, 0x29, 0x9e, 0x85, 0x41, 0x69, 0x63, 0x4f);
 
 using namespace std;
 
@@ -12,8 +20,10 @@ int main()
 
     HRESULT hr;
     IClassFactory *pIClassFactory;
-    IFortuneTeller *pIFortuneTeller;
-    BSTR bstrFortune;
+    //IFortuneTeller *pIFortuneTeller;
+    IMFDeviceTransform* pIFortuneTeller;
+
+    //BSTR bstrFortune;
 
     hr = CoInitialize(NULL);
     if (FAILED(hr))
@@ -23,6 +33,7 @@ int main()
     }
 
     hr = CoGetClassObject(CLSID_FortuneTeller, CLSCTX_INPROC_SERVER, NULL, IID_IClassFactory, (VOID**)&pIClassFactory);
+    //hr = CoGetClassObject(CLSID_MultiPinMFT, CLSCTX_INPROC_SERVER, NULL, IID_IClassFactory, (VOID**)&pIClassFactory);
     if (FAILED(hr))
     {
         cout << "CoGetClassObject failed\n";
@@ -31,7 +42,7 @@ int main()
         return 1;
     }
 
-    hr = pIClassFactory->CreateInstance(NULL, IID_IFortuneTeller, (VOID**)&pIFortuneTeller);
+    hr = pIClassFactory->CreateInstance(NULL, IID_IMFDeviceTransform, (VOID**)&pIFortuneTeller);
     if (FAILED(hr))
     {
         cout << "CreateInstance failed\n";
@@ -43,7 +54,7 @@ int main()
     pIClassFactory->Release();
     pIClassFactory = NULL;
 
-
+    /*
     hr = pIFortuneTeller->GetFortune(&bstrFortune);
     if (SUCCEEDED(hr))
     {
@@ -53,6 +64,8 @@ int main()
 
         SysFreeString(bstrFortune);
     }
+    */
+    pIFortuneTeller->InitializeTransform(NULL);
 
     pIFortuneTeller->Release();
     pIFortuneTeller = NULL;

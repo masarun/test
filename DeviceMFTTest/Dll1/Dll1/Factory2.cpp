@@ -46,7 +46,7 @@ STDMETHODIMP_(ULONG __stdcall) ComFortuneTellerFactory::AddRef()
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::AddRef");
 
-    m_cRef++;
+    InterlockedIncrement(&m_cRef);
 
     return m_cRef;
 }
@@ -55,7 +55,7 @@ STDMETHODIMP_(ULONG __stdcall) ComFortuneTellerFactory::Release()
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "ComFortuneTellerFactory::Release");
 
-    m_cRef--;
+    InterlockedDecrement(&m_cRef);
 
     if (m_cRef)
     {

@@ -31,6 +31,11 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::QueryInterface(REFIID rIID, VOID** ppInt
         TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::QueryInterface IMFDeviceTransform");
         *ppInterface = static_cast<IMFDeviceTransform*>(this);
     }
+    else if (rIID == __uuidof(IMFTransform))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CMultipinMft::QueryInterface IMFTransform");
+        *ppInterface = static_cast<IMFTransform*>(this);
+    }
     else if (rIID == __uuidof(IMFMediaEventGenerator))
     {
         TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::QueryInterface IMFMediaEventGenerator");
@@ -205,7 +210,7 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetStreamIDs(DWORD dwInputIDArraySize, D
     return E_NOTIMPL;
 }
 
-STDMETHODIMP_(HRESULT __stdcall) MyMFT::InitializeTransform(IMFAttributes* pAttributes)
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::InitializeTransform(_In_ IMFAttributes* pAttributes)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform");
     return E_NOTIMPL;
@@ -247,6 +252,12 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::SetOutputStreamState(DWORD dwStreamID, I
     return E_NOTIMPL;
 }
 
+STDMETHODIMP_(VOID __stdcall) MyMFT::FlushAllStreams(VOID)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::FlushAllStreams");
+    return VOID();
+}
+
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetShutdownStatus(MFSHUTDOWN_STATUS* pStatus)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetShutdownStatus");
@@ -280,5 +291,72 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetEvent(DWORD dwFlags, IMFMediaEvent** 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::QueueEvent(MediaEventType met, REFGUID guidExtendedType, HRESULT hrStatus, const PROPVARIANT* pvValue)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::QueueEvent");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::AddInputStreams(DWORD cStreams, DWORD* adwStreamIDs)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::AddInputStreams");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::DeleteInputStream(DWORD dwStreamID)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::DeleteInputStream");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetAttributes(IMFAttributes** pAttributes)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetAttributes");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetInputStatus(DWORD dwInputStreamID, DWORD* pdwFlags)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetInputStatus");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetInputStreamInfo(DWORD dwInputStreamID, MFT_INPUT_STREAM_INFO* pStreamInfo)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetInputStreamInfo");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetOutputStatus(DWORD* pdwFlags)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetOutputStatus");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetOutputStreamInfo(DWORD dwOutputStreamID, MFT_OUTPUT_STREAM_INFO* pStreamInfo)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetOutputStreamInfo");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetStreamLimits(DWORD* pdwInputMinimum, DWORD* pdwInputMaximum, DWORD* pdwOutputMinimum, DWORD* pdwOutputMaximum)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetStreamLimits");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::SetInputType(DWORD dwInputStreamID, IMFMediaType* pType, DWORD dwFlags)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetInputType");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::SetOutputBounds(LONGLONG hnsLowerBound, LONGLONG hnsUpperBound)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetOutputBounds");
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) MyMFT::SetOutputType(DWORD dwOutputStreamID, IMFMediaType* pType, DWORD dwFlags)
+{
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetOutputType");
     return E_NOTIMPL;
 }

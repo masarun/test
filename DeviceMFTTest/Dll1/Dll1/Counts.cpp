@@ -16,20 +16,20 @@ ULONG Counters::GetObjectCount()
 
 void Counters::IncLockCount()
 {
-    m_cLocks++;
+    InterlockedIncrement(&m_cLocks);
 }
 
 void Counters::DecLockCount()
 {
-    m_cLocks--;
+    InterlockedDecrement(&m_cLocks);
 }
 
 void Counters::IncObjectCount()
 {
-    m_cNumObjects++;
+    InterlockedIncrement(&m_cNumObjects);
 }
 
 void Counters::DecObjectCount()
 {
-    m_cNumObjects--;
+    InterlockedDecrement(&m_cNumObjects);
 }

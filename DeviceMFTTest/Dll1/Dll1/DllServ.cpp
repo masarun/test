@@ -2,7 +2,7 @@
 #include "DllServ.tmh"
 #include "DllServ.h"
 
-#define CLSID_PATH L"CLSID\\" GUID
+#define CLSID_PATH L"CLSID\\" GUID_Hoge
 
 using namespace std;
 
@@ -67,7 +67,7 @@ STDAPI DllRegisterServer()
         return hr;
     }
 
-    result = AddRegistryValue(CLSID_PATH L"\\InprocServer32", L"ThreadingModel", L"Apartment");
+    result = AddRegistryValue(CLSID_PATH L"\\InprocServer32", L"ThreadingModel", L"Both");
     if (result)
     {
         result = AddRegistryValue(CLSID_PATH L"\\InprocServer32", NULL, szPath);
