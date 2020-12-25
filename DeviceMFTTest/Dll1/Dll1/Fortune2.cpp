@@ -41,14 +41,14 @@ STDMETHODIMP_(HRESULT __stdcall) ComFortuneTeller::QueryInterface(REFIID rIID, V
 
 STDMETHODIMP_(ULONG __stdcall) ComFortuneTeller::AddRef()
 {
-    m_cRef++;
+    InterlockedIncrement(&m_cRef);
 
     return m_cRef;
 }
 
 STDMETHODIMP_(ULONG __stdcall) ComFortuneTeller::Release()
 {
-    m_cRef--;
+    InterlockedDecrement(&m_cRef);
 
     if (m_cRef)
     {

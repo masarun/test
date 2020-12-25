@@ -3,12 +3,25 @@
 #include <mfidl.h>
 #include <ks.h>
 #include <ksproxy.h>
+#include <mfapi.h>
+
+#include <Windows.Foundation.h>
+#include <wrl\client.h>
+using namespace ABI::Windows::Foundation;
+using namespace Microsoft::WRL;
+#include <wil\result.h>
+#include <wil\resource.h>
+#include <wil\com.h>
+#include <wil\result_macros.h>
+
+#include "pch.h"
 
 class MyMFT : public IMFRealTimeClientEx, public IKsControl, public IMFSampleAllocatorControl, public IMFDeviceTransform, public IMFShutdown, public IMFMediaEventGenerator,
 	public IMFTransform
 {
 public:
 	MyMFT();
+	~MyMFT();
 
 	// IUknown
 	STDMETHODIMP QueryInterface(REFIID, VOID**);
@@ -59,6 +72,7 @@ public:
 	STDMETHODIMP Shutdown();
 
 	// IMFMediaEventGenerator
+	// https://docs.microsoft.com/en-us/windows/win32/medfound/media-event-generators
 	STDMETHODIMP BeginGetEvent(IMFAsyncCallback*, IUnknown*);
 	STDMETHODIMP EndGetEvent(IMFAsyncResult*, IMFMediaEvent**);
 	STDMETHODIMP GetEvent(DWORD, IMFMediaEvent**);
@@ -130,6 +144,28 @@ public:
 		IMFMediaType* pType,
 		DWORD        dwFlags
 	);
+
+private:
+	ULONG m_cRef;
+
+
+	ULONG m_InputPinCount;
+	ULONG m_OutputPinCount;
+
+	CBasePinArray m_basePinArrayInPins;
+	CBasePinArray m_basePinArrayOutPins;
+
+	CInPin* GetInPin(DWORD dwStreamId);
+	COutPin* GetOutPin(DWORD dwStreamId);
+
+	// https://docs.microsoft.com/en-us/windows/win32/medfound/media-event-generators
+	CRITICAL_SECTION m_critSec;
+	IMFMediaEventQueue* m_pQueue;
+
+	ComPtr<IMFTransform> m_spSourceTransform;
+
+	HRESULT BridgeInputPinOutputPin(CInPin* pInPin, COutPin* pOutPin);
 };
 
 typedef MyMFT* PMyMFT;
+
