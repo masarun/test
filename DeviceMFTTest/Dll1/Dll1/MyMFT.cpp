@@ -133,8 +133,26 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::RegisterThreadsEx(DWORD* pdwTaskIndex, L
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::SetWorkQueueEx(DWORD dwMultithreadedWorkQueueId, LONG lWorkItemBasePriority)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetWorkQueueEx E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetWorkQueueEx Entry");
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetWorkQueueEx dwMultithreadedWorkQueueId: %d", dwMultithreadedWorkQueueId);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetWorkQueueEx lWorkItemBasePriority: %d", lWorkItemBasePriority);
+
+    DWORD m_dwMultithreadedWorkQueueId = dwMultithreadedWorkQueueId;
+    LONG m_lWorkItemBasePriority = lWorkItemBasePriority;
+
+    for (DWORD index = 0; index < m_basePinArrayInPins.size(); index++)
+    {
+        m_basePinArrayInPins[index]->SetWorkQueue(dwMultithreadedWorkQueueId);
+    }
+
+    for (DWORD index = 0; index < m_basePinArrayOutPins.size(); index++)
+    {
+        m_basePinArrayOutPins[index]->SetWorkQueue(dwMultithreadedWorkQueueId);
+    }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetWorkQueueEx Exit");
+    return S_OK;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::UnregisterThreads()
@@ -145,8 +163,12 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::UnregisterThreads()
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::KsEvent(PKSEVENT Event, ULONG EventLength, LPVOID EventData, ULONG DataLength, ULONG* BytesReturned)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsEvent E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsEvent Entry");
+
+    HRESULT hr = m_spIkscontrol->KsEvent(Event, EventLength, EventData, DataLength, BytesReturned);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsEvent Exit %!HRESULT!", hr);
+    return hr;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::KsMethod(PKSMETHOD Method, ULONG MethodLength, LPVOID MethodData, ULONG DataLength, ULONG* BytesReturned)
@@ -157,8 +179,12 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::KsMethod(PKSMETHOD Method, ULONG MethodL
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::KsProperty(PKSPROPERTY Property, ULONG PropertyLength, LPVOID PropertyData, ULONG DataLength, ULONG* BytesReturned)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsProperty E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsProperty Entry");
+
+    HRESULT hr = m_spIkscontrol->KsProperty(Property, PropertyLength, PropertyData, DataLength, BytesReturned);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsProperty Exit %!HRESULT!", hr);
+    return hr;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetAllocatorUsage(DWORD dwOutputStreamID, DWORD* pdwInputStreamID, MFSampleAllocatorUsage* peUsage)
@@ -169,8 +195,8 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetAllocatorUsage(DWORD dwOutputStreamID
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::SetDefaultAllocator(DWORD dwOutputStreamID, IUnknown* pAllocator)
 {
-TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetDefaultAllocator E_NOTIMPL");
-return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetDefaultAllocator E_NOTIMPL");
+    return E_NOTIMPL;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::FlushInputStream(DWORD dwStreamIndex, DWORD dwFlags)
@@ -242,9 +268,11 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetOutputAvailableType(DWORD dwOutputStr
         ComPtr<COutPin> outPin = GetOutPin(dwOutputStreamID);
         if (outPin != NULL)
         {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetOutputAvailableType GetOutPin");
             *pMediaType = nullptr;
 
             hr = outPin->GetOutputAvailableType(dwTypeIndex, pMediaType);
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetOutputAvailableType GetOutputAvailableType");
         }
     }
 
@@ -261,6 +289,7 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetOutputCurrentType(DWORD dwOutputStrea
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetOutputStreamAttributes(DWORD dwOutputStreamID, IMFAttributes** ppAttributes)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetOutputStreamAttributes Entry");
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetOutputStreamAttributes dwOutputStreamID: %d", dwOutputStreamID);
 
     HRESULT hr = S_OK;
     ComPtr<COutPin> outPin = nullptr;
@@ -268,8 +297,11 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetOutputStreamAttributes(DWORD dwOutput
     *ppAttributes = nullptr;
 
     outPin = GetOutPin(dwOutputStreamID);
-
-    hr = outPin->QueryInterface(IID_PPV_ARGS(ppAttributes));
+    if (outPin != NULL)
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetOutputStreamAttributes GetOutPin");
+        hr = outPin->QueryInterface(IID_PPV_ARGS(ppAttributes));
+    }
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetOutputStreamAttributes Exit %!HRESULT!", hr);
     return hr;
@@ -370,11 +402,24 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::InitializeTransform(_In_ IMFAttributes* 
         return hr;
     }
 
+    // Get Ikscontrol from the source.
+    hr = m_spSourceTransform.As(&m_spIkscontrol);
+    if (FAILED(hr))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform m_spSourceTransform.As Failed %!HRESULT!", hr);
+        spFilterUnk = nullptr;
+        m_spSourceTransform = nullptr;
+        return hr;
+    }
+
+
     hr = m_spSourceTransform->GetStreamCount(&cInputStreams, &cOutputStreams);
     if (FAILED(hr))
     {
         TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform GetStreamCount Failed %!HRESULT!", hr);
-        spFilterUnk = nullptr;
+        spFilterUnk = nullptr;        
+        m_spSourceTransform = nullptr;
+        m_spIkscontrol = nullptr;
         return hr;
     }
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform cInputStreams: %d", cInputStreams);
@@ -456,6 +501,17 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::InitializeTransform(_In_ IMFAttributes* 
                             outPin->SetUINT32(MF_DEVICESTREAM_STREAM_ID, index);
                             TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform outPin->SetUINT32");
 
+                            // Try to get MF_DEVICESTREAM_ATTRIBUTE_FRAMESOURCE_TYPES attribute from Input PIN.
+                            UINT32 uiFrameSourceType = 0;
+                            if (SUCCEEDED(inPin->GetUINT32(MF_DEVICESTREAM_ATTRIBUTE_FRAMESOURCE_TYPES, &uiFrameSourceType)))
+                            {
+                                TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform inPin->GetUINT32 MF_DEVICESTREAM_ATTRIBUTE_FRAMESOURCE_TYPES");
+
+                                // Set MF_DEVICESTREAM_ATTRIBUTE_FRAMESOURCE_TYPES attribute.
+                                outPin->SetUINT32(MF_DEVICESTREAM_ATTRIBUTE_FRAMESOURCE_TYPES, uiFrameSourceType);
+                                TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform outPin->SetUINT32");
+                            }
+
                             // Connect In-Out relationship.
                             BridgeInputPinOutputPin(inPin.Get(), outPin);
                             TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform BridgeInputPinOutputPin");
@@ -507,7 +563,7 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::ProcessInput(DWORD dwInputStreamID, IMFS
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::ProcessMessage(MFT_MESSAGE_TYPE eMessage, ULONG_PTR ulParam)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::ProcessMessage E_NOTIMPL");
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::ProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, MFT_OUTPUT_DATA_BUFFER* pOutputSample, DWORD* pdwStatus)

@@ -111,8 +111,12 @@ STDMETHODIMP_(HRESULT __stdcall) CBasePin::CompareItem(REFGUID guidKey, REFPROPV
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::CopyAllItems(IMFAttributes* pDest)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::CopyAllItems E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::CopyAllItems Entry");
+
+    HRESULT hr = m_spAttributes->CopyAllItems(pDest);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::CopyAllItems Exit %!HRESULT!", hr);
+    return hr;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::DeleteAllItems()
@@ -123,8 +127,15 @@ STDMETHODIMP_(HRESULT __stdcall) CBasePin::DeleteAllItems()
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::DeleteItem(REFGUID guidKey)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::DeleteItem E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::DeleteItem Entry");
+
+    string strGuid2 = guidToString2(guidKey);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::DeleteItem guidKey: %s", strGuid2.c_str());
+
+    HRESULT hr = m_spAttributes->DeleteItem(guidKey);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::DeleteItem Exit %!HRESULT!", hr);
+    return hr;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetAllocatedBlob(REFGUID guidKey, UINT8** ppBuf, UINT32* pcbSize)
@@ -168,16 +179,18 @@ STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetGUID(REFGUID guidKey, GUID* pguidV
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID Entry");
 
     HRESULT hr = E_FAIL;
+    string strGuid2 = guidToString2(guidKey);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID guidKey: %s", strGuid2.c_str());
 
     try
     { 
         hr = m_spAttributes->GetGUID(guidKey, pguidValue);
 
-        string strGuid2 = guidToString2(guidKey);
-        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID guidKey: %s", strGuid2.c_str());
-
-        string strGuid = guidToString2(*pguidValue);
-        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID GUID: %s", strGuid.c_str());
+        if (SUCCEEDED(hr))
+        {
+            string strGuid = guidToString2(*pguidValue);
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID m_spAttributes->GetGUID: %s", strGuid.c_str());
+        }
     }
     catch (...)
     {
@@ -197,8 +210,15 @@ STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetGUID(REFGUID guidKey, GUID* pguidV
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetItem(REFGUID guidKey, PROPVARIANT* pValue)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetItem E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetItem Entry");
+
+    string strGuid = guidToString2(guidKey);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetItem guidKey: %s", strGuid.c_str());
+
+    HRESULT hr = m_spAttributes->GetItem(guidKey, pValue);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetItem Exit %!HRESULT!", hr);
+    return hr;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetItemByIndex(UINT32 unIndex, GUID* pguidKey, PROPVARIANT* pValue)
@@ -230,13 +250,13 @@ STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetUINT32(REFGUID guidKey, UINT32* pu
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetUINT32 Entry");
 
     string strGuid = guidToString2(guidKey);
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID guidKey: %s", strGuid.c_str());
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetUINT32 guidKey: %s", strGuid.c_str());
 
     HRESULT hr = m_spAttributes->GetUINT32(guidKey, punValue);
 
     if (SUCCEEDED(hr))
     {
-        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID Value: %d", *punValue);
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetUINT32 Value: %d", *punValue);
     }
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetUINT32 Exit %!HRESULT!", hr);
@@ -251,8 +271,12 @@ STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetUINT64(REFGUID guidKey, UINT64* pu
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetUnknown(REFGUID guidKey, REFIID riid, LPVOID* ppv)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetUnknown E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetUnknown Entry");
+
+    HRESULT hr = m_spAttributes->GetUnknown(guidKey, riid, ppv);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetUnknown Exit %!HRESULT!", hr);
+    return hr;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::LockStore()
@@ -471,10 +495,20 @@ HRESULT CBasePin::GetMediaTypeAt(DWORD pos, IMFMediaType** pMediaType)
 
             hr = S_OK;
         }
+        else
+        {
+            hr = MF_E_NO_MORE_TYPES;
+        }
     }
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetMediaTypeAt Exit %!HRESULT!", hr);
     return hr;
+}
+
+VOID CBasePin::SetWorkQueue(DWORD dwQueueId)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::SetWorkQueue dwQueueId: %d", dwQueueId);
+    m_dwWorkQueueId = dwQueueId;
 }
 
 COutPin::COutPin(DWORD outputStreamId, IMFTransform *sourceTransform, IKsControl* iksControl) : CBasePin(outputStreamId)
@@ -510,6 +544,10 @@ HRESULT COutPin::GetOutputAvailableType(DWORD dwTypeIndex, IMFMediaType** ppType
             *ppType = m_listOfMediaTypes[dwTypeIndex];
 
             hr = S_OK;
+        }
+        else
+        {
+            hr = MF_E_NO_MORE_TYPES;
         }
     }
 

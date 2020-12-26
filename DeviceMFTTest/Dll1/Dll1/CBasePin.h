@@ -28,12 +28,15 @@ protected:
 	ComPtr<IMFAttributes> m_spAttributes;
 
 	IMFMediaTypeArray m_listOfMediaTypes;
+	DWORD m_dwWorkQueueId;
+	ComPtr<IKsControl> m_spIkscontrol;
 
 public:
 	CBasePin(DWORD streamId);
 
 	HRESULT AddMediaType(DWORD* pos, IMFMediaType* pMediaType);
 	HRESULT GetMediaTypeAt(DWORD pos, IMFMediaType** pMediaType);
+	VOID SetWorkQueue(_In_ DWORD dwQueueId);
 
 	// IUnknown
 	STDMETHODIMP QueryInterface(REFIID, VOID**);
@@ -225,7 +228,6 @@ public:
 private:
 	ComPtr<IMFTransform> m_spSourceTransform;
 	GUID m_stStreamType;
-	ComPtr<IKsControl> m_spIkscontrol;
 	HANDLE m_waitInputMediaTypeWaiter;
 
 
@@ -247,7 +249,6 @@ public:
 
 private:
 	GUID m_stStreamType;
-	ComPtr<IKsControl> m_spIkscontrol;
 	ComPtr<IMFTransform> m_spSourceTransform;
 };
 

@@ -165,6 +165,11 @@ private:
 	ComPtr<IMFTransform> m_spSourceTransform;
 
 	HRESULT BridgeInputPinOutputPin(CInPin* pInPin, COutPin* pOutPin);
+
+	DWORD m_dwMultithreadedWorkQueueId;
+	LONG m_lWorkItemBasePriority;
+
+	ComPtr<IKsControl> m_spIkscontrol;
 };
 
 typedef MyMFT* PMyMFT;
