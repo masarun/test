@@ -10,6 +10,13 @@ CBasePin::CBasePin(DWORD streamId)
 {
     m_cRef = 0;
     m_streamId = streamId;
+    m_spDxgiManager = nullptr;
+    m_spIkscontrol = nullptr;
+    m_setMediaType = nullptr;
+
+    m_state = DeviceStreamState_Stop;
+
+    InitializeCriticalSection(&m_lock);
 }
 
 
@@ -197,13 +204,6 @@ STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetGUID(REFGUID guidKey, GUID* pguidV
         TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID Exception");
     }
 
-    /*
-    if (SUCCEEDED(hr))
-    {
-        string strGuid = guidToString2(*pguidValue);
-        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID GUID: %s", strGuid.c_str());
-    }
-    */
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetGUID Exit %!HRESULT!", hr);
     return hr;
 }
@@ -377,6 +377,7 @@ CInPin::CInPin(IMFAttributes* pAttributes, DWORD inputStreamId) : CBasePin(input
     m_waitInputMediaTypeWaiter = NULL;
 
     m_spAttributes = pAttributes;
+    m_spPrefferedMediaType = nullptr;
 }
 
 CInPin::~CInPin()
@@ -408,7 +409,10 @@ STDMETHODIMP_(HRESULT __stdcall) CInPin::Init(IMFTransform* pTransform)
             FALSE,
             TEXT("MediaTypeWaiter")
         );
-        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::Init CreateEvent");
+        if (m_waitInputMediaTypeWaiter != NULL)
+        {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::Init CreateEvent");
+        }
 
         hr = GenerateMFMediaTypeListFromDevice(GetStreamId());
         TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::Init GenerateMFMediaTypeListFromDevice %!HRESULT!", hr);
@@ -452,6 +456,100 @@ HRESULT CInPin::GenerateMFMediaTypeListFromDevice(UINT uiStreamId)
     }
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::GenerateMFMediaTypeListFromDevice Exit %!HRESULT!", hr);
+    return hr;
+}
+
+VOID CInPin::setPreferredMediaType(IMFMediaType* pMediaType)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::setPreferredMediaType");
+
+    m_spPrefferedMediaType = pMediaType;
+    return VOID();
+}
+
+DeviceStreamState CInPin::setPreferredStreamState(DeviceStreamState streamState)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::setPreferredStreamState");
+    return (DeviceStreamState)InterlockedCompareExchange((LONG*)&m_preferredStreamState, (LONG)streamState, (LONG)m_preferredStreamState);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CInPin::WaitForSetInputPinMediaChange()
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::WaitForSetInputPinMediaChange Entry");
+
+    HRESULT hr = E_FAIL;
+    DWORD dwWait = 0;
+
+    if (m_waitInputMediaTypeWaiter != NULL)
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::WaitForSetInputPinMediaChange m_waitInputMediaTypeWaiter != NULL");
+
+        dwWait = WaitForSingleObject(m_waitInputMediaTypeWaiter, INFINITE);
+        if (dwWait != WAIT_OBJECT_0)
+        {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::WaitForSetInputPinMediaChange dwWait != WAIT_OBJECT_0");
+            hr = HRESULT_FROM_WIN32(GetLastError());
+        }
+        else
+        {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::WaitForSetInputPinMediaChange dwWait == WAIT_OBJECT_0");
+            hr = S_OK;
+        }
+    }
+    else
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::WaitForSetInputPinMediaChange m_waitInputMediaTypeWaiter == NULL");
+    }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::WaitForSetInputPinMediaChange Exit %!HRESULT!", hr);
+    return hr;
+}
+
+HRESULT CInPin::GetInputStreamPreferredState(DeviceStreamState* value, IMFMediaType** ppMediaType)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::GetInputStreamPreferredState Entry");
+
+    HRESULT hr = S_OK;
+
+    EnterCriticalSection(&m_lock);
+
+    if (value != nullptr)
+    {
+        *value = m_preferredStreamState;
+    }
+
+    if (ppMediaType)
+    {
+        *ppMediaType = nullptr;
+        if (m_spPrefferedMediaType != nullptr)
+        {
+            m_spPrefferedMediaType.CopyTo(ppMediaType);
+        }
+    }
+
+    LeaveCriticalSection(&m_lock);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::GetInputStreamPreferredState Exit %!HRESULT!", hr);
+    return hr;
+}
+
+HRESULT CInPin::SetInputStreamState(IMFMediaType* pMediaType, DeviceStreamState value, DWORD dwFlags)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::SetInputStreamState Entry");
+
+    HRESULT hr = S_OK;
+
+    EnterCriticalSection(&m_lock);
+
+    setMediaType(pMediaType);
+    SetState(value);
+
+    m_spPrefferedMediaType = nullptr;
+    SetEvent(m_waitInputMediaTypeWaiter);
+
+    LeaveCriticalSection(&m_lock);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::SetInputStreamState Exit %!HRESULT!", hr);
     return hr;
 }
 
@@ -511,6 +609,120 @@ VOID CBasePin::SetWorkQueue(DWORD dwQueueId)
     m_dwWorkQueueId = dwQueueId;
 }
 
+VOID CBasePin::SetD3DManager(IUnknown* pManager)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::SetD3DManager Entry");
+
+    EnterCriticalSection(&m_lock);
+
+    m_spDxgiManager = pManager;
+
+    LeaveCriticalSection(&m_lock);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::SetD3DManager Exit");
+    return VOID();
+}
+
+HRESULT CBasePin::getMediaType(IMFMediaType** ppMediaType)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::getMediaType Entry");
+
+    HRESULT hr = E_FAIL;
+
+    if (ppMediaType != nullptr)
+    {
+        *ppMediaType = nullptr;
+
+        if (m_setMediaType != nullptr)
+        {
+            hr = m_setMediaType.CopyTo(ppMediaType);
+        }
+        else
+        {
+            hr = MF_E_TRANSFORM_TYPE_NOT_SET;
+        }
+    }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::getMediaType Exit %!HRESULT!", hr);
+    return hr;
+}
+
+VOID CBasePin::setMediaType(IMFMediaType* pMediaType)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::setMediaType Entry");
+
+    if (pMediaType != nullptr)
+    {
+        m_setMediaType = pMediaType;
+    }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::setMediaType Exit");
+    return VOID();
+}
+
+STDMETHODIMP_(BOOL __stdcall) CBasePin::IsMediaTypeSupported(IMFMediaType* pMediaType, IMFMediaType** ppIMFMediaTypeFull)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::IsMediaTypeSupported Entry");
+
+    HRESULT hr = E_FAIL;
+    BOOL result = false;
+
+    EnterCriticalSection(&m_lock);
+
+    if (pMediaType != nullptr)
+    {
+        if (ppIMFMediaTypeFull != nullptr)
+        {
+            *ppIMFMediaTypeFull = nullptr;
+
+            for (DWORD index = 0; index < m_listOfMediaTypes.size(); index++)
+            {
+                DWORD dwResult = 0;
+                hr = m_listOfMediaTypes[index]->IsEqual(pMediaType, &dwResult);
+                if (hr == S_FALSE)
+                {
+                    // https://docs.microsoft.com/en-us/windows/win32/api/mfobjects/nf-mfobjects-imfmediatype-isequal
+
+                    if ((dwResult & MF_MEDIATYPE_EQUAL_MAJOR_TYPES) &&
+                        (dwResult & MF_MEDIATYPE_EQUAL_FORMAT_TYPES) &&
+                        (dwResult & MF_MEDIATYPE_EQUAL_FORMAT_DATA))
+                    {
+                        hr = S_OK;
+                    }
+                }
+
+                if (hr = S_OK)
+                {
+                    *ppIMFMediaTypeFull = m_listOfMediaTypes[index];
+                    (*ppIMFMediaTypeFull)->AddRef();
+
+                    break;
+                }
+                else if (FAILED(hr))
+                {
+                    break;
+                }                
+            }
+        }
+    }
+
+    LeaveCriticalSection(&m_lock);
+
+    if (SUCCEEDED(hr))
+    {
+        result = true;
+    }
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::IsMediaTypeSupported Exit: result %d", result);
+    return result;
+}
+
+STDMETHODIMP_(DeviceStreamState __stdcall) CBasePin::SetState(DeviceStreamState State)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::SetState");
+
+    return DeviceStreamState(InterlockedExchange((LONG*)&m_state, State));
+}
+
 COutPin::COutPin(DWORD outputStreamId, IMFTransform *sourceTransform, IKsControl* iksControl) : CBasePin(outputStreamId)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::COutPin Entry");
@@ -553,4 +765,40 @@ HRESULT COutPin::GetOutputAvailableType(DWORD dwTypeIndex, IMFMediaType** ppType
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::GetOutputAvailableType Exit %!HRESULT!", hr);
     return hr;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) COutPin::ChangeMediaTypeFromInpin(IMFMediaType* pInMediatype, IMFMediaType* pOutMediaType, DeviceStreamState state)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::ChangeMediaTypeFromInpin Entry");
+
+    HRESULT hr = E_FAIL;
+
+    EnterCriticalSection(&m_lock);
+
+    SetState(DeviceStreamState_Disabled);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::ChangeMediaTypeFromInpin SetState");
+
+    // TODO
+    // Queue Operations
+
+    setMediaType(pOutMediaType);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::ChangeMediaTypeFromInpin setMediaType");
+
+    SetState(state);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::ChangeMediaTypeFromInpin SetState");
+
+    hr = S_OK;
+
+    LeaveCriticalSection(&m_lock);
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::ChangeMediaTypeFromInpin Exit %!HRESULT!", hr);
+    return hr;
+}
+
+STDMETHODIMP_(VOID __stdcall) COutPin::SetFirstSample(BOOL firstSample)
+{
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::SetFirstSample");
+
+    m_firstSample = firstSample;
+    return VOID();
 }

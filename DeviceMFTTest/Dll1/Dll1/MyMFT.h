@@ -4,6 +4,8 @@
 #include <ks.h>
 #include <ksproxy.h>
 #include <mfapi.h>
+#include <d3d9.h>
+#include <dxva2api.h>
 
 #include <Windows.Foundation.h>
 #include <wrl\client.h>
@@ -158,18 +160,40 @@ private:
 	CInPin* GetInPin(DWORD dwStreamId);
 	COutPin* GetOutPin(DWORD dwStreamId);
 
-	// https://docs.microsoft.com/en-us/windows/win32/medfound/media-event-generators
 	CRITICAL_SECTION m_critSec;
+
+	// https://docs.microsoft.com/en-us/windows/win32/medfound/media-event-generators
+	CRITICAL_SECTION m_critSecForEventGenerator;
+
+
 	IMFMediaEventQueue* m_pQueue;
 
 	ComPtr<IMFTransform> m_spSourceTransform;
 
 	HRESULT BridgeInputPinOutputPin(CInPin* pInPin, COutPin* pOutPin);
+	HRESULT ChangeMediaTypeEx(ULONG pinId, IMFMediaType* pMediaType, DeviceStreamState newState);
+	HRESULT SendEventToManager(MediaEventType, REFGUID, UINT32);
+	HRESULT QueueEvent(IMFMediaEvent* pEvent);
+	VOID SetStreamingState(DeviceStreamState state);
 
 	DWORD m_dwMultithreadedWorkQueueId;
 	LONG m_lWorkItemBasePriority;
 
 	ComPtr<IKsControl> m_spIkscontrol;
+	ComPtr<IUnknown> m_spDeviceManagerUnk;
+	DeviceStreamState m_StreamingState;
+};
+
+class CMediaTypePrinter {
+private:
+	IMFMediaType* pMediaType;
+	PCHAR m_pBuffer;
+	ULONG buffLen;
+public:
+	CMediaTypePrinter(IMFMediaType* _pMediaType);
+	~CMediaTypePrinter();
+	STDMETHODIMP_(PCHAR) ToCompleteString();
+	STDMETHODIMP_(PCHAR) ToString();
 };
 
 typedef MyMFT* PMyMFT;

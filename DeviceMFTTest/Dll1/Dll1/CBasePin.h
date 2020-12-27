@@ -24,12 +24,17 @@ private:
 	ULONG m_cRef;
 	ULONG m_streamId;
 
+
 protected:
 	ComPtr<IMFAttributes> m_spAttributes;
 
 	IMFMediaTypeArray m_listOfMediaTypes;
 	DWORD m_dwWorkQueueId;
 	ComPtr<IKsControl> m_spIkscontrol;
+	ComPtr<IUnknown> m_spDxgiManager;
+	ComPtr<IMFMediaType> m_setMediaType;
+	DeviceStreamState m_state;
+	CRITICAL_SECTION m_lock;
 
 public:
 	CBasePin(DWORD streamId);
@@ -37,6 +42,12 @@ public:
 	HRESULT AddMediaType(DWORD* pos, IMFMediaType* pMediaType);
 	HRESULT GetMediaTypeAt(DWORD pos, IMFMediaType** pMediaType);
 	VOID SetWorkQueue(_In_ DWORD dwQueueId);
+	VOID SetD3DManager(IUnknown* pManager);
+
+	HRESULT getMediaType(IMFMediaType** ppMediaType);
+	VOID setMediaType(IMFMediaType* pMediaType);
+	STDMETHOD_(BOOL, IsMediaTypeSupported)(IMFMediaType* pMediaType, IMFMediaType** ppIMFMediaTypeFull);
+	STDMETHODIMP_(DeviceStreamState) SetState(_In_ DeviceStreamState State);
 
 	// IUnknown
 	STDMETHODIMP QueryInterface(REFIID, VOID**);
@@ -225,11 +236,18 @@ public:
 	CInPin(IMFAttributes* pAttributes, DWORD inputStreamId);
 	~CInPin();
 	STDMETHODIMP Init(IMFTransform* pTransform);
+	VOID setPreferredMediaType(IMFMediaType* pMediaType);
+	DeviceStreamState setPreferredStreamState(DeviceStreamState streamState);
+	STDMETHODIMP WaitForSetInputPinMediaChange();
+	HRESULT GetInputStreamPreferredState(DeviceStreamState* value, IMFMediaType** ppMediaType);
+	HRESULT SetInputStreamState(IMFMediaType* pMediaType, DeviceStreamState value, DWORD dwFlags);
+
 private:
 	ComPtr<IMFTransform> m_spSourceTransform;
 	GUID m_stStreamType;
 	HANDLE m_waitInputMediaTypeWaiter;
-
+	ComPtr<IMFMediaType> m_spPrefferedMediaType;
+	DeviceStreamState m_preferredStreamState;
 
 	HRESULT GenerateMFMediaTypeListFromDevice(UINT uiStreamId);
 
@@ -246,10 +264,13 @@ public:
 	COutPin(DWORD outputStreamId, IMFTransform *sourceTransform, IKsControl* iksControl);
 	
 	HRESULT GetOutputAvailableType(DWORD dwTypeIndex, IMFMediaType** ppType);
+	STDMETHODIMP ChangeMediaTypeFromInpin(IMFMediaType* pInMediatype, IMFMediaType* pOutMediaType, DeviceStreamState state);
+	STDMETHODIMP_(VOID) SetFirstSample(BOOL);
 
 private:
 	GUID m_stStreamType;
 	ComPtr<IMFTransform> m_spSourceTransform;
+	BOOL m_firstSample;
 };
 
 typedef std::vector<CBasePin*> CBasePinArray;
