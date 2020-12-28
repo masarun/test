@@ -1230,8 +1230,7 @@ HRESULT MyMFT::QueueEvent(IMFMediaEvent* pEvent)
 VOID MyMFT::SetStreamingState(DeviceStreamState state)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetStreamingState");
-
-    m_StreamingState = state;
+    InterlockedExchange((LONG*)&m_StreamingState, state);
     return VOID();
 }
 
