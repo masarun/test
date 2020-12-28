@@ -156,7 +156,7 @@
   </ItemGroup>
   <PropertyGroup>
     <TargetName>multipinmft</TargetName>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\wil\include</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\wil\include</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -196,6 +196,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);UNICODE;MF_WPP;SECURITY_WIN32;MFT_UNIQUE_METHOD_NAMES;MF_DEVICEMFT_ALLOW_MFT0_LOAD</PreprocessorDefinitions>
+      <WppEnabled>true</WppEnabled>
     </ClCompile>
     <Midl>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);UNICODE;MF_WPP;SECURITY_WIN32;MFT_UNIQUE_METHOD_NAMES;MF_DEVICEMFT_ALLOW_MFT0_LOAD</PreprocessorDefinitions>
@@ -206,6 +207,7 @@
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies);D2d1.lib;mf.lib;mfplat.lib;mfuuid.lib;uuid.lib</AdditionalDependencies>
       <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
