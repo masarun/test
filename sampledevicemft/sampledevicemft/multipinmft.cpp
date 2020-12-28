@@ -574,6 +574,8 @@ STDMETHODIMP CMultipinMft::GetOutputAvailableType(
 --*/
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType Entry");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType dwOutputStreamID: %d", dwOutputStreamID);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType dwTypeIndex: %d", dwTypeIndex);
 
     HRESULT hr = S_OK;
     CAutoLock Lock(m_critSec);
@@ -1805,6 +1807,7 @@ HRESULT CMultipinMft::BridgeInputPinOutputPin(
             }
         }
     }
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::BridgeInputPinOutputPin ulAddedMediaTypeCount: %d", ulAddedMediaTypeCount);
     if (ulAddedMediaTypeCount == 0)
     {
         DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Make Sure Pin %d has one media type exposed ", piPin->streamId());
