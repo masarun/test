@@ -6,6 +6,7 @@
 #include <mfapi.h>
 #include <d3d9.h>
 #include <dxva2api.h>
+#include <ksmedia.h>
 
 #include <Windows.Foundation.h>
 #include <wrl\client.h>

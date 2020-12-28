@@ -183,9 +183,26 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::KsMethod(PKSMETHOD Method, ULONG MethodL
     return E_NOTIMPL;
 }
 
+#define IsEqualCLSID(rclsid1, rclsid2) IsEqualGUID(rclsid1, rclsid2)
+
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::KsProperty(PKSPROPERTY Property, ULONG PropertyLength, LPVOID PropertyData, ULONG DataLength, ULONG* BytesReturned)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsProperty Entry");
+
+    if (IsEqualCLSID(Property->Set, KSPROPERTYSETID_ExtendedCameraControl)
+        && (Property->Id == KSPROPERTY_CAMERACONTROL_EXTENDED_WARMSTART))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsProperty Warm Start Control %d Passed", Property->Id);
+    }
+
+    if (IsEqualCLSID(Property->Set, KSPROPERTYSETID_ExtendedCameraControl))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsProperty Extended Control %d Passed", Property->Id);
+    }
+    else if (IsEqualCLSID(Property->Set, PROPSETID_VIDCAP_VIDEOCONTROL) && (Property->Id == KSPROPERTY_VIDEOCONTROL_MODE))
+    {
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::KsProperty IsEqualCLSID(Property->Set, PROPSETID_VIDCAP_VIDEOCONTROL) && (Property->Id == KSPROPERTY_VIDEOCONTROL_MODE)");
+    }
 
     HRESULT hr = m_spIkscontrol->KsProperty(Property, PropertyLength, PropertyData, DataLength, BytesReturned);
 
@@ -1058,12 +1075,18 @@ HRESULT MyMFT::ChangeMediaTypeEx(ULONG pinId, IMFMediaType* pMediaType, DeviceSt
             //
             ComPtr<IMFMediaType> spOldMediaType;
             (VOID)spoPin->getMediaType(spOldMediaType.GetAddressOf());
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::ChangeMediaTypeEx spoPin->getMediaType");
+
             CMediaTypePrinter newType(pMediaType);
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::ChangeMediaTypeEx newType");
+
             CMediaTypePrinter oldType(spOldMediaType.Get());
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::ChangeMediaTypeEx oldType");
+
             if (WPP_LEVEL_ENABLED(DMFT_GENERAL))
             {
-                //TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, " Pin:%d old MT:[%s] St:%d", pinId, oldType.ToString(), newState);
-                //TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, " Pin:%d new MT:[%s] St:%d", pinId, newType.ToString(), newState);
+                TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, " Pin:%d old MT:[%s] St:%d", pinId, oldType.ToString(), newState);
+                TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, " Pin:%d new MT:[%s] St:%d", pinId, newType.ToString(), newState);
             }
         }
 
@@ -1456,6 +1479,8 @@ goto done;}\
 }
 STDMETHODIMP_(PCHAR __stdcall) CMediaTypePrinter::ToCompleteString()
 {
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CMediaTypePrinter::ToCompleteString Entry");
+
     HRESULT             hr = S_OK;
     UINT32              attrCount = 0;
     GUID                attrGuid = { 0 };
@@ -1466,35 +1491,50 @@ STDMETHODIMP_(PCHAR __stdcall) CMediaTypePrinter::ToCompleteString()
 
     if (pMediaType && !m_pBuffer)
     {
-        pMediaType->GetCount(&attrCount);
+        if (FAILED(pMediaType->GetCount(&attrCount)))
+        {
+            goto done;
+        }
         buffLen = MEDIAPRINTER_STARTLEN;
         m_pBuffer = new char[buffLen];
-        if (m_pBuffer != NULL)
+        
+        if (m_pBuffer == NULL)
         {
-            m_pBuffer[0] = 0;
-            for (UINT32 ulIndex = 0; ulIndex < attrCount; ulIndex++)
-            {
-                PropVariantInit(&var);
-                checkAdjustBufferCap(m_pBuffer, buffLen);
-                pMediaType->GetItemByIndex(ulIndex, &attrGuid, &var);
-                pMediaType->GetItemType(attrGuid, &pType);
-                if (ulIndex > 0)
-                    strcat_s(m_pBuffer, MEDIAPRINTER_STARTLEN, " : ");
-                strcat_s(m_pBuffer, buffLen, GetGUIDNameConst(attrGuid));
-                strcat_s(m_pBuffer, buffLen, "=");
-                pTempBaseStr = DumpAttribute(pType, var);
-                strcat_s(m_pBuffer, buffLen, pTempBaseStr);
-                delete(pTempBaseStr);
-                PropVariantClear(&var);
-            }
+            goto done;
         }
 
+        m_pBuffer[0] = 0;
+        for (UINT32 ulIndex = 0; ulIndex < attrCount; ulIndex++)
+        {
+            PropVariantInit(&var);
+            checkAdjustBufferCap(m_pBuffer, buffLen);
+            if (FAILED(pMediaType->GetItemByIndex(ulIndex, &attrGuid, &var)))
+            {
+                goto done;
+            }
+
+            if (FAILED(pMediaType->GetItemType(attrGuid, &pType)))
+            {
+                goto done;
+            }
+            if (ulIndex > 0)
+                strcat_s(m_pBuffer, MEDIAPRINTER_STARTLEN, " : ");
+            strcat_s(m_pBuffer, buffLen, GetGUIDNameConst(attrGuid));
+            strcat_s(m_pBuffer, buffLen, "=");
+            pTempBaseStr = DumpAttribute(pType, var);
+            strcat_s(m_pBuffer, buffLen, pTempBaseStr);
+            delete(pTempBaseStr);
+            PropVariantClear(&var);
+        }
+done:
         if (tempStore)
         {
             delete(tempStore);
         }
     }
-done:
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CMediaTypePrinter::ToCompleteString m_pBuffer: %s", m_pBuffer);
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CMediaTypePrinter::ToCompleteString Exit");
     return m_pBuffer;
 }
 
@@ -1524,30 +1564,37 @@ STDMETHODIMP_(PCHAR __stdcall) CMediaTypePrinter::ToString()
     {
         buffLen = MEDIAPRINTER_STARTLEN;
         m_pBuffer = new (std::nothrow) char[buffLen];
-        if (m_pBuffer != NULL)
+        if (m_pBuffer == NULL)
         {
-            m_pBuffer[0] = 0;
-            for (UINT32 ulIndex = 0; ulIndex < ARRAYSIZE(impGuids); ulIndex++)
+            goto done;
+        }
+        m_pBuffer[0] = 0;
+        for (UINT32 ulIndex = 0; ulIndex < ARRAYSIZE(impGuids); ulIndex++)
+        {
+            PropVariantInit(&var);
+            checkAdjustBufferCap(m_pBuffer, buffLen);
+            attrGuid = impGuids[ulIndex];
+            if (FAILED(pMediaType->GetItemType(attrGuid, &pType)))
             {
-                PropVariantInit(&var);
-                checkAdjustBufferCap(m_pBuffer, buffLen);
-                attrGuid = impGuids[ulIndex];
-                pMediaType->GetItemType(attrGuid, &pType);
-                pMediaType->GetItem(attrGuid, &var);
-                if (ulIndex > 0)
-                    strcat_s(m_pBuffer, MEDIAPRINTER_STARTLEN, " : ");
-                strcat_s(m_pBuffer, buffLen, GetGUIDNameConst(attrGuid));
-                strcat_s(m_pBuffer, buffLen, "=");
-                pTempBaseStr = DumpAttribute(pType, var);
-                strcat_s(m_pBuffer, buffLen, pTempBaseStr);
-                delete(pTempBaseStr);
-                PropVariantClear(&var);
+                goto done;
             }
+            if (FAILED(pMediaType->GetItem(attrGuid, &var)))
+            {
+                goto done;
+            }
+            if (ulIndex > 0)
+                strcat_s(m_pBuffer, MEDIAPRINTER_STARTLEN, " : ");
+            strcat_s(m_pBuffer, buffLen, GetGUIDNameConst(attrGuid));
+            strcat_s(m_pBuffer, buffLen, "=");
+            pTempBaseStr = DumpAttribute(pType, var);
+            strcat_s(m_pBuffer, buffLen, pTempBaseStr);
+            delete(pTempBaseStr);
+            PropVariantClear(&var);
         }
     }
 done:
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CMediaTypePrinter::ToString m_pBuffer: %s", m_pBuffer);
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CMediaTypePrinter::ToString Exit");
-    return m_pBuffer;
 
+    return m_pBuffer;
 }
