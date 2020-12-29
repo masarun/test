@@ -489,7 +489,7 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::InitializeTransform(_In_ IMFAttributes* 
 
     if ((cInputStreams > 0) || (cOutputStreams > 0))
     {
-        m_InputPinCount = cInputStreams;
+        m_InputPinCount = cOutputStreams;
         m_OutputPinCount = cOutputStreams;
 
         pcInputStreams = new DWORD[cInputStreams];
