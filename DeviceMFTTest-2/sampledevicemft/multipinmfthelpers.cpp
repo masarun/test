@@ -45,7 +45,7 @@ STDMETHODIMP_(VOID) CPinQueue::InsertInternal( _In_ IMFSample *pSample )
 {
     UNREFERENCED_PARAMETER(pSample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::InsertInternal");
-
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::InsertInternal E_NOTIMPL");
 #if 0
     pSample->AddRef();
     HRESULT hr = ExceptionBoundary([&]()
@@ -74,6 +74,7 @@ STDMETHODIMP CPinQueue::Insert( _In_ IMFSample *pSample )
 {
     UNREFERENCED_PARAMETER(pSample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Insert");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Insert E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -90,6 +91,7 @@ STDMETHODIMP CPinQueue::Remove( _Outptr_result_maybenull_ IMFSample **ppSample)
 {
     UNREFERENCED_PARAMETER(ppSample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Remove");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Remove E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -116,7 +118,7 @@ Description:
 VOID CPinQueue::Clear( )
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Clear");
-
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Clear E_NOTIMPL");
 #if 0
     //
     // Stop the tees
@@ -152,6 +154,7 @@ STDMETHODIMP CPinQueue::RecreateTee(_In_  IMFMediaType *inMediatype,
     UNREFERENCED_PARAMETER(outMediatype);
     UNREFERENCED_PARAMETER(punkManager);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTee");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTee E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -213,6 +216,7 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
     UNREFERENCED_PARAMETER(allocatorUsage);
     UNREFERENCED_PARAMETER(pAllocator);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -295,6 +299,7 @@ STDMETHODIMP CNullTee::PassThrough( _In_ IMFSample *pSample )
 {
     UNREFERENCED_PARAMETER(pSample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CNullTee::PassThrough");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CNullTee::PassThrough E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -322,6 +327,7 @@ STDMETHODIMP CWrapTee::SetMediaTypes( _In_ IMFMediaType* pInMediaType, _In_ IMFM
     UNREFERENCED_PARAMETER(pInMediaType);
     UNREFERENCED_PARAMETER(pOutMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::SetMediaTypes");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::SetMediaTypes E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -341,6 +347,7 @@ STDMETHODIMP CWrapTee::PassThrough( _In_ IMFSample* pInSample )
 {
     UNREFERENCED_PARAMETER(pInSample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::PassThrough");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::PassThrough E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -382,6 +389,7 @@ done:
 STDMETHODIMP CVideoProcTee::StartStreaming()
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::StartStreaming");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::StartStreaming E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -393,6 +401,7 @@ HRESULT CVideoProcTee::SetMediaTypes(_In_ IMFMediaType* pInMediaType, _In_ IMFMe
     UNREFERENCED_PARAMETER(pInMediaType);
     UNREFERENCED_PARAMETER(pOutMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::SetMediaTypes");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::SetMediaTypes E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -1753,6 +1762,9 @@ HRESULT CPinCreationFactory::CreatePin(_In_ ULONG ulInputStreamId, /* The Input 
     _Outptr_ CBasePin** ppPin, /*Output*/
     _In_ BOOL& isCustom)
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinCreationFactory::CreatePin");
+
+
     HRESULT hr = S_OK;
     ComPtr<IMFAttributes> spAttributes;
     GUID    streamCategory = GUID_NULL;
@@ -1855,6 +1867,7 @@ HRESULT CPinCreationFactory::CreatePin(_In_ ULONG ulInputStreamId, /* The Input 
     }
 
 done:
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
 }
 

@@ -65,12 +65,17 @@ STDMETHODIMP_(DeviceStreamState) CBasePin::SetState(_In_ DeviceStreamState state
 
 HRESULT CBasePin::AddMediaType( _Inout_ DWORD *pos, _In_ IMFMediaType *pMediaType)
 {
+#if 0
     UNREFERENCED_PARAMETER(pos);
     UNREFERENCED_PARAMETER(pMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::AddMediaType");
     return E_NOTIMPL;
+#endif
 
-#if 0
+    UNREFERENCED_PARAMETER(pos);
+    UNREFERENCED_PARAMETER(pMediaType);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::AddMediaType");
+
     HRESULT hr = S_OK;
     CAutoLock Lock(lock());
 
@@ -87,18 +92,23 @@ HRESULT CBasePin::AddMediaType( _Inout_ DWORD *pos, _In_ IMFMediaType *pMediaTyp
     }
 
 done:
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 
 HRESULT CBasePin::GetMediaTypeAt( _In_ DWORD pos, _Outptr_result_maybenull_ IMFMediaType **ppMediaType )
 {
+#if 0
     UNREFERENCED_PARAMETER(ppMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetMediaTypeAt");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetMediaTypeAt pos: %d", pos);
     return E_NOTIMPL;
+#endif
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetMediaTypeAt");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetMediaTypeAt pos: %d", pos);
 
-#if 0
+
     HRESULT hr = S_OK;
     CAutoLock Lock(lock());
     ComPtr<IMFMediaType> spMediaType;
@@ -111,8 +121,9 @@ HRESULT CBasePin::GetMediaTypeAt( _In_ DWORD pos, _Outptr_result_maybenull_ IMFM
     spMediaType = m_listOfMediaTypes[pos];
     *ppMediaType = spMediaType.Detach();
 done:
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 
 STDMETHODIMP_(BOOL) CBasePin::IsMediaTypeSupported
@@ -122,13 +133,17 @@ STDMETHODIMP_(BOOL) CBasePin::IsMediaTypeSupported
      IMFMediaType **ppIMFMediaTypeFull
 )
 {
+#if 0
     UNREFERENCED_PARAMETER(pMediaType);
     UNREFERENCED_PARAMETER(ppIMFMediaTypeFull);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::IsMediaTypeSupported");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::IsMediaTypeSupported E_NOTIMPL");
 
     return FALSE;
+#endif
 
-#if 0
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::IsMediaTypeSupported");
+
     HRESULT hr = S_OK;
     BOOL bFound = FALSE;
     CAutoLock Lock(lock());
@@ -167,22 +182,27 @@ STDMETHODIMP_(BOOL) CBasePin::IsMediaTypeSupported
         }
     }
 done:
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return SUCCEEDED(hr) ? TRUE : FALSE;
-#endif
+
 }
 
 STDMETHODIMP CBasePin::GetOutputAvailableType( 
     _In_ DWORD dwTypeIndex,
     _Out_opt_ IMFMediaType** ppType)
 {
+#if 0
     UNREFERENCED_PARAMETER(ppType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType dwTypeIndex: %d", dwTypeIndex);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType E_NOTIMPL");
     return E_NOTIMPL;
-
-#if 0
-    return GetMediaTypeAt( dwTypeIndex, ppType );
 #endif
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType dwTypeIndex: %d", dwTypeIndex);
+
+    return GetMediaTypeAt( dwTypeIndex, ppType );
+
 }
 
 HRESULT CBasePin::QueryInterface(
@@ -221,7 +241,7 @@ VOID CBasePin::SetD3DManager(_In_opt_ IUnknown* pManager)
 {
     UNREFERENCED_PARAMETER(pManager);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetD3DManager");
-
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetD3DManager E_NOTIMPL");
 #if 0
     //
     // Should release the old dxgi manager.. We will not invalidate the pins or allocators
@@ -246,21 +266,23 @@ CInPin::CInPin(
     m_waitInputMediaTypeWaiter(NULL),
     m_preferredStreamState(DeviceStreamState_Stop)
 {
+#if 0
     UNREFERENCED_PARAMETER(pAttributes);
     UNREFERENCED_PARAMETER(pParent);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::CInPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::CInPin ulPinId: %d", ulPinId);
-
-#if 0
-    setAttributes(pAttributes);
 #endif
+
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::CInPin");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::CInPin ulPinId: %d", ulPinId);
+    setAttributes(pAttributes);
+
 }
 
 CInPin::~CInPin()
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::~CInPin");
 
-#if 0
     setAttributes( nullptr );
     m_spSourceTransform = nullptr;
 
@@ -268,18 +290,21 @@ CInPin::~CInPin()
     {
         CloseHandle(m_waitInputMediaTypeWaiter);
     }
-#endif
+
 }
 
 STDMETHODIMP CInPin::Init( 
     _In_ IMFTransform* pTransform
     )
 {
+#if 0
     UNREFERENCED_PARAMETER(pTransform);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::Init");
     return E_NOTIMPL;
+#endif
 
-#if 0
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::Init");
+
     HRESULT hr = S_OK;
     
     DMFTCHECKNULL_GOTO( pTransform, done, E_INVALIDARG );
@@ -316,19 +341,23 @@ done:
         m_stStreamType = GUID_NULL;
     }
 
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
 }
 
 HRESULT CInPin::GenerateMFMediaTypeListFromDevice(
     _In_ UINT uiStreamId
     )
 {
+#if 0
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GenerateMFMediaTypeListFromDevice");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GenerateMFMediaTypeListFromDevice uiStreamId: %d", uiStreamId);
     return E_NOTIMPL;
+#endif
 
-#if 0
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GenerateMFMediaTypeListFromDevice");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GenerateMFMediaTypeListFromDevice uiStreamId: %d", uiStreamId);
+
     HRESULT hr = S_OK;
     GUID stSubType = { 0 };
     //This is only called in the begining when the input pin is constructed
@@ -348,8 +377,10 @@ done:
     if (hr == MF_E_NO_MORE_TYPES) {
         hr = S_OK;
     }
+
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 
 STDMETHODIMP CInPin::SendSample(
@@ -358,6 +389,7 @@ STDMETHODIMP CInPin::SendSample(
 {
     UNREFERENCED_PARAMETER(pSample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SendSample");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SendSample E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -392,10 +424,14 @@ STDMETHODIMP_(VOID) CInPin::ConnectPin( _In_ CBasePin * poPin )
 
 STDMETHODIMP CInPin::WaitForSetInputPinMediaChange()
 {
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::WaitForSetInputPinMediaChange");
-    return E_NOTIMPL;
-
 #if 0
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::WaitForSetInputPinMediaChange");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::WaitForSetInputPinMediaChange E_NOTIMPL");
+    return E_NOTIMPL;
+#endif
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::WaitForSetInputPinMediaChange");
+
+
     DWORD   dwWait  = 0;
     HRESULT hr      = S_OK;
 
@@ -409,7 +445,7 @@ STDMETHODIMP CInPin::WaitForSetInputPinMediaChange()
 done:
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 
 HRESULT CInPin::GetInputStreamPreferredState(
@@ -417,12 +453,15 @@ HRESULT CInPin::GetInputStreamPreferredState(
     _Outptr_opt_result_maybenull_  IMFMediaType**      ppMediaType
     )
 {
+#if 0
     UNREFERENCED_PARAMETER(value);
     UNREFERENCED_PARAMETER(ppMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GetInputStreamPreferredState");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GetInputStreamPreferredState E_NOTIMPL");
     return E_NOTIMPL;
+#endif
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GetInputStreamPreferredState");
 
-#if 0
     HRESULT hr = S_OK;
     CAutoLock Lock(lock());
 
@@ -442,7 +481,7 @@ HRESULT CInPin::GetInputStreamPreferredState(
 
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 
 HRESULT CInPin::SetInputStreamState(
@@ -455,6 +494,7 @@ HRESULT CInPin::SetInputStreamState(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState value: %d", value);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState dwFlags: %d", dwFlags);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -483,7 +523,7 @@ HRESULT CInPin::SetInputStreamState(
 STDMETHODIMP_(VOID) CInPin::ShutdownPin()
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::ShutdownPin");
-
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::ShutdownPin E_NOTIMPL");
 #if 0
     m_spSourceTransform = nullptr;
     m_outpin = nullptr;
@@ -513,6 +553,7 @@ HRESULT CInPin::ForwardSecureBuffer(
 {
     UNREFERENCED_PARAMETER(sample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::ForwardSecureBuffer");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::ForwardSecureBuffer E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -564,11 +605,15 @@ COutPin::COutPin(
     , m_allocatorUsage(allocatorUsage)
 #endif
 {
+#if 0
     UNREFERENCED_PARAMETER(pIksControl);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::COutPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::COutPin ulPinId: %d", ulPinId);
+#endif
 
-#if 0
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::COutPin");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::COutPin ulPinId: %d", ulPinId);
+
     HRESULT                 hr              = S_OK;
     ComPtr<IMFAttributes>   spAttributes;
 
@@ -585,7 +630,7 @@ COutPin::COutPin(
     
 done:
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-#endif
+
 }
 
 COutPin::~COutPin()
@@ -611,11 +656,15 @@ STDMETHODIMP COutPin::AddPin(
     _In_ DWORD inputPinId
     )
 {
+#if 0
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddPin inputPinId: %d", inputPinId);
     return E_NOTIMPL;
+#endif
 
-#if 0
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddPin");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddPin inputPinId: %d", inputPinId);
+
     //
     //Add a new queue corresponding to the input pin
     //
@@ -639,7 +688,7 @@ done:
 
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return S_OK;
-#endif
+
 }
 /*++
 COutPin::AddSample
@@ -655,6 +704,7 @@ STDMETHODIMP COutPin::AddSample(
     UNREFERENCED_PARAMETER(pSample);
     UNREFERENCED_PARAMETER(pPin);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddSample");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddSample E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -691,7 +741,7 @@ STDMETHODIMP_(VOID) COutPin::SetFirstSample(
 {
     UNREFERENCED_PARAMETER(fisrtSample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::SetFirstSample");
-
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::SetFirstSample E_NOTIMPL");
 #if 0
     m_firstSample = fisrtSample;
 #endif
@@ -703,7 +753,7 @@ STDMETHODIMP_(VOID) COutPin::SetAllocator(
 {
     UNREFERENCED_PARAMETER(pAllocator);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::SetAllocator");
-
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::SetAllocator E_NOTIMPL");
 #if 0
     CAutoLock Lock(lock());
     m_spDefaultAllocator = pAllocator;
@@ -719,6 +769,7 @@ Called from the device Transform when the output queues have to be flushed
 HRESULT COutPin::FlushQueues()
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::FlushQueues");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::FlushQueues E_NOTIMPL");
     return E_NOTIMPL;
 #if 0
     HRESULT hr = S_OK;
@@ -744,6 +795,7 @@ HRESULT COutPin::ChangeMediaTypeFromInpin(
     UNREFERENCED_PARAMETER(pOutMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin state: %d", state);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -782,6 +834,7 @@ STDMETHODIMP COutPin::GetOutputStreamInfo(
 {
     UNREFERENCED_PARAMETER(pStreamInfo);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::GetOutputStreamInfo");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::GetOutputStreamInfo E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -823,6 +876,7 @@ STDMETHODIMP COutPin::ProcessOutput(_In_  DWORD dwFlags,
     UNREFERENCED_PARAMETER(pdwStatus);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ProcessOutput");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ProcessOutput dwFlags: %d", dwFlags);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ProcessOutput E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -884,6 +938,7 @@ STDMETHODIMP COutPin::KsProperty(
     UNREFERENCED_PARAMETER(ulDataLength);
     UNREFERENCED_PARAMETER(pBytesReturned);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::KsProperty");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::KsProperty E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -906,6 +961,7 @@ STDMETHODIMP CAsyncInPin::SendSample(_In_ IMFSample *pSample)
 {
     UNREFERENCED_PARAMETER(pSample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::SendSample");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::SendSample E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -938,6 +994,7 @@ HRESULT CAsyncInPin::Invoke( _In_ IMFAsyncResult* pResult )
 {
     UNREFERENCED_PARAMETER(pResult);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::Invoke");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::Invoke E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -969,7 +1026,7 @@ done:
 STDMETHODIMP_(VOID) CAsyncInPin::ShutdownPin()
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::ShutdownPin");
-
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::ShutdownPin E_NOTIMPL");
 #if 0
     CAutoLock Lock(lock());
     if (m_asyncCallback.Get())
@@ -992,6 +1049,7 @@ STDMETHODIMP CTranslateOutPin::AddMediaType(
     UNREFERENCED_PARAMETER(pos);
     UNREFERENCED_PARAMETER(pMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CTranslateOutPin::AddMediaType");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CTranslateOutPin::AddMediaType E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
@@ -1061,6 +1119,7 @@ STDMETHODIMP_(BOOL) CTranslateOutPin::IsMediaTypeSupported(
     UNREFERENCED_PARAMETER(pMediaType);
     UNREFERENCED_PARAMETER(ppIMFMediaTypeFull);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CTranslateOutPin::IsMediaTypeSupported");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CTranslateOutPin::IsMediaTypeSupported E_NOTIMPL");
     return FALSE;
 
 #if 0
@@ -1099,6 +1158,7 @@ HRESULT CTranslateOutPin::ChangeMediaTypeFromInpin(
     UNREFERENCED_PARAMETER(pOutMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CTranslateOutPin::ChangeMediaTypeFromInpin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CTranslateOutPin::ChangeMediaTypeFromInpin state: %d", state);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CTranslateOutPin::ChangeMediaTypeFromInpin E_NOTIMPL");
     return E_NOTIMPL;
 
 #if 0
