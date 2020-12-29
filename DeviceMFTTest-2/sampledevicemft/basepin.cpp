@@ -490,14 +490,19 @@ HRESULT CInPin::SetInputStreamState(
     _In_ DWORD              dwFlags
     )
 {
+#if 0
     UNREFERENCED_PARAMETER(pMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState value: %d", value);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState dwFlags: %d", dwFlags);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState E_NOTIMPL");
     return E_NOTIMPL;
+#endif
 
-#if 0
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState value: %d", value);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState dwFlags: %d", dwFlags);
+
     HRESULT hr = S_OK;
     UNREFERENCED_PARAMETER(dwFlags);
 
@@ -517,7 +522,7 @@ HRESULT CInPin::SetInputStreamState(
     SetEvent(m_waitInputMediaTypeWaiter);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 
 STDMETHODIMP_(VOID) CInPin::ShutdownPin()
@@ -768,16 +773,20 @@ Called from the device Transform when the output queues have to be flushed
 --*/
 HRESULT COutPin::FlushQueues()
 {
+#if 0
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::FlushQueues");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::FlushQueues E_NOTIMPL");
     return E_NOTIMPL;
-#if 0
+#endif
+    
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::FlushQueues");
+
     HRESULT hr = S_OK;
     CAutoLock Lock( lock() );
     (VOID)m_queue->Clear();
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 /*++
 COutPin::ChangeMediaTypeFromInpin
@@ -791,14 +800,18 @@ HRESULT COutPin::ChangeMediaTypeFromInpin(
     _In_ IMFMediaType* pOutMediaType,
     _In_ DeviceStreamState state)
 {
+#if 0
     UNREFERENCED_PARAMETER(pInMediatype);
     UNREFERENCED_PARAMETER(pOutMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin state: %d", state);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin E_NOTIMPL");
     return E_NOTIMPL;
+#endif
 
-#if 0
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin state: %d", state);
+
     HRESULT hr = S_OK;
     CAutoLock Lock(lock());
     //
@@ -819,8 +832,9 @@ HRESULT COutPin::ChangeMediaTypeFromInpin(
         (VOID)SetState( state );
     }
 done:
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 
 /*++

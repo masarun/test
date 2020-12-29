@@ -117,9 +117,13 @@ Description:
 --*/
 VOID CPinQueue::Clear( )
 {
+#if 0
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Clear");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Clear E_NOTIMPL");
-#if 0
+#endif
+
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Clear");
+
     //
     // Stop the tees
     // Execute Flush
@@ -134,7 +138,7 @@ VOID CPinQueue::Clear( )
         ComPtr<IMFSample> spSample;
         Remove( spSample.GetAddressOf());
     }
-#endif
+
 }
 
 /*++
@@ -210,6 +214,7 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
     _In_ MFSampleAllocatorUsage allocatorUsage,
     _In_opt_ IMFVideoSampleAllocator* pAllocator)
 {
+#if 0
     UNREFERENCED_PARAMETER(inMediatype);
     UNREFERENCED_PARAMETER(outMediatype);
     UNREFERENCED_PARAMETER(punkManager);
@@ -218,8 +223,10 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode E_NOTIMPL");
     return E_NOTIMPL;
+#endif
 
-#if 0
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode");
+
     HRESULT hr = S_OK;
 
     Ctee::ReleaseTee(m_spTeer);// Should release the reference
@@ -251,8 +258,9 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
         m_spTeer.Attach(sampleCopytee.release());
     }
 
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 #endif // ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
 #ifdef MF_DEVICEMFT_ADD_GRAYSCALER_

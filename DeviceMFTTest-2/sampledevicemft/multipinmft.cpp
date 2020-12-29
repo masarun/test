@@ -1029,6 +1029,7 @@ STDMETHODIMP CMultipinMft::SetInputStreamState(
 
     --*/
 {
+#if 0
     UNREFERENCED_PARAMETER(pMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState dwStreamID: %d", dwStreamID);
@@ -1036,8 +1037,12 @@ STDMETHODIMP CMultipinMft::SetInputStreamState(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState dwFlags: %d", dwFlags);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState E_NOTIMPL -----");
     return E_NOTIMPL;
+#endif
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState -----");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState dwStreamID: %d", dwStreamID);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState value: %d", value);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState dwFlags: %d", dwFlags);
 
-#if 0
     HRESULT hr = S_OK;
     ComPtr<CInPin> spiPin = GetInPin(dwStreamID);
     DMFTCHECKNULL_GOTO(spiPin, done, MF_E_INVALIDSTREAMNUMBER);
@@ -1047,7 +1052,7 @@ STDMETHODIMP CMultipinMft::SetInputStreamState(
 done:
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-#endif
+
 }
 
 STDMETHODIMP CMultipinMft::GetInputStreamState(
