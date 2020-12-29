@@ -25,10 +25,15 @@ CPinQueue::CPinQueue(   _In_ DWORD dwPinId ,
     dwPinId is the input pin Id to which this queue corresponds
     */
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::CPinQueue");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::CPinQueue dwPinId: %d", dwPinId);
+
     m_streamCategory = GUID_NULL;
 }
 CPinQueue::~CPinQueue( )
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::~CPinQueue");
+
     Ctee::ReleaseTee(m_spTeer);
 }
 
@@ -38,6 +43,10 @@ Description:
 --*/
 STDMETHODIMP_(VOID) CPinQueue::InsertInternal( _In_ IMFSample *pSample )
 {
+    UNREFERENCED_PARAMETER(pSample);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::InsertInternal");
+
+#if 0
     pSample->AddRef();
     HRESULT hr = ExceptionBoundary([&]()
     {
@@ -55,6 +64,7 @@ STDMETHODIMP_(VOID) CPinQueue::InsertInternal( _In_ IMFSample *pSample )
         // There is a bug in the pipeline that doesn't release the sample fed from processinput. We have to explicitly release the sample here
         SAFE_RELEASE(pSample);
     }
+#endif
 }
 
 STDMETHODIMP CPinQueue::Insert( _In_ IMFSample *pSample )
@@ -62,7 +72,13 @@ STDMETHODIMP CPinQueue::Insert( _In_ IMFSample *pSample )
 //m_spTeer is the wraptee.. this could be a null tee which is a passthrough, an xvp tee which inserts an xvp into the queue etc
 //
 {
+    UNREFERENCED_PARAMETER(pSample);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Insert");
+    return E_NOTIMPL;
+
+#if 0
     return m_spTeer->PassThrough( pSample );
+#endif
 }
 
 /*++
@@ -72,6 +88,11 @@ Description:
 
 STDMETHODIMP CPinQueue::Remove( _Outptr_result_maybenull_ IMFSample **ppSample)
 {
+    UNREFERENCED_PARAMETER(ppSample);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Remove");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
     DMFTCHECKNULL_GOTO( ppSample, done,E_INVALIDARG );
     *ppSample = nullptr;
@@ -85,6 +106,7 @@ STDMETHODIMP CPinQueue::Remove( _Outptr_result_maybenull_ IMFSample **ppSample)
     m_sampleList.erase( m_sampleList.begin() );
 done:
     return hr;
+#endif
 }
 
 /*++
@@ -93,6 +115,9 @@ Description:
 --*/
 VOID CPinQueue::Clear( )
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Clear");
+
+#if 0
     //
     // Stop the tees
     // Execute Flush
@@ -107,6 +132,7 @@ VOID CPinQueue::Clear( )
         ComPtr<IMFSample> spSample;
         Remove( spSample.GetAddressOf());
     }
+#endif
 }
 
 /*++
@@ -122,6 +148,13 @@ STDMETHODIMP CPinQueue::RecreateTee(_In_  IMFMediaType *inMediatype,
     _In_ IMFMediaType *outMediatype,
     _In_opt_ IUnknown* punkManager)
 {
+    UNREFERENCED_PARAMETER(inMediatype);
+    UNREFERENCED_PARAMETER(outMediatype);
+    UNREFERENCED_PARAMETER(punkManager);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTee");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
     DMFT_conversion_type operation = DeviceMftTransformTypeIllegal;
 
@@ -164,6 +197,7 @@ done:
         Ctee::ReleaseTee(m_spTeer);
     }
     return hr;
+#endif
 }
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
 STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
@@ -173,6 +207,15 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
     _In_ MFSampleAllocatorUsage allocatorUsage,
     _In_opt_ IMFVideoSampleAllocator* pAllocator)
 {
+    UNREFERENCED_PARAMETER(inMediatype);
+    UNREFERENCED_PARAMETER(outMediatype);
+    UNREFERENCED_PARAMETER(punkManager);
+    UNREFERENCED_PARAMETER(allocatorUsage);
+    UNREFERENCED_PARAMETER(pAllocator);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
 
     Ctee::ReleaseTee(m_spTeer);// Should release the reference
@@ -205,6 +248,7 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
     }
 
     return hr;
+#endif
 }
 #endif // ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
 #ifdef MF_DEVICEMFT_ADD_GRAYSCALER_
@@ -249,6 +293,11 @@ Description:
 --*/
 STDMETHODIMP CNullTee::PassThrough( _In_ IMFSample *pSample )
 {
+    UNREFERENCED_PARAMETER(pSample);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CNullTee::PassThrough");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
     DMFTCHECKNULL_GOTO(pSample, done, S_OK); //No OP for a NULL Sample!!!
     DMFTCHECKNULL_GOTO(m_Queue.Get(), done, E_UNEXPECTED); // State not set correctly
@@ -260,6 +309,7 @@ STDMETHODIMP CNullTee::PassThrough( _In_ IMFSample *pSample )
 
     done:
     return hr;
+#endif
 }
 
 /*++
@@ -269,9 +319,16 @@ Description:
 --*/
 STDMETHODIMP CWrapTee::SetMediaTypes( _In_ IMFMediaType* pInMediaType, _In_ IMFMediaType* pOutMediaType )
 {
+    UNREFERENCED_PARAMETER(pInMediaType);
+    UNREFERENCED_PARAMETER(pOutMediaType);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::SetMediaTypes");
+    return E_NOTIMPL;
+
+#if 0
     m_pInputMediaType = pInMediaType;
     m_pOutputMediaType = pOutMediaType;
     return S_OK;
+#endif
 }
 
 /*++
@@ -282,6 +339,11 @@ this path traversed. This function feeds the sample to the XVP or the decoding T
 --*/
 STDMETHODIMP CWrapTee::PassThrough( _In_ IMFSample* pInSample )
 {
+    UNREFERENCED_PARAMETER(pInSample);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::PassThrough");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
     IMFSample* pOutSample = nullptr;
     bool       newSample = false;
@@ -314,14 +376,26 @@ done:
     }
 
     return hr;
+#endif
 }
 
 STDMETHODIMP CVideoProcTee::StartStreaming()
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::StartStreaming");
+    return E_NOTIMPL;
+
+#if 0
     return S_OK;
+#endif
 }
 HRESULT CVideoProcTee::SetMediaTypes(_In_ IMFMediaType* pInMediaType, _In_ IMFMediaType* pOutMediaType)
 {
+    UNREFERENCED_PARAMETER(pInMediaType);
+    UNREFERENCED_PARAMETER(pOutMediaType);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::SetMediaTypes");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFTransform> spTransform;
     DMFTCHECKHR_GOTO(CWrapTee::SetMediaTypes(pInMediaType, pOutMediaType),done);
@@ -333,6 +407,7 @@ HRESULT CVideoProcTee::SetMediaTypes(_In_ IMFMediaType* pInMediaType, _In_ IMFMe
     DMFTCHECKHR_GOTO(StartStreaming(), done);
 done:
     return hr;
+#endif
 }
 
 

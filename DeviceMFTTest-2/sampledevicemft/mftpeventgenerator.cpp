@@ -21,6 +21,8 @@ CMediaEventGenerator::CMediaEventGenerator () :
     m_pQueue(NULL),
     m_bShutdown(FALSE)
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::CMediaEventGenerator");
+
     //Call this explicit...
     InitMediaEventGenerator();
 }
@@ -29,7 +31,8 @@ STDMETHODIMP CMediaEventGenerator::InitMediaEventGenerator(
     void
     )
 {
-    
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::InitMediaEventGenerator");
+
     return MFCreateEventQueue(&m_pQueue);
 
 }
@@ -38,6 +41,8 @@ STDMETHODIMP_(ULONG) CMediaEventGenerator::AddRef(
     void
     )
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::AddRef");
+
     return InterlockedIncrement(&m_nRefCount);
 }
 
@@ -45,6 +50,10 @@ STDMETHODIMP_(ULONG) CMediaEventGenerator::Release(
     void
     )
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::Release");
+    return 0;
+
+#if 0
     ULONG uCount = InterlockedDecrement(&m_nRefCount);
 
     if (uCount == 0)
@@ -52,12 +61,15 @@ STDMETHODIMP_(ULONG) CMediaEventGenerator::Release(
         delete this;
     }
     return uCount;
+#endif
 }
 
 STDMETHODIMP CMediaEventGenerator::QueryInterface(
     _In_ REFIID iid,
     _COM_Outptr_ void** ppv)
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::QueryInterface");
+
     HRESULT hr = S_OK;
 
     *ppv = NULL;
@@ -83,6 +95,12 @@ STDMETHODIMP CMediaEventGenerator::BeginGetEvent(
     _In_ IUnknown* pState
     )
 {
+    UNREFERENCED_PARAMETER(pCallback);
+    UNREFERENCED_PARAMETER(pState);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::BeginGetEvent");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
     m_critSec.Lock();
 
@@ -96,6 +114,7 @@ STDMETHODIMP CMediaEventGenerator::BeginGetEvent(
     m_critSec.Unlock();
 
     return hr;    
+#endif
 }
 
 STDMETHODIMP CMediaEventGenerator::EndGetEvent(
@@ -103,6 +122,12 @@ STDMETHODIMP CMediaEventGenerator::EndGetEvent(
     _Outptr_result_maybenull_ IMFMediaEvent** ppEvent
     )
 {
+    UNREFERENCED_PARAMETER(pResult);
+    UNREFERENCED_PARAMETER(ppEvent);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::EndGetEvent");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
     m_critSec.Lock();
 
@@ -116,6 +141,7 @@ STDMETHODIMP CMediaEventGenerator::EndGetEvent(
     m_critSec.Unlock();
     
     return hr;    
+#endif
 }
 
 STDMETHODIMP CMediaEventGenerator::GetEvent(
@@ -123,6 +149,12 @@ STDMETHODIMP CMediaEventGenerator::GetEvent(
     _Outptr_result_maybenull_ IMFMediaEvent** ppEvent
     )
 {
+    UNREFERENCED_PARAMETER(ppEvent);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::GetEvent");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::GetEvent dwFlags: %d", dwFlags);
+    return E_NOTIMPL;
+
+#if 0
     //
     // Because GetEvent can block indefinitely, it requires
     // a slightly different locking strategy.
@@ -150,6 +182,7 @@ STDMETHODIMP CMediaEventGenerator::GetEvent(
     }
         
     return hr;
+#endif
 }
 
 STDMETHODIMP CMediaEventGenerator::QueueEvent(
@@ -159,6 +192,14 @@ STDMETHODIMP CMediaEventGenerator::QueueEvent(
     _In_opt_ const PROPVARIANT* pvValue
     )
 {
+    UNREFERENCED_PARAMETER(met);
+    UNREFERENCED_PARAMETER(extendedType);
+    UNREFERENCED_PARAMETER(hrStatus);
+    UNREFERENCED_PARAMETER(pvValue);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::QueueEvent 1");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
     m_critSec.Lock();
     
@@ -178,12 +219,17 @@ STDMETHODIMP CMediaEventGenerator::QueueEvent(
     m_critSec.Unlock();
     
     return hr;
+#endif
 }
 
 STDMETHODIMP CMediaEventGenerator::ShutdownEventGenerator(
     void
     )
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::ShutdownEventGenerator");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
 
 
@@ -203,12 +249,18 @@ STDMETHODIMP CMediaEventGenerator::ShutdownEventGenerator(
     m_critSec.Unlock();
 
     return hr;
+#endif
 }
 
 STDMETHODIMP CMediaEventGenerator::QueueEvent(
     _In_ IMFMediaEvent* pEvent
     )
 {
+    UNREFERENCED_PARAMETER(pEvent);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::QueueEvent 2");
+    return E_NOTIMPL;
+
+#if 0
     HRESULT hr = S_OK;
     m_critSec.Lock();
     
@@ -224,11 +276,14 @@ STDMETHODIMP CMediaEventGenerator::QueueEvent(
 
     m_critSec.Unlock();
     return hr;
+#endif
 }
 
 CMediaEventGenerator::~CMediaEventGenerator (
     void
     )
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMediaEventGenerator::~CMediaEventGenerator");
+
     ShutdownEventGenerator();
 }

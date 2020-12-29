@@ -21,7 +21,7 @@ CCustomPin::CCustomPin(
     )
     :CInPin( pAttributes, PinId, pParent )
 {
-
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CCustomPin::CCustomPin");
 }
 //
 // Process input calls the pin here.. In this code sample we
@@ -31,6 +31,11 @@ STDMETHODIMP CCustomPin::SendSample(
     _In_ IMFSample *pSample
     )
 {
+    UNREFERENCED_PARAMETER(pSample);
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CCustomPin::SendSample");
+    return E_NOTIMPL;
+
+#if 0
     //
     // Log sample and exit.. The pipeline will just keep on churning more samples till 
     // We go into the stop state
@@ -38,6 +43,7 @@ STDMETHODIMP CCustomPin::SendSample(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Custom Pin %d received Sample %p", streamId(), pSample);
 
     return S_OK;
+#endif
 }
 
 //
@@ -60,6 +66,11 @@ STDMETHODIMP_(DeviceStreamState) CCustomPin::SetState(
     _In_ DeviceStreamState State
     )
 {
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CCustomPin::SetState");
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CCustomPin::SetState State: %d", State);
+    return State;
+
+#if 0
     HRESULT hr = S_OK;
     
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Id:%d Transition into state: %d ", streamId(), State);
@@ -95,4 +106,5 @@ STDMETHODIMP_(DeviceStreamState) CCustomPin::SetState(
 done:
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return oldState;
+#endif
 }
