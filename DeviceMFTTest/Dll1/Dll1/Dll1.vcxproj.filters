@@ -39,7 +39,16 @@
     <ClInclude Include="CRegistry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MyMFT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Trace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DllServ.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CBasePin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,10 +74,17 @@
     <ClCompile Include="CRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MyMFT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CBasePin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
