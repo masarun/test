@@ -192,6 +192,9 @@ private:
 	CBasePinArray m_InPins;
 	CBasePinArray m_OutPins;
 	map<int, int> m_outputPinMap;
+	CCritSec m_critSec2;
+	DWORD m_dwWorkQueueId;
+	LONG m_lWorkQueuePriority;
 };
 
 typedef MyMFT* PMyMFT;

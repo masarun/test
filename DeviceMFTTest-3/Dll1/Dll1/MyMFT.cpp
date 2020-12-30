@@ -151,8 +151,24 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::RegisterThreadsEx(DWORD* pdwTaskIndex, L
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::SetWorkQueueEx(DWORD dwMultithreadedWorkQueueId, LONG lWorkItemBasePriority)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetWorkQueueEx E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::SetWorkQueueEx");
+
+    CAutoLock   lock(m_critSec2);
+    //
+    // Cache the WorkQueuId and WorkItemBasePriority. This is called once soon after the device MFT is initialized
+    //
+    m_dwWorkQueueId = dwMultithreadedWorkQueueId;
+    m_lWorkQueuePriority = lWorkItemBasePriority;
+    // Set it on the pins
+    for (DWORD dwIndex = 0; dwIndex < (DWORD)m_InPins.size(); dwIndex++)
+    {
+        m_InPins[dwIndex]->SetWorkQueue(dwMultithreadedWorkQueueId);
+    }
+    for (DWORD dwIndex = 0; dwIndex < (DWORD)m_OutPins.size(); dwIndex++)
+    {
+        m_OutPins[dwIndex]->SetWorkQueue(dwMultithreadedWorkQueueId);
+    }
+    return S_OK;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::UnregisterThreads()

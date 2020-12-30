@@ -81,12 +81,18 @@ protected:
 	{
 		return m_Parent;
 	}
+
 public:
 	CBasePin(DWORD streamId);
 	CBasePin(_In_ ULONG _id = 0, _In_ MyMFT* parent = NULL);
 
 	HRESULT AddMediaType(DWORD* pos, IMFMediaType* pMediaType);
 	HRESULT GetMediaTypeAt(DWORD pos, IMFMediaType** pMediaType);
+
+	VOID SetWorkQueue(_In_ DWORD dwQueueId)
+	{
+		m_dwWorkQueueId = dwQueueId;
+	}
 
 	// IUnknown
 	STDMETHODIMP QueryInterface(REFIID, VOID**);

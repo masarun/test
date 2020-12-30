@@ -124,8 +124,8 @@ STDMETHODIMP_(HRESULT __stdcall) CBasePin::DeleteAllItems()
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::DeleteItem(REFGUID guidKey)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::DeleteItem E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::DeleteItem");
+    return m_spAttributes->DeleteItem(guidKey);
 }
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetAllocatedBlob(REFGUID guidKey, UINT8** ppBuf, UINT32* pcbSize)
@@ -198,8 +198,8 @@ STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetGUID(REFGUID guidKey, GUID* pguidV
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetItem(REFGUID guidKey, PROPVARIANT* pValue)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetItem E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CBasePin::GetItem");
+    return m_spAttributes->GetItem(guidKey, pValue);
 }
 
 STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetItemByIndex(UINT32 unIndex, GUID* pguidKey, PROPVARIANT* pValue)
