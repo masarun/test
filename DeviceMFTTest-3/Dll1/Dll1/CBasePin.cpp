@@ -395,6 +395,15 @@ STDMETHODIMP_(HRESULT __stdcall) CInPin::Init(IMFTransform* pTransform)
     return hr;
 }
 
+STDMETHODIMP_(VOID __stdcall) CInPin::ConnectPin(CBasePin* poPin)
+{
+    CAutoLock Lock(lock());
+    if (poPin != nullptr)
+    {
+        m_outpin = poPin;
+    }
+}
+
 HRESULT CInPin::GenerateMFMediaTypeListFromDevice(UINT uiStreamId)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "CInPin::GenerateMFMediaTypeListFromDevice Entry");
@@ -554,6 +563,29 @@ HRESULT COutPin::GetOutputAvailableType(DWORD dwTypeIndex, IMFMediaType** ppType
     return hr;
 }
 
+STDMETHODIMP_(HRESULT __stdcall) COutPin::AddPin(DWORD pinId)
+{
+    HRESULT hr = S_OK;
+    CAutoLock Lock(lock());
+
+    if (m_queue != NULL)
+    {
+        // This pin is alreaqdy connected.. This sample only supports a one on one pin mapping
+        DMFTCHECKHR_GOTO(E_UNEXPECTED, done);
+
+    }
+#if defined MF_DEVICEMFT_ADD_GRAYSCALER_ // Take this out to remove the gray scaler
+    m_queue = new (std::nothrow) CPinQueueWithGrayScale(inputPinId);
+#else
+    m_queue = new (std::nothrow) CPinQueue(pinId, Parent());
+#endif
+    DMFTCHECKNULL_GOTO(m_queue, done, E_OUTOFMEMORY);
+
+done:
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return S_OK;
+}
+
 CPinQueue::CPinQueue(DWORD _inPinId, IMFDeviceTransform* pTransform) : m_dwInPinId(_inPinId),
 m_pTransform(pTransform),
 m_cRef(1)
@@ -605,3 +637,43 @@ STDMETHODIMP_(VOID __stdcall) CPinQueue::Clear()
 {
     return VOID();
 }
+
+CCritSec::CCritSec()
+{
+    InitializeCriticalSection(&m_criticalSection);
+}
+CCritSec::~CCritSec()
+{
+    DeleteCriticalSection(&m_criticalSection);
+}
+_Requires_lock_not_held_(m_criticalSection) _Acquires_lock_(m_criticalSection)
+void CCritSec::Lock()
+{
+    EnterCriticalSection(&m_criticalSection);
+}
+
+_Requires_lock_held_(m_criticalSection) _Releases_lock_(m_criticalSection)
+void CCritSec::Unlock()
+{
+    LeaveCriticalSection(&m_criticalSection);
+}
+
+
+_Acquires_lock_(this->m_pCriticalSection->m_criticalSection)
+CAutoLock::CAutoLock(CCritSec& crit)
+{
+    m_pCriticalSection = &crit;
+    m_pCriticalSection->Lock();
+}
+_Acquires_lock_(this->m_pCriticalSection->m_criticalSection)
+CAutoLock::CAutoLock(CCritSec* crit)
+{
+    m_pCriticalSection = crit;
+    m_pCriticalSection->Lock();
+}
+_Releases_lock_(this->m_pCriticalSection->m_criticalSection)
+CAutoLock::~CAutoLock()
+{
+    m_pCriticalSection->Unlock();
+}
+

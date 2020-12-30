@@ -95,3 +95,4 @@ HRESULT ExceptionBoundary(Lambda&& lambda)
         return E_UNEXPECTED;
     }
 }
+

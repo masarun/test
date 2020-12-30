@@ -23,6 +23,32 @@ typedef std::vector<IMFMediaType*> IMFMediaTypeArray;
 class MyMFT;
 class CPinQueue;
 
+class CCritSec
+{
+private:
+	CRITICAL_SECTION m_criticalSection;
+public:
+	CCritSec();
+	~CCritSec();
+	_Requires_lock_not_held_(m_criticalSection) _Acquires_lock_(m_criticalSection)
+		void Lock();
+	_Requires_lock_held_(m_criticalSection) _Releases_lock_(m_criticalSection)
+		void Unlock();
+};
+
+class CAutoLock
+{
+protected:
+	CCritSec* m_pCriticalSection;
+public:
+	_Acquires_lock_(this->m_pCriticalSection->m_criticalSection)
+		CAutoLock(CCritSec& crit);
+	_Acquires_lock_(this->m_pCriticalSection->m_criticalSection)
+		CAutoLock(CCritSec* crit);
+	_Releases_lock_(this->m_pCriticalSection->m_criticalSection)
+		~CAutoLock();
+};
+
 class CBasePin : public IMFAttributes, public IKsControl
 {
 private:
@@ -31,6 +57,7 @@ private:
 	ComPtr<IMFMediaType> m_setMediaType;
 	MyMFT* m_Parent;
 	ULONG  m_nRefCount;
+	CCritSec m_lock;
 
 protected:
 	ComPtr<IMFAttributes> m_spAttributes;
@@ -45,6 +72,14 @@ protected:
 	{
 		m_spAttributes = _pAttributes;
 		return S_OK;
+	}
+	__inline CCritSec& lock()
+	{
+		return m_lock;
+	}
+	_inline MyMFT* Parent()
+	{
+		return m_Parent;
 	}
 public:
 	CBasePin(DWORD streamId);
@@ -245,12 +280,15 @@ public:
 	CInPin(IMFAttributes* pAttributes, DWORD inputStreamId, MyMFT* parent);
 	~CInPin();
 	STDMETHODIMP Init(IMFTransform* pTransform);
+	STDMETHOD_(VOID, ConnectPin)(
+		_In_ CBasePin*
+		);
 private:
 	ComPtr<IMFTransform> m_spSourceTransform;
 	GUID m_stStreamType;
 	ComPtr<IKsControl> m_spIkscontrol;
 	HANDLE m_waitInputMediaTypeWaiter;
-
+	ComPtr<CBasePin> m_outpin;
 
 	HRESULT GenerateMFMediaTypeListFromDevice(UINT uiStreamId);
 
@@ -273,7 +311,9 @@ public:
 	);
 
 	HRESULT GetOutputAvailableType(DWORD dwTypeIndex, IMFMediaType** ppType);
-
+	STDMETHODIMP AddPin(
+		_In_ DWORD pinId
+	);
 private:
 	GUID m_stStreamType;
 	ComPtr<IKsControl> m_spIkscontrol;

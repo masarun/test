@@ -16,6 +16,9 @@ using namespace Microsoft::WRL;
 #include <wil\result_macros.h>
 #include "common.h"
 
+#include <map>
+using namespace std;
+
 #include <initguid.h>
 DEFINE_GUID(AVSTREAM_CUSTOM_PIN_IMAGE,
 	0x888c4105, 0xb328, 0x4ed6, 0xa3, 0xca, 0x2f, 0xf4, 0xc0, 0x3a, 0x9f, 0x33);
@@ -188,6 +191,7 @@ private:
 	ULONG m_CustomPinCount;
 	CBasePinArray m_InPins;
 	CBasePinArray m_OutPins;
+	map<int, int> m_outputPinMap;
 };
 
 typedef MyMFT* PMyMFT;

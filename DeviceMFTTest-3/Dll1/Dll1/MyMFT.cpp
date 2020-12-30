@@ -760,11 +760,46 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::ProcessInput(DWORD dwInputStreamID, IMFS
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::ProcessInput E_NOTIMPL");
     return E_NOTIMPL;
 }
+void printMessageEvent(MFT_MESSAGE_TYPE msg)
+{
+    switch (msg)
+    {
+    case MFT_MESSAGE_COMMAND_FLUSH:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! :PROCESSMESSAGE: MFT_MESSAGE_COMMAND_FLUSH");
+        break;
+    case MFT_MESSAGE_COMMAND_DRAIN:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! :PROCESSMESSAGE: MFT_MESSAGE_COMMAND_DRAIN");
+        break;
+    case MFT_MESSAGE_COMMAND_MARKER:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! :PROCESSMESSAGE: MFT_MESSAGE_COMMAND_MARKER");
+        break;
+    case MFT_MESSAGE_COMMAND_TICK:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! :PROCESSMESSAGE: MFT_MESSAGE_COMMAND_TICK");
+        break;
+    case MFT_MESSAGE_NOTIFY_END_OF_STREAM:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! :PROCESSMESSAGE: MFT_MESSAGE_NOTIFY_END_OF_STREAM");
+        break;
+    case MFT_MESSAGE_NOTIFY_BEGIN_STREAMING:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! :PROCESSMESSAGE: MFT_MESSAGE_NOTIFY_BEGIN_STREAMING");
+        break;
+    case MFT_MESSAGE_NOTIFY_START_OF_STREAM:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! :PROCESSMESSAGE: MFT_MESSAGE_NOTIFY_START_OF_STREAM");
+        break;
+    case  MFT_MESSAGE_DROP_SAMPLES:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! :PROCESSMESSAGE: MFT_MESSAGE_DROP_SAMPLES");
+        break;
+    case MFT_MESSAGE_SET_D3D_MANAGER:
+        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! :PROCESSMESSAGE: MFT_MESSAGE_SET_D3D_MANAGER");
+        break;
+
+    }
+}
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::ProcessMessage(MFT_MESSAGE_TYPE eMessage, ULONG_PTR ulParam)
 {
-    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::ProcessMessage E_NOTIMPL");
-    return E_NOTIMPL;
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::ProcessMessage E_NOTIMPL (Returns S_OK)");
+    printMessageEvent(eMessage);
+    return S_OK;
 }
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::ProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, MFT_OUTPUT_DATA_BUFFER* pOutputSample, DWORD* pdwStatus)
@@ -1040,6 +1075,64 @@ HRESULT MyMFT::BridgeInputPinOutputPin(CInPin* pInPin, COutPin* pOutPin)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::BridgeInputPinOutputPin Entry");
 
+    HRESULT hr = S_OK;
+    ULONG   ulIndex = 0;
+    ULONG   ulAddedMediaTypeCount = 0;
+    ComPtr<IMFMediaType> spMediaType;
+
+    DMFTCHECKNULL_GOTO(pInPin, done, E_INVALIDARG);
+    DMFTCHECKNULL_GOTO(pOutPin, done, E_INVALIDARG);
+    //
+    // Copy over the media types from input pin to output pin. Since there is no
+    // decoder support, only the uncompressed media types are inserted. Please make
+    // sure any pin advertised supports at least one media type. The pipeline doesn't
+    // like pins with no media types
+    //
+    while (SUCCEEDED(hr = pInPin->GetMediaTypeAt(ulIndex++, spMediaType.ReleaseAndGetAddressOf())))
+    {
+        GUID subType = GUID_NULL;
+        DMFTCHECKHR_GOTO(spMediaType->GetGUID(MF_MT_SUBTYPE, &subType), done);
+        {
+            DMFTCHECKHR_GOTO(hr = pOutPin->AddMediaType(NULL, spMediaType.Get()), done);
+            if (hr == S_OK)
+            {
+                ulAddedMediaTypeCount++;
+            }
+        }
+    }
+    if (ulAddedMediaTypeCount == 0)
+    {
+        //DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Make Sure Pin %d has one media type exposed ", piPin->streamId());
+        DMFTCHECKHR_GOTO(MF_E_INVALID_STREAM_DATA, done);
+    }
+    //
+    //Add the Input Pin to the output Pin
+    //
+    DMFTCHECKHR_GOTO(pOutPin->AddPin(pInPin->streamId()), done);
+    hr = ExceptionBoundary([&]() {
+        //
+        // Add the output pin to the input pin. 
+        // Create the pin map. So that we know which pin input pin is connected to which output pin
+        //
+        pInPin->ConnectPin(pOutPin);
+        m_outputPinMap.insert(std::pair< int, int >(pOutPin->streamId(), pInPin->streamId()));
+});
+
+
+
+done:
+    //
+    //Failed adding media types
+    //
+    if (FAILED(hr))
+    {
+        //DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_ERROR, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    }
+
+    //DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_ERROR, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = E_FAIL;
 
     if ((pInPin != NULL) && (pOutPin != NULL))
@@ -1074,11 +1167,11 @@ HRESULT MyMFT::BridgeInputPinOutputPin(CInPin* pInPin, COutPin* pOutPin)
 
             hr = MF_E_INVALID_STREAM_DATA;
         }
-
     }
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::BridgeInputPinOutputPin Exit %!HRESULT!", hr);
     return hr;
+#endif
 }
 
 STDMETHODIMP MyMFT::CheckCustomPin(
