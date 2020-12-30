@@ -11,5 +11,6 @@
 #include "framework.h"
 #include "Trace.h"
 #include "CBasePin.h"
+#include "MyMFT.h"
 
 #endif //PCH_H

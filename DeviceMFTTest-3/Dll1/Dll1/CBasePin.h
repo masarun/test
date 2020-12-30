@@ -1,4 +1,6 @@
 #pragma once
+#include "pch.h"
+
 #include <mfidl.h>
 #include <ks.h>
 #include <ksproxy.h>
@@ -18,19 +20,35 @@ using namespace Microsoft::WRL;
 
 typedef std::vector<IMFMediaType*> IMFMediaTypeArray;
 
+class MyMFT;
+class CPinQueue;
+
 class CBasePin : public IMFAttributes, public IKsControl
 {
 private:
 	ULONG m_cRef;
 	ULONG m_streamId;
+	ComPtr<IMFMediaType> m_setMediaType;
+	MyMFT* m_Parent;
+	ULONG  m_nRefCount;
 
 protected:
 	ComPtr<IMFAttributes> m_spAttributes;
 
 	IMFMediaTypeArray m_listOfMediaTypes;
 
+	DeviceStreamState       m_state;
+	ComPtr<IUnknown>        m_spDxgiManager;
+	DWORD                   m_dwWorkQueueId;
+	
+	__inline HRESULT setAttributes(_In_ IMFAttributes* _pAttributes)
+	{
+		m_spAttributes = _pAttributes;
+		return S_OK;
+	}
 public:
 	CBasePin(DWORD streamId);
+	CBasePin(_In_ ULONG _id = 0, _In_ MyMFT* parent = NULL);
 
 	HRESULT AddMediaType(DWORD* pos, IMFMediaType* pMediaType);
 	HRESULT GetMediaTypeAt(DWORD pos, IMFMediaType** pMediaType);
@@ -214,12 +232,17 @@ public:
 	STDMETHOD(UnlockStore)();
 
 	DWORD GetStreamId();
+
+	__inline DWORD streamId()
+	{
+		return m_streamId;
+	}
 };
 
 class CInPin : public CBasePin
 {
 public:
-	CInPin(IMFAttributes* pAttributes, DWORD inputStreamId);
+	CInPin(IMFAttributes* pAttributes, DWORD inputStreamId, MyMFT* parent);
 	~CInPin();
 	STDMETHODIMP Init(IMFTransform* pTransform);
 private:
@@ -242,15 +265,194 @@ class COutPin : public CBasePin
 {
 public:
 	COutPin(DWORD outputStreamId, IMFTransform *sourceTransform, IKsControl* iksControl);
-	
+	COutPin(
+		_In_ ULONG         id = 0,
+		_In_opt_  MyMFT* pparent = NULL,
+		_In_     IKsControl* iksControl = NULL, 
+		_In_     MFSampleAllocatorUsage allocatorUsage = MFSampleAllocatorUsage_DoesNotAllocate
+	);
+
 	HRESULT GetOutputAvailableType(DWORD dwTypeIndex, IMFMediaType** ppType);
 
 private:
 	GUID m_stStreamType;
 	ComPtr<IKsControl> m_spIkscontrol;
 	ComPtr<IMFTransform> m_spSourceTransform;
+
+protected:
+	CPinQueue* m_queue;           /* Queue where the sample will be stored*/
+	BOOL                      m_firstSample;
+	MFSampleAllocatorUsage    m_allocatorUsage;
+	wil::com_ptr_nothrow<IMFVideoSampleAllocator> m_spDefaultAllocator;
 };
 
 typedef std::vector<CBasePin*> CBasePinArray;
+typedef  std::vector< IMFSample*>    IMFSampleList;
 
+class Ctee : public IUnknown {
+public:
+	// This is a helper class to release the interface
+	// It will first call shutdowntee to break any circular
+	// references any components might have with their composed
+	// objects
+	static VOID ReleaseTee(_In_ ComPtr<Ctee>& tee)
+	{
+		if (tee)
+		{
+			tee->ShutdownTee();
+			tee = nullptr;
+		}
+	}
+	STDMETHOD(Start)()
+	{
+		return S_OK;
+	}
+	STDMETHOD(Stop)()
+	{
+		return S_OK;
+	}
+	virtual STDMETHODIMP PassThrough(_In_ IMFSample*) = 0;
+
+	STDMETHOD_(VOID, ShutdownTee)()
+	{
+		return; // NOOP
+	}
+	STDMETHODIMP QueryInterface(REFIID riid, void** ppv)
+	{
+		HRESULT hr = S_OK;
+		if (ppv != nullptr)
+		{
+			*ppv = nullptr;
+			if (riid == __uuidof(IUnknown))
+			{
+				AddRef();
+				*ppv = static_cast<IUnknown*>(this);
+			}
+			else
+			{
+				hr = E_NOINTERFACE;
+			}
+		}
+		else
+		{
+			hr = E_POINTER;
+		}
+		return hr;
+	}
+	Ctee()
+	{
+	}
+	virtual ~Ctee()
+	{}
+	STDMETHODIMP_(ULONG) AddRef()
+	{
+		return InterlockedIncrement(&m_cRef);
+	}
+	STDMETHODIMP_(ULONG) Release()
+	{
+		long cRef = InterlockedDecrement(&m_cRef);
+		if (cRef == 0)
+		{
+			delete this;
+		}
+		return cRef;
+	}
+
+protected:
+	ULONG m_cRef = 0;
+};
+
+class CPinQueue : public IUnknown {
+public:
+	CPinQueue(_In_ DWORD _inPinId, _In_ IMFDeviceTransform* pTransform = nullptr);
+	~CPinQueue();
+
+	STDMETHODIMP_(VOID) InsertInternal(_In_  IMFSample* pSample = nullptr);
+	STDMETHODIMP Insert(_In_ IMFSample* pSample);
+	STDMETHODIMP Remove(_Outptr_result_maybenull_ IMFSample** pSample);
+	virtual STDMETHODIMP RecreateTee(
+		_In_  IMFMediaType* inMediatype,
+		_In_ IMFMediaType* outMediatype,
+		_In_opt_ IUnknown* punkManager);
+#if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
+	STDMETHODIMP RecreateTeeByAllocatorMode(
+		_In_  IMFMediaType* inMediatype,
+		_In_ IMFMediaType* outMediatype,
+		_In_opt_ IUnknown* punkManager,
+		_In_ MFSampleAllocatorUsage allocatorUsage,
+		_In_opt_ IMFVideoSampleAllocator* pAllcoator);
+#endif
+	STDMETHODIMP_(VOID) Clear();
+
+	//
+	//Inline functions
+	//
+	__inline BOOL Empty()
+	{
+		return (!m_sampleList.size());
+	}
+	__inline DWORD pinStreamId()
+	{
+		return m_dwInPinId;
+	}
+	__inline GUID pinCategory()
+	{
+		if (IsEqualCLSID(m_streamCategory, GUID_NULL))
+		{
+			ComPtr<IMFAttributes> spAttributes;
+			if (SUCCEEDED(m_pTransform->GetOutputStreamAttributes(pinStreamId(), spAttributes.ReleaseAndGetAddressOf())))
+			{
+				(VOID)spAttributes->GetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, &m_streamCategory);
+
+			}
+		}
+		return m_streamCategory;
+	}
+
+	STDMETHODIMP QueryInterface(REFIID riid, void** ppv)
+	{
+		HRESULT hr = S_OK;
+		if (ppv != nullptr)
+		{
+			*ppv = nullptr;
+			if (riid == __uuidof(IUnknown))
+			{
+				AddRef();
+				*ppv = static_cast<IUnknown*>(this);
+			}
+			else
+			{
+				hr = E_NOINTERFACE;
+			}
+		}
+		else
+		{
+			hr = E_POINTER;
+		}
+		return hr;
+	}
+
+	STDMETHODIMP_(ULONG) AddRef()
+	{
+		return InterlockedIncrement(&m_cRef);
+	}
+	STDMETHODIMP_(ULONG) Release()
+	{
+		long cRef = InterlockedDecrement(&m_cRef);
+		if (cRef == 0)
+		{
+			delete this;
+		}
+		return cRef;
+	}
+
+private:
+	DWORD                m_dwInPinId;           /* This is the input pin       */
+	IMFSampleList        m_sampleList;          /* List storing the samples    */
+	IMFDeviceTransform* m_pTransform;         /* Weak reference to the the device MFT */
+	GUID                 m_streamCategory;
+	ULONG                m_cRef;
+protected:
+	ComPtr<Ctee>         m_spTeer;                /*Tee that acts as a passthrough or an XVP  */
+};
 

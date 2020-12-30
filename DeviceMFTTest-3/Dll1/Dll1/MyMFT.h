@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 #include <mfidl.h>
 #include <ks.h>
@@ -13,12 +14,18 @@ using namespace Microsoft::WRL;
 #include <wil\resource.h>
 #include <wil\com.h>
 #include <wil\result_macros.h>
+#include "common.h"
 
-#include "pch.h"
+#include <initguid.h>
+DEFINE_GUID(AVSTREAM_CUSTOM_PIN_IMAGE,
+	0x888c4105, 0xb328, 0x4ed6, 0xa3, 0xca, 0x2f, 0xf4, 0xc0, 0x3a, 0x9f, 0x33);
+
 
 class MyMFT : public IMFRealTimeClientEx, public IKsControl, public IMFSampleAllocatorControl, public IMFDeviceTransform, public IMFShutdown, public IMFMediaEventGenerator,
 	public IMFTransform
 {
+	friend class CPinCreationFactory;
+
 public:
 	MyMFT();
 	~MyMFT();
@@ -145,6 +152,12 @@ public:
 		DWORD        dwFlags
 	);
 
+	_DEFINE_DEVICEMFT_MFT0HELPER_IMPL__
+		
+	_inline IMFTransform* Parent()
+	{
+		return m_spSourceTransform.Get();
+	}
 private:
 	ULONG m_cRef;
 
@@ -152,8 +165,8 @@ private:
 	ULONG m_InputPinCount;
 	ULONG m_OutputPinCount;
 
-	CBasePinArray m_basePinArrayInPins;
-	CBasePinArray m_basePinArrayOutPins;
+	//CBasePinArray m_basePinArrayInPins;
+	//CBasePinArray m_basePinArrayOutPins;
 
 	CInPin* GetInPin(DWORD dwStreamId);
 	COutPin* GetOutPin(DWORD dwStreamId);
@@ -165,7 +178,32 @@ private:
 	ComPtr<IMFTransform> m_spSourceTransform;
 
 	HRESULT BridgeInputPinOutputPin(CInPin* pInPin, COutPin* pOutPin);
+	STDMETHODIMP CheckCustomPin(
+		_In_ CInPin* pPin,
+		_Inout_ PBOOL  pIsCustom
+	);
+
+	PWCHAR m_SymbolicLink;
+	ComPtr<IKsControl> m_spIkscontrol;
+	ULONG m_CustomPinCount;
+	CBasePinArray m_InPins;
+	CBasePinArray m_OutPins;
 };
 
 typedef MyMFT* PMyMFT;
 
+class CPinCreationFactory {
+protected:
+	ComPtr<MyMFT> m_spDeviceTransform;
+public:
+	typedef enum _type_pin {
+		DMFT_PIN_INPUT,
+		DMFT_PIN_OUTPUT,
+		DMFT_PIN_CUSTOM,
+		DMFT_PIN_ALLOCATOR_PIN,
+		DMFT_MAX
+	}type_pin;
+	HRESULT CreatePin(_In_ ULONG ulInputStreamId, _In_ ULONG ulOutStreamId, _In_ type_pin type, _Outptr_ CBasePin** ppPin, _In_ BOOL& isCustom);
+	CPinCreationFactory(_In_ MyMFT* pDeviceTransform) :m_spDeviceTransform(pDeviceTransform) {
+	}
+};

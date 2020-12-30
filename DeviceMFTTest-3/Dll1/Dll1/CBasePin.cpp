@@ -10,6 +10,7 @@ CBasePin::CBasePin(DWORD streamId)
 {
     m_cRef = 0;
     m_streamId = streamId;
+    m_Parent = NULL;
 }
 
 
@@ -346,7 +347,7 @@ DWORD CBasePin::GetStreamId()
     return m_streamId;
 }
 
-CInPin::CInPin(IMFAttributes* pAttributes, DWORD inputStreamId) : CBasePin(inputStreamId)
+CInPin::CInPin(IMFAttributes* pAttributes, DWORD inputStreamId, MyMFT* parent) : CBasePin(inputStreamId, parent)
 {
     m_spAttributes = nullptr;
     m_spSourceTransform = nullptr;
@@ -477,7 +478,7 @@ HRESULT CBasePin::GetMediaTypeAt(DWORD pos, IMFMediaType** pMediaType)
     return hr;
 }
 
-COutPin::COutPin(DWORD outputStreamId, IMFTransform *sourceTransform, IKsControl* iksControl) : CBasePin(outputStreamId)
+COutPin::COutPin(DWORD outputStreamId, IMFTransform *sourceTransform, IKsControl* iksControl) : CBasePin(outputStreamId, (MyMFT *)sourceTransform)
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::COutPin Entry");
 
@@ -493,6 +494,42 @@ COutPin::COutPin(DWORD outputStreamId, IMFTransform *sourceTransform, IKsControl
     SetUINT32(MF_TRANSFORM_ASYNC, TRUE);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::COutPin Exit");
+}
+
+CBasePin::CBasePin(_In_ ULONG id, _In_ MyMFT* parent) :
+    m_streamId(id)
+    , m_Parent(parent)
+    , m_setMediaType(nullptr)
+    , m_nRefCount(0)
+    , m_state(DeviceStreamState_Stop)
+    , m_dwWorkQueueId(MFASYNC_CALLBACK_QUEUE_UNDEFINED)
+{
+
+}
+
+COutPin::COutPin(ULONG id, MyMFT* pparent, IKsControl* iksControl, MFSampleAllocatorUsage allocatorUsage) : CBasePin(id, pparent)
+, m_firstSample(false)
+, m_queue(nullptr)
+, m_allocatorUsage(allocatorUsage)
+{
+
+    HRESULT                 hr = S_OK;
+    ComPtr<IMFAttributes>   spAttributes;
+
+    //
+    //Get the input pin IKS control.. the pin IKS control talks to sourcetransform's IKS control
+    //
+    m_spIkscontrol = iksControl;
+
+    MFCreateAttributes(&spAttributes, 3); //Create the space for the attribute store!!
+    setAttributes(spAttributes.Get());
+    DMFTCHECKHR_GOTO(SetUINT32(MFT_SUPPORT_DYNAMIC_FORMAT_CHANGE, TRUE), done);
+    DMFTCHECKHR_GOTO(SetString(MFT_ENUM_HARDWARE_URL_Attribute, L"Sample_CameraExtensionMft"), done);
+    DMFTCHECKHR_GOTO(SetUINT32(MF_TRANSFORM_ASYNC, TRUE), done);
+
+done:
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+
 }
 
 HRESULT COutPin::GetOutputAvailableType(DWORD dwTypeIndex, IMFMediaType** ppType)
@@ -515,4 +552,56 @@ HRESULT COutPin::GetOutputAvailableType(DWORD dwTypeIndex, IMFMediaType** ppType
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "COutPin::GetOutputAvailableType Exit %!HRESULT!", hr);
     return hr;
+}
+
+CPinQueue::CPinQueue(DWORD _inPinId, IMFDeviceTransform* pTransform) : m_dwInPinId(_inPinId),
+m_pTransform(pTransform),
+m_cRef(1)
+{
+    m_streamCategory = GUID_NULL;
+}
+
+CPinQueue::~CPinQueue()
+{
+    Ctee::ReleaseTee(m_spTeer);
+}
+
+STDMETHODIMP_(VOID __stdcall) CPinQueue::InsertInternal(IMFSample* pSample)
+{
+    return VOID();
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CPinQueue::Insert(IMFSample* pSample)
+{
+    UNREFERENCED_PARAMETER(pSample);
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CPinQueue::Remove(IMFSample** pSample)
+{
+    UNREFERENCED_PARAMETER(pSample);
+    return E_NOTIMPL;
+}
+
+HRESULT __stdcall CPinQueue::RecreateTee(IMFMediaType* inMediatype, IMFMediaType* outMediatype, IUnknown* punkManager)
+{
+    UNREFERENCED_PARAMETER(inMediatype);
+    UNREFERENCED_PARAMETER(outMediatype);
+    UNREFERENCED_PARAMETER(punkManager);
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CPinQueue::RecreateTeeByAllocatorMode(IMFMediaType* inMediatype, IMFMediaType* outMediatype, IUnknown* punkManager, MFSampleAllocatorUsage allocatorUsage, IMFVideoSampleAllocator* pAllcoator)
+{
+    UNREFERENCED_PARAMETER(inMediatype);
+    UNREFERENCED_PARAMETER(outMediatype);
+    UNREFERENCED_PARAMETER(punkManager);
+    UNREFERENCED_PARAMETER(allocatorUsage);
+    UNREFERENCED_PARAMETER(pAllcoator);
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP_(VOID __stdcall) CPinQueue::Clear()
+{
+    return VOID();
 }

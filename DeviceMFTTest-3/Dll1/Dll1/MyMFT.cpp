@@ -1,10 +1,9 @@
 #include "pch.h"
-#include "MyMFT.h"
 #include "MyMFT.tmh"
 
 #include <string>
 #include <array>
-using namespace std;
+using namespace std; 
 
 MyMFT::MyMFT() : m_cRef(0)
 {
@@ -19,6 +18,25 @@ MyMFT::MyMFT() : m_cRef(0)
 
 MyMFT::~MyMFT()
 {
+    for (UINT index = 0; index < m_InPins.size(); index++)
+    {
+        if (m_InPins[index] != NULL)
+        {
+            delete(m_InPins[index]);
+        }
+    }
+    m_InPins.clear();
+
+    for (DWORD index = 0; index < m_OutPins.size(); index++)
+    {
+        if (m_OutPins[index] != NULL)
+        {
+            delete(m_OutPins[index]);
+        }
+    }
+    m_OutPins.clear();
+
+#if 0
     for (UINT index = 0; index < m_basePinArrayInPins.size(); index++)
     {
         if (m_basePinArrayInPins[index] != NULL)
@@ -36,7 +54,7 @@ MyMFT::~MyMFT()
         }
     }
     m_basePinArrayOutPins.clear();
-
+#endif
     m_spSourceTransform = nullptr;
 }
 
@@ -317,6 +335,30 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetStreamIDs(DWORD dwInputIDArraySize, D
         {
             for (UINT index = 0; index < dwInputIDArraySize; index++)
             {
+                if (m_InPins[index] != NULL)
+                {
+                    pdwInputStreamIds[index] = m_InPins[index]->GetStreamId();
+                    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetStreamIDs m_InPins[%d]->GetStreamId(): %d", index, m_InPins[index]->GetStreamId());
+                }
+            }
+        }
+
+        if (dwOutputIDArraySize)
+        {
+            for (DWORD index = 0; index < dwOutputIDArraySize; index++)
+            {
+                if (m_OutPins[index] != NULL)
+                {
+                    pdwOutputStreamIds[index] = m_OutPins[index]->GetStreamId();
+                    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetStreamIDs m_OutPins[%d]->GetStreamId(): %d", index, m_OutPins[index]->GetStreamId());
+                }
+            }
+        }
+#if 0
+        if (dwInputIDArraySize)
+        {
+            for (UINT index = 0; index < dwInputIDArraySize; index++)
+            {
                 if (m_basePinArrayInPins[index] != NULL)
                 {
                     pdwInputStreamIds[index] = m_basePinArrayInPins[index]->GetStreamId();
@@ -336,6 +378,7 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::GetStreamIDs(DWORD dwInputIDArraySize, D
                 }
             }
         }
+#endif
     }
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetStreamIDs Exit %!HRESULT!", hr);
     return hr;
@@ -345,6 +388,219 @@ STDMETHODIMP_(HRESULT __stdcall) MyMFT::InitializeTransform(_In_ IMFAttributes* 
 {
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform Entry");
 
+    HRESULT                 hr = S_OK;
+    ComPtr<IUnknown>        spFilterUnk = nullptr;
+    DWORD* pcInputStreams = NULL, * pcOutputStreams = NULL;
+    DWORD                   inputStreams = 0;
+    DWORD                   outputStreams = 0;
+    GUID* outGuids = NULL;
+    GUID                    streamCategory = GUID_NULL;
+    ULONG                   ulOutPinIndex = 0;
+    UINT32                  uiSymLinkLen = 0;
+    CPinCreationFactory* pPinFactory = new (std::nothrow) CPinCreationFactory(this);
+    if (pAttributes == NULL)
+    {
+        goto done;
+    }
+
+    //
+    // The attribute passed with MF_DEVICEMFT_CONNECTED_FILTER_KSCONTROL is the source transform. This generally represents a filter
+    // This needs to be stored so that we know the device properties. We cache it. We query for the IKSControl which is used to send
+    // controls to the driver.
+    //
+    if (FAILED(pAttributes->GetUnknown(MF_DEVICEMFT_CONNECTED_FILTER_KSCONTROL, IID_PPV_ARGS(&spFilterUnk))))
+    {
+        goto done;
+    }
+
+    if (SUCCEEDED(pAttributes->GetStringLength(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, &uiSymLinkLen))) // Not available prior to RS5
+    {
+        m_SymbolicLink = new (std::nothrow) WCHAR[++uiSymLinkLen];
+        if (m_SymbolicLink == NULL)
+        {
+            goto done;
+        }
+        if (FAILED(pAttributes->GetString(MF_DEVSOURCE_ATTRIBUTE_SOURCE_TYPE_VIDCAP_SYMBOLIC_LINK, m_SymbolicLink, uiSymLinkLen, &uiSymLinkLen)))
+        {
+            goto done;
+        }
+    }
+
+    if (FAILED(spFilterUnk.As(&m_spSourceTransform)))
+    {
+        goto done;
+    }
+
+    if (FAILED(m_spSourceTransform.As(&m_spIkscontrol)))
+    {
+        goto done;
+    }
+
+    if (FAILED(m_spSourceTransform->GetStreamCount(&inputStreams, &outputStreams)))
+    {
+        goto done;
+    }
+
+    spFilterUnk = nullptr;
+
+    //
+    //The number of input pins created by the device transform should match the pins exposed by
+    //the source transform i.e. outputStreams from SourceTransform or DevProxy = Input pins of the Device MFT
+    //
+
+    if (inputStreams > 0 || outputStreams > 0)
+    {
+        pcInputStreams = new (std::nothrow) DWORD[inputStreams];
+        if (pcInputStreams == NULL)
+        {
+            goto done;
+        }
+
+        pcOutputStreams = new (std::nothrow) DWORD[outputStreams];
+        if (pcOutputStreams == NULL)
+        {
+            goto done;
+        }
+
+        if (FAILED(m_spSourceTransform->GetStreamIDs(inputStreams, pcInputStreams,
+            outputStreams,
+            pcOutputStreams)))
+        {
+            goto done;
+        }
+
+        //
+        // Output pins from DevProxy = Input pins of device MFT.. We are the first transform in the pipeline before MFT0
+        //
+
+        for (ULONG ulIndex = 0; ulIndex < outputStreams; ulIndex++)
+        {
+            ComPtr<IMFAttributes>   pInAttributes = nullptr;
+            BOOL                    bCustom = FALSE;
+            ComPtr<CInPin>          spInPin;
+
+            if (FAILED((pPinFactory->CreatePin(
+                pcOutputStreams[ulIndex], /*Input Pin ID as advertised by the pipeline*/
+                0, /*This is not needed for Input Pin*/
+                CPinCreationFactory::DMFT_PIN_INPUT, /*Input Pin*/
+                (CBasePin**)spInPin.GetAddressOf(),
+                bCustom))))
+            {
+                goto done;
+            }
+            if (bCustom)
+            {
+                m_CustomPinCount++;
+            }
+            hr = ExceptionBoundary([&]()
+                {
+                    m_InPins.push_back(spInPin.Get());
+                });
+            if (FAILED(hr))
+            {
+                goto done;
+            }
+            if (FAILED(spInPin->Init(m_spSourceTransform.Get())))
+            {
+                goto done;
+            }
+            spInPin.Detach();
+        }
+
+        //
+        // Create one on one mapping
+        //
+        for (ULONG ulIndex = 0; ulIndex < m_InPins.size(); ulIndex++)
+        {
+
+            ComPtr<COutPin> spoPin;
+            BOOL     bCustom = FALSE;
+            ComPtr<CInPin> spiPin = (CInPin*)m_InPins[ulIndex];
+
+            if (spiPin.Get())
+            {
+                BOOL isCustom = false;
+                if (SUCCEEDED(CheckCustomPin(spiPin.Get(), &isCustom)) && (isCustom))
+                {
+                    //
+                    // In this sample we are not connecting the custom pin to the output
+                    // This is because we really have no way of testing the custom pin with the
+                    // pipeline. 
+                    // This however can be changed if the custom media type is converted here in
+                    // the device MFT and later exposed to the pipeline..
+                    //
+                    continue;
+                }
+
+                DMFTCHECKHR_GOTO(pPinFactory->CreatePin(spiPin->streamId(), /*Input Pin connected to the Output Pin*/
+                    ulOutPinIndex, /*Output pin Id*/
+                    CPinCreationFactory::DMFT_PIN_OUTPUT, /*Output pin */
+                    (CBasePin**)spoPin.ReleaseAndGetAddressOf(),
+                    bCustom), done);
+                hr = BridgeInputPinOutputPin(spiPin.Get(), spoPin.Get());
+                if (SUCCEEDED(hr))
+                {
+                    DMFTCHECKHR_GOTO(ExceptionBoundary([&]()
+                        {
+                            m_OutPins.push_back(spoPin.Get());
+                        }), done);
+                    spoPin.Detach();
+                    ulOutPinIndex++;
+                    hr = S_OK;
+                }
+                if (hr == MF_E_INVALID_STREAM_DATA)
+                {
+                    // Skip the pin which doesn't have any mediatypes exposed
+                    hr = S_OK;
+                }
+                DMFTCHECKHR_GOTO(hr, done);
+}
+        }
+
+    }
+
+    m_InputPinCount = ULONG(m_InPins.size());
+    m_OutputPinCount = ULONG(m_OutPins.size());
+
+done:
+
+    if (pcInputStreams)
+    {
+        delete[](pcInputStreams);
+    }
+    if (pcOutputStreams)
+    {
+        delete[](pcOutputStreams);
+    }
+    if (outGuids)
+    {
+        delete[](outGuids);
+    }
+    SAFE_DELETE(pPinFactory);
+    if (FAILED(hr))
+    {
+        //Release the pins and the resources acquired
+        for (ULONG ulIndex = 0, ulSize = (ULONG)m_InPins.size(); ulIndex < ulSize; ulIndex++)
+        {
+            SAFERELEASE(m_InPins[ulIndex]);
+        }
+        m_InPins.clear();
+        for (ULONG ulIndex = 0, ulSize = (ULONG)m_OutPins.size(); ulIndex < ulSize; ulIndex++)
+        {
+            SAFERELEASE(m_OutPins[ulIndex]);
+        }
+        m_OutPins.clear();
+        //
+        // Simply clear the custom pins since the input pins must have deleted the pin
+        //
+        m_spSourceTransform = nullptr;
+        m_spIkscontrol = nullptr;
+    }
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform Exit %!HRESULT!", hr);
+    return hr;
+
+#if 0
     HRESULT hr = E_FAIL;
 
     ComPtr<IUnknown> spFilterUnk = nullptr;
@@ -490,6 +746,7 @@ CLEANUP:
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::InitializeTransform Exit %!HRESULT!", hr);
     return hr;
+#endif
 }
 
 STDMETHODIMP_(HRESULT __stdcall) MyMFT::ProcessEvent(DWORD dwInputStreamID, IMFMediaEvent* pEvent)
@@ -721,6 +978,17 @@ CInPin* MyMFT::GetInPin(DWORD dwStreamId)
 
     CInPin* pin = nullptr;
 
+    for (UINT index = 0; index < m_InPins.size(); index++)
+    {
+        if (m_InPins[index]->GetStreamId() == dwStreamId)
+        {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "m_InPins[%d]->GetStreamId() == %d", index, dwStreamId);
+
+            pin = (CInPin*)m_InPins[index];
+            break;
+        }
+    }
+#if 0
     for (UINT index = 0; index < m_basePinArrayInPins.size(); index++)
     {
         if (m_basePinArrayInPins[index]->GetStreamId() == dwStreamId)
@@ -731,7 +999,7 @@ CInPin* MyMFT::GetInPin(DWORD dwStreamId)
             break;
         }
     }
-
+#endif
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetInPin Exit");
     return pin;
 }
@@ -742,6 +1010,17 @@ COutPin* MyMFT::GetOutPin(DWORD dwStreamId)
 
     COutPin* pin = nullptr;
 
+    for (DWORD index = 0; index < m_OutPins.size(); index++)
+    {
+        if (m_OutPins[index]->GetStreamId() == dwStreamId)
+        {
+            TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "m_OutPins[%d]->GetStreamId() == %d", index, dwStreamId);
+
+            pin = (COutPin*)m_OutPins[index];
+            break;
+        }
+    }
+#if 0
     for (DWORD index = 0; index < m_basePinArrayOutPins.size(); index++)
     {
         if (m_basePinArrayOutPins[index]->GetStreamId() == dwStreamId)
@@ -752,7 +1031,7 @@ COutPin* MyMFT::GetOutPin(DWORD dwStreamId)
             break;
         }
     }
-
+#endif
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::GetOutPin Exit");
     return pin;
 }
@@ -799,5 +1078,128 @@ HRESULT MyMFT::BridgeInputPinOutputPin(CInPin* pInPin, COutPin* pOutPin)
     }
 
     TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "MyMFT::BridgeInputPinOutputPin Exit %!HRESULT!", hr);
+    return hr;
+}
+
+STDMETHODIMP MyMFT::CheckCustomPin(
+    _In_ CInPin* pPin,
+    _Inout_ PBOOL  pIsCustom
+)
+{
+    HRESULT hr = S_OK;
+    DMFTCHECKNULL_GOTO(pPin, done, E_INVALIDARG);
+    DMFTCHECKNULL_GOTO(pIsCustom, done, E_INVALIDARG);
+
+    *pIsCustom = false;
+done:
+    return hr;
+}
+
+HRESULT CPinCreationFactory::CreatePin(ULONG ulInputStreamId, ULONG ulOutStreamId, type_pin type, CBasePin** ppPin, BOOL& isCustom)
+{
+    HRESULT hr = S_OK;
+    ComPtr<IMFAttributes> spAttributes;
+    GUID    streamCategory = GUID_NULL;
+    DMFTCHECKNULL_GOTO(ppPin, done, E_INVALIDARG);
+    *ppPin = nullptr;
+    isCustom = FALSE;
+    DMFTCHECKHR_GOTO(m_spDeviceTransform->Parent()->GetOutputStreamAttributes(ulInputStreamId, &spAttributes), done);
+    if (type == DMFT_PIN_INPUT)
+    {
+        ComPtr<CInPin>  spInPin;
+        DMFTCHECKHR_GOTO(spAttributes->GetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, &streamCategory), done);
+        // Create Cutom Pin
+        if (IsEqualCLSID(streamCategory, AVSTREAM_CUSTOM_PIN_IMAGE))
+        {
+            //spInPin = new (std::nothrow) CCustomPin(spAttributes.Get(), ulInputStreamId, static_cast<CMultipinMft*> (m_spDeviceTransform.Get()));
+            //isCustom = TRUE;
+        }
+        else
+        {
+#if defined MF_DEVICEMFT_ASYNCPIN_NEEDED
+            //spInPin = new (std::nothrow) CAsyncInPin(spAttributes.Get(), ulInputStreamId, m_spDeviceTransform.Get()); // Asynchronous PIn, if you need it
+            spInPin = new (std::nothrow) CInPin(spAttributes.Get(), ulInputStreamId, m_spDeviceTransform.Get()); // Asynchronous PIn, if you need it
+#else
+            spInPin = new (std::nothrow) CInPin(spAttributes.Get(), ulInputStreamId, m_spDeviceTransform.Get());
+#endif
+        }
+        DMFTCHECKNULL_GOTO(spInPin.Get(), done, E_OUTOFMEMORY);
+        *ppPin = spInPin.Detach();
+
+    }
+    else if (type == DMFT_PIN_OUTPUT)
+    {
+        ComPtr<COutPin> spOutPin;
+        ComPtr<IKsControl>  spKscontrol;
+        ComPtr<CInPin>      spInPin;
+        GUID                pinGuid = GUID_NULL;
+        UINT32              uiFrameSourceType = 0;
+
+        spInPin = static_cast<CInPin*>(m_spDeviceTransform->GetInPin(ulInputStreamId));              // Get the Input Pin connected to the Output pin
+        DMFTCHECKNULL_GOTO(spInPin.Get(), done, E_INVALIDARG);
+        DMFTCHECKHR_GOTO(spInPin.As(&spKscontrol), done);   // Grab the IKSControl off the input pin
+        DMFTCHECKHR_GOTO(spInPin->GetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, &pinGuid), done);         // Get the Stream Category. Advertise on the output pin
+
+#if defined MF_DEVICEMFT_DECODING_MEDIATYPE_NEEDED
+        spOutPin = new (std::nothrow) CTranslateOutPin(ulOutStreamId, m_spDeviceTransform.Get(), spKscontrol.Get());         // Create the output pin
+#else
+        spOutPin = new (std::nothrow) COutPin(ulOutStreamId, m_spDeviceTransform.Get(), spKscontrol.Get()
+#if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
+            , MFSampleAllocatorUsage_DoesNotAllocate
+#endif
+        );         // Create the output pin
+#endif
+        DMFTCHECKNULL_GOTO(spOutPin.Get(), done, E_OUTOFMEMORY);
+
+        DMFTCHECKHR_GOTO(spOutPin->SetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, pinGuid), done);         // Advertise the Stream category to the Pipeline
+        DMFTCHECKHR_GOTO(spOutPin->SetUINT32(MF_DEVICESTREAM_STREAM_ID, ulOutStreamId), done);       // Advertise the stream Id to the Pipeline
+        //
+        // @@@@ README
+        // Note H264 pins are tagged MFFrameSourceTypes_Custom. Since we are decoding H264 if we enable decoding,
+        // lets change it to color, because we are producing an uncompressed format type, hence change it to 
+        //    MFFrameSourceTypes_Color, MFFrameSourceTypes_Infrared or MFFrameSourceTypes_Depth
+        //
+        if (SUCCEEDED(spInPin->GetUINT32(MF_DEVICESTREAM_ATTRIBUTE_FRAMESOURCE_TYPES, &uiFrameSourceType)))
+        {
+#if defined MF_DEVICEMFT_DECODING_MEDIATYPE_NEEDED
+            uiFrameSourceType = (uiFrameSourceType == MFFrameSourceTypes_Custom) ? MFFrameSourceTypes_Color : uiFrameSourceType;
+#endif
+            DMFTCHECKHR_GOTO(spOutPin->SetUINT32(MF_DEVICESTREAM_ATTRIBUTE_FRAMESOURCE_TYPES, uiFrameSourceType), done);   // Copy over the Frame Source Type.
+        }
+
+#if defined (MF_DEVICEMFT_ALLOW_MFT0_LOAD) && defined (MFT_UNIQUE_METHOD_NAMES)
+        //
+        // If we wish to load MFT0 as well as Device MFT then we should be doing the following
+        // Copy over the GUID attribute MF_DEVICESTREAM_EXTENSION_PLUGIN_CLSID from the input
+        // pin to the output pin. This is because Device MFT is the new face of the filter now
+        // and MFT0 will now get loaded for the output pins exposed from Device MFT rather than
+        // DevProxy!
+        //
+
+        GUID        guidMFT0 = GUID_NULL;
+        if (SUCCEEDED(spInPin->GetGUID(MF_DEVICESTREAM_EXTENSION_PLUGIN_CLSID, &guidMFT0)))
+        {
+            //
+            // This stream has an MFT0 .. Attach the GUID to the Outpin pin attribute
+            // The downstream will query this attribute  on the pins exposed from device MFT
+            //
+            DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! setting Mft0 guid on pin %d", ulOutStreamId);
+
+            DMFTCHECKHR_GOTO(spOutPin->SetGUID(MF_DEVICESTREAM_EXTENSION_PLUGIN_CLSID, guidMFT0), done);
+
+            DMFTCHECKHR_GOTO(spOutPin->SetUnknown(MF_DEVICESTREAM_EXTENSION_PLUGIN_CONNECTION_POINT,
+                static_cast<IUnknown*>(static_cast <IKsControl*>(m_spDeviceTransform.Get()))), done);
+
+        }
+#endif
+        * ppPin = spOutPin.Detach();
+    }
+    else
+    {
+        DMFTCHECKHR_GOTO(E_INVALIDARG, done);
+    }
+
+done:
+    TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
 }
