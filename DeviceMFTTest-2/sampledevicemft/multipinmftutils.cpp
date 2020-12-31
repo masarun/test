@@ -74,6 +74,16 @@ STDMETHODIMP   IsOptimizedPlanarVideoInputImageOutputPair(
     _Out_ bool *optimized,
     _Out_ bool *optimizedxvpneeded )
 {
+    UNREFERENCED_PARAMETER(inMediaType);
+    UNREFERENCED_PARAMETER(outMediaType);
+    UNREFERENCED_PARAMETER(optimized);
+    UNREFERENCED_PARAMETER(optimizedxvpneeded);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT         hr                  = S_OK;
     GUID            guidInputSubType    = GUID_NULL;
     GUID            guidOutputSubType   = GUID_NULL;
@@ -122,6 +132,7 @@ STDMETHODIMP   IsOptimizedPlanarVideoInputImageOutputPair(
 
 done:
     return hr;
+#endif
 }
 
 
@@ -143,6 +154,15 @@ STDMETHODIMP CompareMediaTypesForConverter(
     _Inout_ PDMFT_conversion_type  operation
     )
 {
+    UNREFERENCED_PARAMETER(inMediaType);
+    UNREFERENCED_PARAMETER(newMediaType);
+    UNREFERENCED_PARAMETER(operation);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr          = S_OK;
     GUID    guidTypeA   = GUID_NULL;
     GUID    guidTypeB   = GUID_NULL;
@@ -173,6 +193,7 @@ STDMETHODIMP CompareMediaTypesForConverter(
       }
   done:
     return hr;
+#endif
 }
 
 /*++
@@ -183,6 +204,14 @@ HRESULT IsInputDxSample(
     _Inout_ BOOL *isDxSample
     )
 {
+    UNREFERENCED_PARAMETER(pSample);
+    UNREFERENCED_PARAMETER(isDxSample);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFMediaBuffer> spBuffer = nullptr;
     DMFTCHECKNULL_GOTO( pSample, done, E_INVALIDARG );
@@ -200,6 +229,7 @@ HRESULT IsInputDxSample(
     }
 done:
     return hr;
+#endif
 }
 
 
@@ -209,12 +239,20 @@ done:
 --*/
 STDMETHODIMP_(BOOL) IsPinStateInActive( _In_ DeviceStreamState state)
 {
+    UNREFERENCED_PARAMETER(state);
+
+    BOOL result = false;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting result: %d", result);
+    return result;
+
+#if 0
     if ((state == DeviceStreamState_Disabled) ||
         (state == DeviceStreamState_Stop))
     {
         return TRUE;
     }
     return FALSE;
+#endif
 }
 
 /*
@@ -223,6 +261,13 @@ Description:
 */
 STDMETHODIMP_(BOOL) IsKnownUncompressedVideoType(_In_ GUID guidSubType)
 {
+    UNREFERENCED_PARAMETER(guidSubType);
+
+    BOOL result = false;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting result: %d", result);
+    return result;
+
+#if 0
     if (guidSubType == MFVideoFormat_ARGB32 ||
         guidSubType == MFVideoFormat_RGB24 ||
         guidSubType == MFVideoFormat_RGB555 ||
@@ -262,6 +307,7 @@ STDMETHODIMP_(BOOL) IsKnownUncompressedVideoType(_In_ GUID guidSubType)
     }  
 
     return( FALSE ); 
+#endif
 }
 
 #ifndef IF_EQUAL_RETURN
@@ -940,6 +986,14 @@ void TransformImage_RGB32(
 
 HRESULT GetDXGIAdapterLuid(_In_ IMFDXGIDeviceManager *pDXManager, _Out_ LUID &AdapterLuid)
 {
+    UNREFERENCED_PARAMETER(pDXManager);
+    UNREFERENCED_PARAMETER(AdapterLuid);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<ID3D11Device> spDevice;
     ComPtr<IDXGIDevice> spDXGIDevice;
@@ -964,10 +1018,19 @@ done:
     }
 
     return hr;
+#endif
 }
 
 HRESULT EnumSWDecoder(_Outptr_ IMFTransform** ppTransform, _In_ GUID subType)
 {
+    UNREFERENCED_PARAMETER(ppTransform);
+    UNREFERENCED_PARAMETER(subType);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     IMFActivate** ppActivate = nullptr;
     UINT32 count = 0;
@@ -1018,6 +1081,7 @@ done:
         CoTaskMemFree(ppActivate);
     }
     return hr;
+#endif
 }
 //
 // @@@@ README Create the decoder
@@ -1028,6 +1092,17 @@ HRESULT CreateDecoderFromLuid( _In_ LUID ullAdapterLuidRunningOn,
     _Inout_ BOOL fHwMft,
     _Outptr_ IMFTransform** ppDecoder)
 {
+    UNREFERENCED_PARAMETER(ullAdapterLuidRunningOn);
+    UNREFERENCED_PARAMETER(pInputType);
+    UNREFERENCED_PARAMETER(pOutputType);
+    UNREFERENCED_PARAMETER(fHwMft);
+    UNREFERENCED_PARAMETER(ppDecoder);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFAttributes> spAttribs;
     ComPtr<IMFTransform> spMJPGDecoder;
@@ -1088,12 +1163,22 @@ done:
     }
     SAFE_COTASKMEMFREE(ppActivates);
     return hr;
+#endif
 }
 
 HRESULT SetDX11BindFlags( _In_  IUnknown *pUnkManager,
     _In_ GUID guidPinCategory,
     _Inout_ DWORD &dwBindFlags)
 {
+    UNREFERENCED_PARAMETER(pUnkManager);
+    UNREFERENCED_PARAMETER(guidPinCategory);
+    UNREFERENCED_PARAMETER(dwBindFlags);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+# if 0
     HRESULT hr = S_OK;
     ComPtr<IUnknown> spDeviceManager;
     BOOL fFL10 = FALSE;
@@ -1138,6 +1223,7 @@ HRESULT SetDX11BindFlags( _In_  IUnknown *pUnkManager,
     }
 done:
     return hr;
+#endif
 }
 
 // @@@@ README: Create the Decoder
@@ -1147,6 +1233,17 @@ HRESULT CreateDecoderHW(_In_ IMFDXGIDeviceManager* pManager,
     _Outptr_ IMFTransform** ppTransform,
     _Inout_  BOOL&           fHwMft)
 {
+    UNREFERENCED_PARAMETER(pManager);
+    UNREFERENCED_PARAMETER(inType);
+    UNREFERENCED_PARAMETER(outType);
+    UNREFERENCED_PARAMETER(ppTransform);
+    UNREFERENCED_PARAMETER(fHwMft);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     LUID luid;
     ComPtr<IMFTransform> spTransform;
@@ -1168,6 +1265,7 @@ HRESULT CreateDecoderHW(_In_ IMFDXGIDeviceManager* pManager,
     *ppTransform = spTransform.Detach();
 done:
     return hr;
+#endif
 }
 
 HRESULT
@@ -1176,6 +1274,14 @@ SubtypeToDXGIFormat(
     _Inout_ DXGI_FORMAT &format
 )
 {
+    UNREFERENCED_PARAMETER(subType);
+    UNREFERENCED_PARAMETER(format);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     typedef struct {
         GUID subType;
@@ -1209,6 +1315,7 @@ SubtypeToDXGIFormat(
     // compressed media type or unsupported of the range
     hr = (format == DXGI_FORMAT_UNKNOWN) ? E_NOTIMPL : S_OK;
     return hr;
+#endif
 }
 
 HRESULT IsDXFormatSupported(
@@ -1217,6 +1324,16 @@ HRESULT IsDXFormatSupported(
     _Outptr_opt_ ID3D11Device** ppDevice,
     _In_opt_ PUINT32 pSupportedFormat)
 {
+    UNREFERENCED_PARAMETER(pDeviceManager);
+    UNREFERENCED_PARAMETER(subType);
+    UNREFERENCED_PARAMETER(ppDevice);
+    UNREFERENCED_PARAMETER(pSupportedFormat);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
     UINT32 supportedFormat = 0;
@@ -1241,6 +1358,7 @@ done:
         pDeviceManager->CloseDeviceHandle(hDevice);
     }
     return hr;
+#endif
 }
 
 HRESULT
@@ -1251,6 +1369,16 @@ UpdateAllocatorAttributes(
     _In_ IMFDXGIDeviceManager *pDeviceManager
 )
 {
+    UNREFERENCED_PARAMETER(pAttributes);
+    UNREFERENCED_PARAMETER(guidStreamCategory);
+    UNREFERENCED_PARAMETER(subType);
+    UNREFERENCED_PARAMETER(pDeviceManager);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     UINT32 supportedFormat = 0;
     ComPtr<ID3D11Device> spDevice;
@@ -1297,6 +1425,7 @@ UpdateAllocatorAttributes(
 
 done:
     return hr;
+#endif
 }
 
 const UINT32 ALLOCATOR_MIN_SAMPLES = 10;
@@ -1309,6 +1438,17 @@ HRESULT ConfigureAllocator(
     _In_ BOOL &bDxAllocator,
     _In_ IMFVideoSampleAllocator* pAllocator)
 {
+    UNREFERENCED_PARAMETER(pOutputMediaType);
+    UNREFERENCED_PARAMETER(streamCategory);
+    UNREFERENCED_PARAMETER(pDeviceManagerUnk);
+    UNREFERENCED_PARAMETER(bDxAllocator);
+    UNREFERENCED_PARAMETER(pAllocator);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     wil::com_ptr_nothrow<IMFVideoSampleAllocatorEx> spPrivateAllocator;
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
@@ -1377,6 +1517,7 @@ HRESULT ConfigureAllocator(
     bDxAllocator = fDXAllocator;
 
     return hr;
+#endif
 }
 //
 //@@@@ README: Creating an Allocator.. Please don't allocate samples individually using MFCreateSample as that can lead to fragmentation and is
@@ -1390,6 +1531,17 @@ HRESULT CreateAllocator( _In_ IMFMediaType* pOutputMediaType,
     _In_ BOOL &bDxAllocator,
     _Outptr_ IMFVideoSampleAllocatorEx** ppAllocator )
 {
+    UNREFERENCED_PARAMETER(pOutputMediaType);
+    UNREFERENCED_PARAMETER(streamCategory);
+    UNREFERENCED_PARAMETER(pDeviceManagerUnk);
+    UNREFERENCED_PARAMETER(bDxAllocator);
+    UNREFERENCED_PARAMETER(ppAllocator);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFVideoSampleAllocatorEx> spVideoSampleAllocator;
     ComPtr<IMFAttributes> spAllocatorAttributes;
@@ -1433,12 +1585,22 @@ HRESULT CreateAllocator( _In_ IMFMediaType* pOutputMediaType,
     bDxAllocator = fDXAllocator;
 done:
     return hr;
+#endif
 }
 
 HRESULT CheckPassthroughMediaType(_In_ IMFMediaType *pMediaType1,
     _In_ IMFMediaType *pMediaType2,
     _Out_ BOOL& pfPassThrough)
 {
+    UNREFERENCED_PARAMETER(pMediaType1);
+    UNREFERENCED_PARAMETER(pMediaType2);
+    UNREFERENCED_PARAMETER(pfPassThrough);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     BOOL fPassThrough = FALSE;
     UINT32 uWidth, uHeight;
@@ -1559,11 +1721,20 @@ HRESULT CheckPassthroughMediaType(_In_ IMFMediaType *pMediaType1,
 done:
     pfPassThrough = fPassThrough;
     return hr;
+#endif
 }
 
 
 HRESULT MergeSampleAttributes( _In_ IMFSample* pInSample, _Inout_ IMFSample* pOutSample)
 {
+    UNREFERENCED_PARAMETER(pInSample);
+    UNREFERENCED_PARAMETER(pOutSample);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     UINT32 cAttributes = 0;
     GUID guidAttribute;
@@ -1596,4 +1767,5 @@ done:
     PropVariantClear(&varAttribute);
     PropVariantClear(&varAttributeExists);
     return hr;
+#endif
 }

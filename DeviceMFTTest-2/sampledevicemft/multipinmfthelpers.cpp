@@ -431,6 +431,11 @@ done:
 
 HRESULT CVideoProcTee::CreateAllocator()
 {
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     if (m_bProducesSamples)
     {
@@ -470,6 +475,7 @@ HRESULT CVideoProcTee::CreateAllocator()
     }
 
     return hr;
+#endif
 }
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
@@ -491,16 +497,27 @@ CXvptee::~CXvptee()
 
 HRESULT CXvptee::StartStreaming()
 {
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     CAutoLock Lock(m_Lock);
     DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, 0), done); // ulParam set to zero
     DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, 0), done); // ulParam set to zero
 done:
     return hr;
+#endif
 }
 
 HRESULT CXvptee::StopStreaming()
 {
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     CAutoLock Lock(m_Lock);
     SetAsyncStatus(MF_E_SHUTDOWN);
@@ -509,6 +526,7 @@ HRESULT CXvptee::StopStreaming()
     DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, 0), done); // Notify end of streaming
 done:
     return hr;
+#endif
 }
 
 /*++
@@ -523,6 +541,15 @@ Output Pin.
 --*/
 STDMETHODIMP CXvptee::Do(_In_ IMFSample *pSample, _Outptr_ IMFSample** ppOutSample, _Inout_ bool &newSample)
 {
+    UNREFERENCED_PARAMETER(pSample);
+    UNREFERENCED_PARAMETER(ppOutSample);
+    UNREFERENCED_PARAMETER(newSample);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT                  hr = S_OK;
     MFT_OUTPUT_DATA_BUFFER   outputSample;
     ComPtr <IMFSample>       spXVPOutputSample;
@@ -579,6 +606,7 @@ done:
         DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! [Error hr=0x%x Sample=%p] ", hr, *ppOutSample);
     }
     return hr;
+#endif
 }
 
 
@@ -595,6 +623,15 @@ STDMETHODIMP CXvptee::Configure(
     _Outptr_ IMFTransform **ppTransform
     )
 {
+    UNREFERENCED_PARAMETER(inMediaType);
+    UNREFERENCED_PARAMETER(outMediaType);
+    UNREFERENCED_PARAMETER(ppTransform);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT      hr = S_OK;
     ComPtr<IMFAttributes> spXvpTransformAttributes = nullptr;
     DMFTCHECKNULL_GOTO(ppTransform, done, E_INVALIDARG);
@@ -634,7 +671,7 @@ STDMETHODIMP CXvptee::Configure(
     }
 done:
     return hr;
-
+#endif
 }
 
 // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@//
@@ -655,6 +692,11 @@ CDecoderTee::~CDecoderTee()
 
 HRESULT CDecoderTee::StartStreaming()
 {
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     CAutoLock Lock(&m_Lock);
     DMFTCHECKNULL_GOTO(Transform(), done, MF_E_UNEXPECTED);
@@ -662,10 +704,16 @@ HRESULT CDecoderTee::StartStreaming()
     DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, 0), done);
  done:
     return hr;
+#endif
 }
 
 HRESULT CDecoderTee::StopStreaming()
 {
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFTransform> spTransform;
     {
@@ -689,12 +737,22 @@ HRESULT CDecoderTee::StopStreaming()
     }
 done:
     return hr;
+#endif
 }
 
 STDMETHODIMP CDecoderTee::Configure(_In_opt_ IMFMediaType *inType,
     _In_opt_ IMFMediaType *outType,
     _Outptr_ IMFTransform** ppTransform)
 {
+    UNREFERENCED_PARAMETER(inType);
+    UNREFERENCED_PARAMETER(outType);
+    UNREFERENCED_PARAMETER(ppTransform);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFTransform> spTransform;
     GUID gInSubType = GUID_NULL, gOutSubType = GUID_NULL;
@@ -764,11 +822,21 @@ STDMETHODIMP CDecoderTee::Configure(_In_opt_ IMFMediaType *inType,
     *ppTransform = spTransform.Detach();
 done:
     return hr;
+#endif
 }
 
 
 STDMETHODIMP CDecoderTee::Do(_In_ IMFSample* pSample, _Outptr_ IMFSample **ppoutSample, _Inout_ bool &newSample)
 {
+    UNREFERENCED_PARAMETER(pSample);
+    UNREFERENCED_PARAMETER(ppoutSample);
+    UNREFERENCED_PARAMETER(newSample);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFSample> spOutputSample;
     CAutoLock lock(m_Lock);
@@ -839,6 +907,7 @@ done:
         SetAsyncStatus(hr);
     }
     return hr;
+#endif
 }
 
 //
@@ -847,6 +916,13 @@ done:
 //
 HRESULT CDecoderTee::Invoke(_In_ IMFAsyncResult* pResult)
 {
+    UNREFERENCED_PARAMETER(pResult);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT                 hr = S_OK;
     HRESULT                 hrEventStatus = S_OK;
     MediaEventType          met = MEUnknown;
@@ -958,6 +1034,7 @@ done:
             SetAsyncStatus(hr);
     }
     return hr;
+#endif
 }
 
 //
@@ -967,15 +1044,30 @@ done:
 //
 HRESULT CDecoderTee::GetSample( IMFSample** ppSample )
 {
+    UNREFERENCED_PARAMETER(ppSample);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     if (!m_bProducesSamples && m_spPrivateAllocator.Get())
     {
         return m_spPrivateAllocator->AllocateSample(ppSample);
     }
     return S_OK;
+#endif
 }
 
 HRESULT CDecoderTee::ConfigRealTimeMFT( _In_ IMFTransform* pTransform )
 {
+    UNREFERENCED_PARAMETER(pTransform);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     DWORD dwTaskID = 0;
     ComPtr<IMFRealTimeClientEx> spRTClientEx;
 
@@ -1001,10 +1093,16 @@ HRESULT CDecoderTee::ConfigRealTimeMFT( _In_ IMFTransform* pTransform )
     }
 
     return S_OK;
+#endif
 }
 
 HRESULT CDecoderTee::ProcessFormatChange()
 {
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFMediaType> spDecoderOutputMediaType;
     ComPtr<IMFTransform> spTransform = Transform();
@@ -1065,10 +1163,19 @@ HRESULT CDecoderTee::ProcessFormatChange()
     }
 done:
     return hr;
+#endif
 }
 
 HRESULT CDecoderTee::ConfigDecoder(_In_ IMFTransform* pTransform, _In_ GUID guidSubType )
 {
+    UNREFERENCED_PARAMETER(pTransform);
+    UNREFERENCED_PARAMETER(guidSubType);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFAttributes> spMFTAttributes;
     ComPtr<IMFMediaType> spMediaType;
@@ -1149,11 +1256,19 @@ done:
         m_D3daware  = FALSE;
     }
     return hr;
+#endif
 }
 
 
 HRESULT CDecoderTee::ProcessOutputSync(_COM_Outptr_opt_ IMFSample** ppSample)
 {
+    UNREFERENCED_PARAMETER(ppSample);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     ComPtr<IMFSample> spOutputSample;
     DWORD dwStatus = 0;
@@ -1199,6 +1314,7 @@ HRESULT CDecoderTee::ProcessOutputSync(_COM_Outptr_opt_ IMFSample** ppSample)
     }
  done:
     return hr;
+#endif
 }
 
 VOID CDecoderTee::ShutdownTee()
@@ -1349,15 +1465,26 @@ CSampleCopytee::~CSampleCopytee()
 
 HRESULT CSampleCopytee::StartStreaming()
 {
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     CAutoLock lock(m_Lock);
     RETURN_IF_FAILED(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, 0)); 
     RETURN_IF_FAILED(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, 0));
 
     return S_OK;
+#endif
 }
 
 HRESULT CSampleCopytee::StopStreaming()
 {
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     CAutoLock lock(m_Lock);
     SetAsyncStatus(MF_E_SHUTDOWN);
     RETURN_IF_FAILED(Transform()->MFTProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0)); // Flush the stream
@@ -1365,11 +1492,20 @@ HRESULT CSampleCopytee::StopStreaming()
     RETURN_IF_FAILED(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, 0)); // Notify end of streaming
 
     return S_OK;
+#endif
 }
 
 STDMETHODIMP CSampleCopytee::Do(_In_ IMFSample *pSample, _Outptr_ IMFSample** ppOutSample, _Inout_ bool &newSample)
 {
+    UNREFERENCED_PARAMETER(pSample);
+    UNREFERENCED_PARAMETER(ppOutSample);
+    UNREFERENCED_PARAMETER(newSample);
 
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     MFT_OUTPUT_DATA_BUFFER   outputSample;
     ComPtr <IMFSample>       spXVPOutputSample;
@@ -1415,6 +1551,7 @@ STDMETHODIMP CSampleCopytee::Do(_In_ IMFSample *pSample, _Outptr_ IMFSample** pp
     }
 
     return hr;
+#endif
 }
 
 STDMETHODIMP CSampleCopytee::Configure(
@@ -1423,6 +1560,15 @@ STDMETHODIMP CSampleCopytee::Configure(
     _Outptr_ IMFTransform **ppTransform
 )
 {
+    UNREFERENCED_PARAMETER(inMediaType);
+    UNREFERENCED_PARAMETER(outMediaType);
+    UNREFERENCED_PARAMETER(ppTransform);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     RETURN_HR_IF_NULL(E_INVALIDARG, ppTransform);
 
     CMediaTypePrinter inType(inMediaType);
@@ -1439,6 +1585,7 @@ STDMETHODIMP CSampleCopytee::Configure(
     }
 
     return S_OK;
+#endif
 }
 
 
@@ -1453,6 +1600,17 @@ HRESULT CDMFTEventHandler::KSEvent(
     _In_ ULONG ulDataLength,
     _Inout_ ULONG* pBytesReturned)
 {
+    UNREFERENCED_PARAMETER(pEvent);
+    UNREFERENCED_PARAMETER(ulEventLength);
+    UNREFERENCED_PARAMETER(pEventData);
+    UNREFERENCED_PARAMETER(ulDataLength);
+    UNREFERENCED_PARAMETER(pBytesReturned);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     UNREFERENCED_PARAMETER(ulDataLength);
     UNREFERENCED_PARAMETER(pBytesReturned);
@@ -1594,6 +1752,7 @@ HRESULT CDMFTEventHandler::KSEvent(
 
 done:
     return hr;
+#endif
 }
 
 /*++
@@ -1605,6 +1764,13 @@ Descrtiption:
 
 HRESULT CDMFTEventHandler::SetOneShot( ULONG ulEventId )
 {
+    UNREFERENCED_PARAMETER(ulEventId);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     hr = ExceptionBoundary([&]()
     {
@@ -1640,6 +1806,7 @@ done:
         ulEventId,
         HRESULT_FROM_WIN32(GetLastError()));
     return hr;
+#endif
 }
 
 /*++
@@ -1651,6 +1818,13 @@ Descrtiption:
 
 HRESULT CDMFTEventHandler::SetRegularEvent(ULONG ulEventId)
 {
+    UNREFERENCED_PARAMETER(ulEventId);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     BOOL bEvtFound = FALSE;
     HRESULT hr = ExceptionBoundary([&]()
     {
@@ -1682,6 +1856,7 @@ HRESULT CDMFTEventHandler::SetRegularEvent(ULONG ulEventId)
     }
 done:
     return hr;
+#endif
 }
 
 /*++
@@ -1691,6 +1866,14 @@ Descrtiption:
 
 HRESULT CDMFTEventHandler::Dupe(_In_ HANDLE hEventHandle, _Outptr_ LPHANDLE lpTargetHandle)
 {
+    UNREFERENCED_PARAMETER(hEventHandle);
+    UNREFERENCED_PARAMETER(lpTargetHandle);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     DMFTCHECKNULL_GOTO(hEventHandle, done, E_INVALIDARG);
     DMFTCHECKNULL_GOTO(lpTargetHandle, done, E_INVALIDARG);
@@ -1711,6 +1894,7 @@ HRESULT CDMFTEventHandler::Dupe(_In_ HANDLE hEventHandle, _Outptr_ LPHANDLE lpTa
     }
 done:
     return hr;
+#endif
 }
 
 /*++
@@ -1721,6 +1905,11 @@ Descrtiption:
 --*/
 HRESULT CDMFTEventHandler::Clear()
 {
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     hr = ExceptionBoundary([&]()
     {
@@ -1762,6 +1951,7 @@ HRESULT CDMFTEventHandler::Clear()
     DMFTCHECKHR_GOTO(hr, done);
 done:
     return hr;
+#endif
 }
 
 HRESULT CPinCreationFactory::CreatePin(_In_ ULONG ulInputStreamId, /* The Input stream Id*/
@@ -1881,6 +2071,15 @@ done:
 
 HRESULT CheckPinType(_In_ IMFAttributes* pAttributes, _In_ GUID pinType, _Out_ PBOOL pResult)
 {
+    UNREFERENCED_PARAMETER(pAttributes);
+    UNREFERENCED_PARAMETER(pinType);
+    UNREFERENCED_PARAMETER(pResult);
+
+    HRESULT hr = E_NOTIMPL;
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
+    return hr;
+
+#if 0
     HRESULT hr = S_OK;
     GUID pinClsid = GUID_NULL;
    
@@ -1895,15 +2094,31 @@ HRESULT CheckPinType(_In_ IMFAttributes* pAttributes, _In_ GUID pinType, _Out_ P
     }
 done:
     return hr;
+#endif
 }
 
 BOOL CheckImagePin( _In_ IMFAttributes* pAttributes, _Out_ PBOOL pbIsImagePin )
 {
+    UNREFERENCED_PARAMETER(pAttributes);
+    UNREFERENCED_PARAMETER(pbIsImagePin);
+
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting NOTIMPL");
+    return FALSE;
+#if 0
     return ((SUCCEEDED(CheckPinType(pAttributes, PINNAME_IMAGE, pbIsImagePin)) && pbIsImagePin) ||
         (SUCCEEDED(CheckPinType(pAttributes, PINNAME_VIDEO_STILL, pbIsImagePin)) && pbIsImagePin));
+#endif
 }
 
 HRESULT CheckPreviewPin( _In_ IMFAttributes* pAttributes, _Out_ PBOOL pbIsPreviewPin)
 {
+    UNREFERENCED_PARAMETER(pAttributes);
+    UNREFERENCED_PARAMETER(pbIsPreviewPin);
+
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting NOTIMPL");
+    return FALSE;
+
+#if 0
     return CheckPinType(pAttributes, PINNAME_PREVIEW, pbIsPreviewPin);
+#endif
 }
