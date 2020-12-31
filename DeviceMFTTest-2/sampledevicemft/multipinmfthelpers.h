@@ -119,13 +119,6 @@ public:
     CPinQueue(_In_ DWORD _inPinId, _In_ IMFDeviceTransform* pTransform=nullptr);
     ~CPinQueue();
 
-    STDMETHODIMP_(VOID) InsertInternal  ( _In_  IMFSample *pSample = nullptr );
-    STDMETHODIMP Insert                 ( _In_ IMFSample *pSample );
-    STDMETHODIMP Remove                 (_Outptr_result_maybenull_ IMFSample **pSample);
-    virtual STDMETHODIMP RecreateTee    (
-        _In_  IMFMediaType *inMediatype,
-        _In_ IMFMediaType *outMediatype,
-        _In_opt_ IUnknown* punkManager);
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
     STDMETHODIMP RecreateTeeByAllocatorMode(
         _In_  IMFMediaType* inMediatype,
@@ -209,15 +202,6 @@ protected:
  };
 
 
-#ifdef MF_DEVICEMFT_ADD_GRAYSCALER_
-class CPinQueueWithGrayScale:public  CPinQueue{
-public:
-    CPinQueueWithGrayScale(_In_ DWORD dwPinId, _In_ IMFDeviceTransform* pParent) :CPinQueue(dwPinId,pParent)
-    {
-    }
-    STDMETHODIMP RecreateTee(_In_  IMFMediaType *inMediatype, _In_ IMFMediaType *outMediatype, _In_opt_ IUnknown* punkManager);
-};
-#endif
 //
 // Define these in different components
 // The below classes are used to add the
@@ -245,7 +229,6 @@ public:
     {
         return S_OK;
     }
-   virtual STDMETHODIMP PassThrough( _In_ IMFSample * ) = 0;
 
    STDMETHOD_(VOID, ShutdownTee)()
    {
@@ -303,7 +286,6 @@ public:
         : m_Queue(q)
     {
     }
-    STDMETHODIMP PassThrough( _In_ IMFSample* );
 
 protected:
     // Store the queue here for simplicity
@@ -325,9 +307,7 @@ public:
     {
     }
 
-    STDMETHODIMP PassThrough        ( _In_ IMFSample* );
     virtual STDMETHODIMP Do         ( _In_ IMFSample* pSample, _Out_ IMFSample ** , _Inout_ bool &newSample) = 0;
-    STDMETHODIMP SetMediaTypes(_In_ IMFMediaType* pInMediaType, _In_ IMFMediaType* pOutMediaType);
     //
     // Inline functions
     //
@@ -380,21 +360,9 @@ public:
         m_spDeviceManagerUnk = pUnk;
     }
 
-    STDMETHODIMP SetMediaTypes(_In_ IMFMediaType* pInMediaType, _In_ IMFMediaType* pOutMediaType);
     virtual STDMETHODIMP Configure(_In_ IMFMediaType *, _In_ IMFMediaType *, _Inout_ IMFTransform**) = 0;
     STDMETHOD(CreateAllocator)();
-    STDMETHOD(Stop)()
-    {
-        HRESULT hr = S_OK;
-        if (SUCCEEDED(hr = StopStreaming()))
-        {
-            if (m_spObjectWrapped)
-            {
-                hr = m_spObjectWrapped->Stop();
-            }
-        }
-        return hr;
-    }
+
     virtual ~CVideoProcTee()
     {}
 protected:
@@ -407,8 +375,6 @@ protected:
     {
         return InterlockedCompareExchange(&m_asyncHresult, S_OK, S_OK);
     }
-    STDMETHOD(StartStreaming)() = 0;
-    STDMETHOD(StopStreaming)()  = 0;
     HRESULT              m_asyncHresult;
     ComPtr< IMFTransform > m_spVideoProcessor;
     ComPtr<IUnknown>       m_spDeviceManagerUnk;
@@ -424,8 +390,6 @@ class CXvptee :public CVideoProcTee{
 public:
     CXvptee( _In_ Ctee *, _In_ GUID category = PINNAME_PREVIEW );
     virtual ~CXvptee();
-    STDMETHOD(StartStreaming)();
-    STDMETHOD(StopStreaming)();
     STDMETHODIMP Do             (   _In_ IMFSample* pSample, _Outptr_ IMFSample **, _Inout_ bool &newSample);
     STDMETHODIMP Configure      (   _In_opt_ IMFMediaType *, _In_opt_ IMFMediaType *, _Outptr_ IMFTransform** );
 
@@ -457,8 +421,6 @@ public:
     STDMETHODIMP Configure(_In_opt_ IMFMediaType *, _In_opt_ IMFMediaType *, _Outptr_ IMFTransform**);
     STDMETHODIMP Invoke(_In_ IMFAsyncResult*);
 protected:
-    STDMETHODIMP StartStreaming();
-    STDMETHODIMP StopStreaming();
     HRESULT GetSample( _Outptr_result_maybenull_ IMFSample**);
     HRESULT ConfigDecoder( _In_ IMFTransform* ,_In_ GUID guidSubType = GUID_NULL);
     HRESULT ConfigRealTimeMFT(_In_ IMFTransform* );
@@ -489,8 +451,6 @@ public:
         , _In_ IMFVideoSampleAllocator* sampleAllocator = nullptr
     );
     ~CSampleCopytee();
-    STDMETHOD(StartStreaming)();
-    STDMETHOD(StopStreaming)();
     STDMETHODIMP Do(_In_ IMFSample* pSample, _Outptr_ IMFSample **, _Inout_ bool &newSample);
     STDMETHODIMP Configure(_In_opt_ IMFMediaType *, _In_opt_ IMFMediaType *, _Outptr_ IMFTransform**);
 };

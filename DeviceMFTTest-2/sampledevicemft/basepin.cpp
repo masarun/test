@@ -682,11 +682,8 @@ STDMETHODIMP COutPin::AddPin(
         DMFTCHECKHR_GOTO(E_UNEXPECTED, done);
 
     }
-#if defined MF_DEVICEMFT_ADD_GRAYSCALER_ // Take this out to remove the gray scaler
-    m_queue = new (std::nothrow) CPinQueueWithGrayScale(inputPinId);
-#else
+
     m_queue = new (std::nothrow) CPinQueue(inputPinId,Parent());
-#endif
     DMFTCHECKNULL_GOTO(m_queue, done, E_OUTOFMEMORY );
 
 done:

@@ -37,79 +37,6 @@ CPinQueue::~CPinQueue( )
     Ctee::ReleaseTee(m_spTeer);
 }
 
-/*++
-Description:
-    Insert sample into the list once we reach the open queue
---*/
-STDMETHODIMP_(VOID) CPinQueue::InsertInternal( _In_ IMFSample *pSample )
-{
-    UNREFERENCED_PARAMETER(pSample);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::InsertInternal");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::InsertInternal E_NOTIMPL");
-#if 0
-    pSample->AddRef();
-    HRESULT hr = ExceptionBoundary([&]()
-    {
-        m_sampleList.push_back(pSample);
-    });
-
-    if (SUCCEEDED(hr) && m_pTransform)
-    {
-        hr = reinterpret_cast<CMultipinMft*>(m_pTransform)->QueueEvent(METransformHaveOutput, GUID_NULL, S_OK, NULL);
-    }
-
-    if (FAILED(hr))
-    {
-        DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-        // There is a bug in the pipeline that doesn't release the sample fed from processinput. We have to explicitly release the sample here
-        SAFE_RELEASE(pSample);
-    }
-#endif
-}
-
-STDMETHODIMP CPinQueue::Insert( _In_ IMFSample *pSample )
-//
-//m_spTeer is the wraptee.. this could be a null tee which is a passthrough, an xvp tee which inserts an xvp into the queue etc
-//
-{
-    UNREFERENCED_PARAMETER(pSample);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Insert");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Insert E_NOTIMPL");
-    return E_NOTIMPL;
-
-#if 0
-    return m_spTeer->PassThrough( pSample );
-#endif
-}
-
-/*++
-Description:
-    This extracts the first sample from the queue. called from Pin's ProcessOutput 
---*/
-
-STDMETHODIMP CPinQueue::Remove( _Outptr_result_maybenull_ IMFSample **ppSample)
-{
-    UNREFERENCED_PARAMETER(ppSample);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Remove");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Remove E_NOTIMPL");
-    return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    DMFTCHECKNULL_GOTO( ppSample, done,E_INVALIDARG );
-    *ppSample = nullptr;
-
-    if ( !m_sampleList.empty() )
-    {
-        *ppSample = m_sampleList.front();
-    }
-
-    DMFTCHECKNULL_GOTO( *ppSample, done, MF_E_TRANSFORM_NEED_MORE_INPUT );
-    m_sampleList.erase( m_sampleList.begin() );
-done:
-    return hr;
-#endif
-}
 
 /*++
 Description:
@@ -136,76 +63,11 @@ VOID CPinQueue::Clear( )
     while ( !Empty() )
     {
         ComPtr<IMFSample> spSample;
-        Remove( spSample.GetAddressOf());
     }
 
 }
 
-/*++
-Description:
-    RecreateTee creates the underlying Tees in the queue. It accepts the input media type
-    which is the media type set on the input pin and the output mediatype, which (duh) is the
-    media type on the output pin
-    It also takes an IUnknown which is the D3D Manager. if it is valid we might use it if we
-    have an xvp in the path i.e. inputMediatype =! outputMediatype
---*/
 
-STDMETHODIMP CPinQueue::RecreateTee(_In_  IMFMediaType *inMediatype,
-    _In_ IMFMediaType *outMediatype,
-    _In_opt_ IUnknown* punkManager)
-{
-    UNREFERENCED_PARAMETER(inMediatype);
-    UNREFERENCED_PARAMETER(outMediatype);
-    UNREFERENCED_PARAMETER(punkManager);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTee");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTee E_NOTIMPL");
-    return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    DMFT_conversion_type operation = DeviceMftTransformTypeIllegal;
-
-    Ctee::ReleaseTee(m_spTeer);
-
-    ComPtr<CNullTee> spNulltee = new (std::nothrow) CNullTee(this);
-    DMFTCHECKNULL_GOTO(spNulltee.Get(), done, E_OUTOFMEMORY);
-
-    DMFTCHECKHR_GOTO(CompareMediaTypesForConverter(inMediatype, outMediatype, &operation), done);
-
-    if (operation == DeviceMftTransformTypeDecoder)
-    {
-        // Decoder needed
-        CDecoderTee* pDecTee = new (std::nothrow) CDecoderTee(spNulltee.Get(),
-            static_cast<CMultipinMft*>(m_pTransform)->GetQueueId(),
-            pinCategory());
-        DMFTCHECKNULL_GOTO(pDecTee, done, E_OUTOFMEMORY);
-        (void)pDecTee->SetD3DManager(punkManager);
-        DMFTCHECKHR_GOTO(pDecTee->SetMediaTypes(inMediatype, outMediatype), done);
-        m_spTeer = pDecTee;
-    }
-    else if (operation == DeviceMftTransformTypeXVP)
-    {
-        CXvptee* pXvptee = new (std::nothrow) CXvptee(spNulltee.Get(), pinCategory());
-        DMFTCHECKNULL_GOTO(pXvptee, done, E_OUTOFMEMORY);
-        (void)pXvptee->SetD3DManager(punkManager);
-        DMFTCHECKHR_GOTO(pXvptee->SetMediaTypes(inMediatype, outMediatype), done);
-        m_spTeer = pXvptee;
-    }
-    else
-    {
-        m_spTeer = spNulltee.Get(); /*A simple passthrough*/
-    }
-
-done:
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-
-    if (FAILED(hr))
-    {
-        Ctee::ReleaseTee(m_spTeer);
-    }
-    return hr;
-#endif
-}
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
 STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
     _In_  IMFMediaType* inMediatype,
@@ -224,6 +86,8 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode E_NOTIMPL");
     return E_NOTIMPL;
 #endif
+    UNREFERENCED_PARAMETER(inMediatype);
+    UNREFERENCED_PARAMETER(outMediatype);
 
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode");
 
@@ -254,7 +118,6 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
             sampleCopytee = wil::make_unique_nothrow<CSampleCopytee>(nulltee.release(), pinCategory(), nullptr);
         }
 
-        RETURN_IF_FAILED(sampleCopytee->SetMediaTypes(inMediatype, outMediatype));
         m_spTeer.Attach(sampleCopytee.release());
     }
 
@@ -263,170 +126,6 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
 
 }
 #endif // ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
-#ifdef MF_DEVICEMFT_ADD_GRAYSCALER_
-STDMETHODIMP CPinQueueWithGrayScale::RecreateTee( _In_  IMFMediaType *inMediatype,
-    _In_ IMFMediaType *outMediatype,
-    _In_opt_ IUnknown* punkManager)
-{
-    HRESULT hr = S_OK;
-    
-    GUID      gInputSubType = GUID_NULL;
-    DMFTCHECKNULL_GOTO(inMediatype, done, E_INVALIDARG);
-    DMFTCHECKNULL_GOTO(outMediatype, done, E_INVALIDARG);
-    DMFTCHECKHR_GOTO(CPinQueue::RecreateTee(inMediatype,
-        outMediatype,
-        punkManager),done);
-    DMFTCHECKNULL_GOTO(m_spTeer, done, E_UNEXPECTED);
-    // Wrap the media type with Gray scale tee only if the input media type is a YUY2, UYVY, NV12 or RGB32
-    DMFTCHECKHR_GOTO(inMediatype->GetGUID(MF_MT_SUBTYPE, &gInputSubType), done);
-    if (IsEqualCLSID(gInputSubType, MFVideoFormat_NV12)
-        ||IsEqualCLSID(gInputSubType, MFVideoFormat_YUY2)
-        ||IsEqualCLSID(gInputSubType, MFVideoFormat_UYVY)
-        ||IsEqualCLSID(gInputSubType, MFVideoFormat_RGB32))
-    {
-        CGrayTee *pTee = NULL;
-        pTee = new (std::nothrow) CGrayTee(m_spTeer);
-        DMFTCHECKHR_GOTO(pTee->SetMediaTypes(inMediatype, outMediatype), done);
-        m_spTeer = dynamic_cast< Ctee* >(pTee);
-    }
-    else
-    {
-        DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Skipping Gray scale Effect");
-    }
-done:
-    return hr;
-}
-#endif
-
-/*++
-Description:
-    This is the passthrough Tee in the literal sense i.e. It just dumps the sample
-    into the queue qupplied as an argument
---*/
-STDMETHODIMP CNullTee::PassThrough( _In_ IMFSample *pSample )
-{
-    UNREFERENCED_PARAMETER(pSample);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CNullTee::PassThrough");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CNullTee::PassThrough E_NOTIMPL");
-    return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    DMFTCHECKNULL_GOTO(pSample, done, S_OK); //No OP for a NULL Sample!!!
-    DMFTCHECKNULL_GOTO(m_Queue.Get(), done, E_UNEXPECTED); // State not set correctly
-    //
-    // @@@@ README: If there is a deocding operation that happens then the output samples will be here
-    // Any processing work like sticthing etc for 360 can happen here
-    //
-    m_Queue->InsertInternal(pSample);
-
-    done:
-    return hr;
-#endif
-}
-
-/*++
-Description:
-    This function sets the Media types on the XVP or the decoder transform. Here is where we configure the XVP
-    or the Decoder or the Encoder tee if present. The first iteration only has the XVP added
---*/
-STDMETHODIMP CWrapTee::SetMediaTypes( _In_ IMFMediaType* pInMediaType, _In_ IMFMediaType* pOutMediaType )
-{
-    UNREFERENCED_PARAMETER(pInMediaType);
-    UNREFERENCED_PARAMETER(pOutMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::SetMediaTypes");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::SetMediaTypes E_NOTIMPL");
-    return E_NOTIMPL;
-
-#if 0
-    m_pInputMediaType = pInMediaType;
-    m_pOutputMediaType = pOutMediaType;
-    return S_OK;
-#endif
-}
-
-/*++
-Description:
-This is used when an XVP is present in the Pin. If the path is a passthrough i.e.
-the media type on the input and the output pins are the same then we will not see
-this path traversed. This function feeds the sample to the XVP or the decoding Tee
---*/
-STDMETHODIMP CWrapTee::PassThrough( _In_ IMFSample* pInSample )
-{
-    UNREFERENCED_PARAMETER(pInSample);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::PassThrough");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CWrapTee::PassThrough E_NOTIMPL");
-    return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    IMFSample* pOutSample = nullptr;
-    bool       newSample = false;
-    DMFTCHECKNULL_GOTO(pInSample, done, S_OK); // pass through for no sample
-    DMFTCHECKHR_GOTO(Do(pInSample, &pOutSample,newSample),done);
-    
-    if (m_spObjectWrapped)
-    {
-        if (SUCCEEDED(hr = m_spObjectWrapped->PassThrough( pOutSample )))
-        {
-            //@@@@README There is a very bad bug in the pipeline that the device transform manager
-            // is not releasing the reference on the sample when it is passed to the device MFT so any
-            // sample produced has to be referenced matched in the deviceMFT so that the net reference remains one
-            // This goes against the ownership rules in Com, but this bug has existed in the pipeline so far,
-            // so until we rev the interface we will have to live with it
-            //
-            if (newSample)
-            {
-                // If we produce the sample, then we have to release the sample
-                SAFE_RELEASE(pOutSample);
-            }
-        }
-        
-    }
-
-done:
-    if (FAILED(hr))
-    {
-        DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    }
-
-    return hr;
-#endif
-}
-
-STDMETHODIMP CVideoProcTee::StartStreaming()
-{
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::StartStreaming");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::StartStreaming E_NOTIMPL");
-    return E_NOTIMPL;
-
-#if 0
-    return S_OK;
-#endif
-}
-HRESULT CVideoProcTee::SetMediaTypes(_In_ IMFMediaType* pInMediaType, _In_ IMFMediaType* pOutMediaType)
-{
-    UNREFERENCED_PARAMETER(pInMediaType);
-    UNREFERENCED_PARAMETER(pOutMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::SetMediaTypes");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CVideoProcTee::SetMediaTypes E_NOTIMPL");
-    return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    ComPtr<IMFTransform> spTransform;
-    DMFTCHECKHR_GOTO(CWrapTee::SetMediaTypes(pInMediaType, pOutMediaType),done);
-    DMFTCHECKHR_GOTO(Configure(pInMediaType, pOutMediaType, spTransform.GetAddressOf()), done);
-    m_spVideoProcessor = spTransform.Detach();
-    //
-    // Start streaming
-    //
-    DMFTCHECKHR_GOTO(StartStreaming(), done);
-done:
-    return hr;
-#endif
-}
-
 
 
 HRESULT CVideoProcTee::CreateAllocator()
@@ -491,43 +190,9 @@ CXvptee::CXvptee(_In_ Ctee *tee, GUID category) :
 
 CXvptee::~CXvptee()
 {
-    (VOID)StopStreaming();
     m_spDeviceManagerUnk = nullptr;
 }
 
-HRESULT CXvptee::StartStreaming()
-{
-    HRESULT hr = E_NOTIMPL;
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-
-#if 0
-    HRESULT hr = S_OK;
-    CAutoLock Lock(m_Lock);
-    DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, 0), done); // ulParam set to zero
-    DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, 0), done); // ulParam set to zero
-done:
-    return hr;
-#endif
-}
-
-HRESULT CXvptee::StopStreaming()
-{
-    HRESULT hr = E_NOTIMPL;
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-
-#if 0
-    HRESULT hr = S_OK;
-    CAutoLock Lock(m_Lock);
-    SetAsyncStatus(MF_E_SHUTDOWN);
-    DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0), done); // Flush the stream
-    DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, 0), done); // Notify end of stream
-    DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, 0), done); // Notify end of streaming
-done:
-    return hr;
-#endif
-}
 
 /*++
 CXvptee::Do
@@ -681,7 +346,6 @@ done:
 
 CDecoderTee::~CDecoderTee()
 {
-    (VOID)StopStreaming();
     MFUnlockWorkQueue(m_dwCameraStreamWorkQueueId);
     if (m_spPrivateAllocator)
     {
@@ -690,55 +354,7 @@ CDecoderTee::~CDecoderTee()
     }
 }
 
-HRESULT CDecoderTee::StartStreaming()
-{
-    HRESULT hr = E_NOTIMPL;
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
 
-#if 0
-    HRESULT hr = S_OK;
-    CAutoLock Lock(&m_Lock);
-    DMFTCHECKNULL_GOTO(Transform(), done, MF_E_UNEXPECTED);
-    DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, 0), done);
-    DMFTCHECKHR_GOTO(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, 0), done);
- done:
-    return hr;
-#endif
-}
-
-HRESULT CDecoderTee::StopStreaming()
-{
-    HRESULT hr = E_NOTIMPL;
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-
-#if 0
-    HRESULT hr = S_OK;
-    ComPtr<IMFTransform> spTransform;
-    {
-        CAutoLock Lock(&m_Lock);
-        spTransform = Transform();
-        SetAsyncStatus(MF_E_SHUTDOWN);
-    }
-    if (spTransform.Get())
-    {
-        ComPtr<IMFShutdown> spShutdown;
-        DMFTCHECKHR_GOTO(spTransform->MFTProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, m_dwMFTInputId), done);
-        DMFTCHECKHR_GOTO(spTransform->MFTProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0), done);
-        DMFTCHECKHR_GOTO(spTransform->MFTProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, 0), done);
-        // Shut it down
-        if (SUCCEEDED(spTransform->QueryInterface(IID_PPV_ARGS(&spShutdown))))
-        {
-            (void)spShutdown->Shutdown();
-        }
-        
-        spTransform = nullptr;
-    }
-done:
-    return hr;
-#endif
-}
 
 STDMETHODIMP CDecoderTee::Configure(_In_opt_ IMFMediaType *inType,
     _In_opt_ IMFMediaType *outType,
@@ -1459,41 +1075,9 @@ CSampleCopytee::CSampleCopytee(_In_ Ctee *tee, GUID category
 
 CSampleCopytee::~CSampleCopytee()
 {
-    (VOID)StopStreaming();
     m_spDeviceManagerUnk = nullptr;
 }
 
-HRESULT CSampleCopytee::StartStreaming()
-{
-    HRESULT hr = E_NOTIMPL;
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-
-#if 0
-    CAutoLock lock(m_Lock);
-    RETURN_IF_FAILED(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_BEGIN_STREAMING, 0)); 
-    RETURN_IF_FAILED(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_START_OF_STREAM, 0));
-
-    return S_OK;
-#endif
-}
-
-HRESULT CSampleCopytee::StopStreaming()
-{
-    HRESULT hr = E_NOTIMPL;
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-
-#if 0
-    CAutoLock lock(m_Lock);
-    SetAsyncStatus(MF_E_SHUTDOWN);
-    RETURN_IF_FAILED(Transform()->MFTProcessMessage(MFT_MESSAGE_COMMAND_FLUSH, 0)); // Flush the stream
-    RETURN_IF_FAILED(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_END_OF_STREAM, 0)); // Notify end of stream
-    RETURN_IF_FAILED(Transform()->MFTProcessMessage(MFT_MESSAGE_NOTIFY_END_STREAMING, 0)); // Notify end of streaming
-
-    return S_OK;
-#endif
-}
 
 STDMETHODIMP CSampleCopytee::Do(_In_ IMFSample *pSample, _Outptr_ IMFSample** ppOutSample, _Inout_ bool &newSample)
 {

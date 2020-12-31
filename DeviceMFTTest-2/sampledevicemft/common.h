@@ -237,30 +237,7 @@ typedef  std::pair< std::multimap<int, int>::iterator, std::multimap<int, int>::
 
 
 
-STDMETHODIMP   IsOptimizedPlanarVideoInputImageOutputPair(
-    _In_        IMFMediaType *inMediaType,
-    _In_        IMFMediaType *outMediaType,
-    _Out_       bool *optimized,
-    _Out_       bool *optimizedxvpneeded
-    );
 
-STDMETHODIMP CompareMediaTypesForConverter(_In_opt_ IMFMediaType *inMediaType,
-    _In_        IMFMediaType                *newMediaType,
-    _Inout_     PDMFT_conversion_type       operation
-    );
-
-HRESULT IsInputDxSample(
-    _In_ IMFSample* pSample,
-    _Inout_ BOOL *isDxSample
-    );
-
-STDMETHODIMP_(BOOL) IsPinStateInActive(
-    _In_ DeviceStreamState state
-    );
-
-STDMETHODIMP_(BOOL) IsKnownUncompressedVideoType(
-    _In_ GUID guidSubType
-    );
 LPSTR DumpGUIDA(
     _In_ REFGUID guid
     );
