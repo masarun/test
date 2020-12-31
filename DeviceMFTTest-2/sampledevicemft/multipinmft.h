@@ -414,7 +414,6 @@ private:
     ComPtr<IKsControl>           m_spIkscontrol;
     ComPtr<IMFAttributes>        m_spAttributes;
     map<int, int>                m_outputPinMap;                      // How output pins are connected to input pins i-><0..outpins>
-    CDMFTEventHandler            m_eventHandler;
     PWCHAR                       m_SymbolicLink;
 
 #if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)

@@ -610,46 +610,12 @@ private:
 };
 
 // Decoding and Allocator specific
-HRESULT CreateDecoderHW(    _In_ IMFDXGIDeviceManager* pManager,
-                            _In_ IMFMediaType* inType,
-                            _In_ IMFMediaType* outType,
-                            _Outptr_ IMFTransform** ppTransform,
-                            _Inout_ BOOL&);
 
-HRESULT EnumSWDecoder(      _Outptr_ IMFTransform** ppTransform,
-                            _In_ GUID subType);
-
-HRESULT SetDX11BindFlags(   _In_  IUnknown *pUnkManager,
-                            _In_ GUID guidPinCategory,
-                            _Inout_ DWORD &dwBindFlags);
-
-HRESULT IsDXFormatSupported(
-    _In_ IMFDXGIDeviceManager* pDeviceManager,
-    _In_ GUID subType,
-    _Outptr_opt_ ID3D11Device** ppDevice,
-    _In_opt_ PUINT32 pSupportedFormat);
-
-HRESULT ConfigureAllocator(
-    _In_ IMFMediaType* pOutputMediaType,
-    _In_ GUID streamCategory,
-    _In_ IUnknown* pDeviceManagerUnk,
-    _In_ BOOL &isDxAllocator,
-    _In_ IMFVideoSampleAllocator* pAllocator);
-
-HRESULT CreateAllocator( _In_ IMFMediaType* pOutputMediaType,
-    _In_ GUID streamCategory,
-    _In_ IUnknown* pDeviceManagerUnk,
-    _In_ BOOL &isDxAllocator,      
-    _Outptr_ IMFVideoSampleAllocatorEx** ppAllocator);
 
 HRESULT GetDXGIAdapterLuid( _In_ IMFDXGIDeviceManager *pDXManager,
     _Out_ LUID *pAdapterLuid);
 
-HRESULT MergeSampleAttributes(_In_ IMFSample* pInSample, _Inout_ IMFSample* pOutSample);
 
-HRESULT CheckPassthroughMediaType( _In_ IMFMediaType *pMediaType1,
-    _In_ IMFMediaType *pMediaType2,
-    _Out_ BOOL& pfPassThrough);
 //
 // Internal attribute
 //
