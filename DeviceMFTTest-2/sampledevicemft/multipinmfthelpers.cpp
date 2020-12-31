@@ -215,7 +215,6 @@ HRESULT CPinCreationFactory::CreatePin(_In_ ULONG ulInputStreamId, /* The Input 
         // Create Cutom Pin
         if (IsEqualCLSID(streamCategory, AVSTREAM_CUSTOM_PIN_IMAGE))
         {
-            spInPin = new (std::nothrow) CCustomPin(spAttributes.Get(), ulInputStreamId, static_cast<CMultipinMft*> (m_spDeviceTransform.Get()));
             isCustom = TRUE;
         }
         else
@@ -244,7 +243,7 @@ HRESULT CPinCreationFactory::CreatePin(_In_ ULONG ulInputStreamId, /* The Input 
         DMFTCHECKHR_GOTO(spInPin->GetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, &pinGuid), done);         // Get the Stream Category. Advertise on the output pin
 
 #if defined MF_DEVICEMFT_DECODING_MEDIATYPE_NEEDED
-        spOutPin = new (std::nothrow) CTranslateOutPin(ulOutStreamId, m_spDeviceTransform.Get(), spKscontrol.Get());         // Create the output pin
+
 #else
         spOutPin = new (std::nothrow) COutPin(ulOutStreamId, m_spDeviceTransform.Get(), spKscontrol.Get()
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))

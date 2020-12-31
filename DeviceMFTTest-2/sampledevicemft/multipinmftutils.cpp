@@ -461,37 +461,3 @@ void printMessageEvent(MFT_MESSAGE_TYPE msg)
     }
 }
 
-//
-// Used to check if the pin is a custom pin or not!!
-//
-STDMETHODIMP CheckCustomPin(
-    _In_ CInPin * pPin,
-    _Inout_ PBOOL  pIsCustom 
-    )
-{
-    HRESULT hr = S_OK;
-    DMFTCHECKNULL_GOTO( pPin, done, E_INVALIDARG);
-    DMFTCHECKNULL_GOTO( pIsCustom, done, E_INVALIDARG);
-    
-    *pIsCustom = false;
-
-#if defined _CPPRTTI
-    if (dynamic_cast<CCustomPin*>(pPin) != nullptr)
-    {
-        *pIsCustom = true;
-    }
-    else
-#endif
-    {
-        GUID categoryGUID = GUID_NULL;
-        if (SUCCEEDED(pPin->GetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, &categoryGUID))
-            && IsEqualCLSID(categoryGUID, AVSTREAM_CUSTOM_PIN_IMAGE))
-        {
-            *pIsCustom = true;
-        }
-    }
-done:
-    return hr;
-}
-
-

@@ -550,9 +550,6 @@ public:
         _In_ IMFSample *pSample,
         _In_ CBasePin *inPin
         );
-    STDMETHODIMP GetOutputStreamInfo(
-        _Out_  MFT_OUTPUT_STREAM_INFO *pStreamInfo
-        );
     virtual STDMETHODIMP ChangeMediaTypeFromInpin(
         _In_ IMFMediaType *pInMediatype,
         _In_ IMFMediaType* pOutMediaType,
@@ -631,42 +628,4 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////
 
 };
-
-class CTranslateOutPin : public COutPin {
-    /*List of GUIDS to be translated*/
-    const GUID tranlateGUIDS[2] =  {
-        MFVideoFormat_H264,
-        MFVideoFormat_MJPG
-    };
-    // @@@@README : This is what the compressed media types will be translated into
-    const GUID translatedGUID = MFVideoFormat_NV12; // Translating to NV12
-public:
-    CTranslateOutPin(_In_ ULONG         id = 0,
-        _In_opt_  CMultipinMft *pparent = NULL,
-        _In_     IKsControl*   iksControl = NULL)
-        : COutPin(id, pparent, iksControl
-#if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
-            , MFSampleAllocatorUsage_UsesCustomAllocator
-#endif
-        )
-    {
-        SetUINT32(MF_SD_VIDEO_SPHERICAL, TRUE);
-    }
-    STDMETHOD(AddMediaType)(
-        _Inout_ DWORD *pos,
-        _In_ IMFMediaType *pMediatype);
-    STDMETHOD_(BOOL, IsMediaTypeSupported)(
-        _In_ IMFMediaType *pMediaType,
-        _When_(ppIMFMediaTypeFull != nullptr, _Outptr_result_maybenull_)
-        IMFMediaType **ppIMFMediaTypeFull);
-    STDMETHOD(ChangeMediaTypeFromInpin)(
-        _In_ IMFMediaType *pInMediatype,
-        _In_ IMFMediaType* pOutMediaType,
-        _In_ DeviceStreamState state);
-
-protected:
-
-    map<IMFMediaType*, IMFMediaType*> m_TranslatedMediaTypes;
-};
-
 

@@ -33,10 +33,6 @@ CMultipinMft::CMultipinMft()
     m_spAttributes( nullptr ),
     m_spSourceTransform( nullptr ),
     m_SymbolicLink(nullptr)
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-   , m_spPhotoConfirmationCallback(nullptr)
-   , m_firePhotoConfirmation(FALSE)
-#endif
 #if defined (MF_DEVICEMFT_WARMSTART_HANDLING)
     , m_dwWarmStartMask(0)
 #endif
@@ -50,9 +46,6 @@ CMultipinMft::CMultipinMft()
     DMFTCHECKHR_GOTO(pAttributes->SetUINT32( MF_SA_D3D_AWARE, TRUE ), done);
     DMFTCHECKHR_GOTO(pAttributes->SetString( MFT_ENUM_HARDWARE_URL_Attribute, L"SampleMultiPinMft" ),done);
     m_spAttributes = pAttributes;
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-    m_guidPhotoConfirmationSubtype = MFVideoFormat_NV12;
-#endif
 done:
     if (FAILED(hr))
     {
@@ -134,16 +127,6 @@ STDMETHODIMP CMultipinMft::QueryInterface(
     {
         *ppv = static_cast< IMFRealTimeClientEx* >( this );
     }
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-    else if (iid == __uuidof(IMFCapturePhotoConfirmation))
-    {
-        *ppv = static_cast< IMFCapturePhotoConfirmation* >(this);
-    }
-    else if (iid == __uuidof(IMFGetService))
-    {
-        *ppv = static_cast< IMFGetService* >(this);
-    }
-#endif
     else
     {
         hr = E_NOINTERFACE;
@@ -277,19 +260,6 @@ STDMETHODIMP CMultipinMft::InitializeTransform (
             
             if (spiPin.Get())
             {
-                BOOL isCustom = false;
-                if (SUCCEEDED(CheckCustomPin(spiPin.Get(), &isCustom)) && (isCustom))
-                {
-                    //
-                    // In this sample we are not connecting the custom pin to the output
-                    // This is because we really have no way of testing the custom pin with the
-                    // pipeline. 
-                    // This however can be changed if the custom media type is converted here in
-                    // the device MFT and later exposed to the pipeline..
-                    //
-                    continue;
-                }
-
                 DMFTCHECKHR_GOTO(pPinFactory->CreatePin(spiPin->streamId(), /*Input Pin connected to the Output Pin*/
                     ulOutPinIndex, /*Output pin Id*/
                     CPinCreationFactory::DMFT_PIN_OUTPUT, /*Output pin */
@@ -1366,9 +1336,6 @@ STDMETHODIMP CMultipinMft::KsProperty(
             else
             {
                 DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Take Single Photo Trigger");
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-                InterlockedExchange(reinterpret_cast<PLONG>(&m_firePhotoConfirmation),TRUE);
-#endif
             }
         }
     }
@@ -1474,69 +1441,6 @@ STDMETHODIMP CMultipinMft::KsEvent(
     return hr;
 #endif
 }
-
-
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-//
-//IMFGetService functions
-//
-
-STDMETHODIMP  CMultipinMft::GetService(
-    __in REFGUID guidService,
-    __in REFIID riid,
-    __deref_out LPVOID* ppvObject
-    )
-{
-    //
-    //This doesn't necessarily need to be a GetService function, but this is just so that the
-    //pipeline implementation and the Device transform implementation is consistent.
-    //In this sample the photoconfirmation interface is implementated by the same class
-    //we can delegate it later to any of the pins if needed
-    //
-    UNREFERENCED_PARAMETER(guidService);
-    if (riid == __uuidof(IMFCapturePhotoConfirmation))
-    {
-        return QueryInterface(riid, ppvObject);
-    }
-    else
-        return MF_E_UNSUPPORTED_SERVICE;
-
-
-}
-
-//
-//IMFCapturePhotoConfirmation functions implemented
-//
-
-STDMETHODIMP  CMultipinMft::SetPhotoConfirmationCallback(
-    _In_ IMFAsyncCallback* pNotificationCallback
-    )
-{
-    CAutoLock Lock(m_critSec);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Setting PhotoConfirmation %p, is passed", pNotificationCallback);
-
-    m_spPhotoConfirmationCallback = pNotificationCallback;
-    return S_OK;
-}
-STDMETHODIMP  CMultipinMft::SetPixelFormat(
-    _In_ GUID subtype
-    )
-{
-    CAutoLock Lock(m_critSec);
-    m_guidPhotoConfirmationSubtype = subtype;
-    return S_OK;
-}
-STDMETHODIMP   CMultipinMft::GetPixelFormat(
-    _Out_ GUID* subtype
-    )
-{
-    CAutoLock Lock(m_critSec);
-    *subtype = m_guidPhotoConfirmationSubtype;
-    return S_OK;
-}
-
-#endif
-
 
 
 #if defined (MF_DEVICEMFT_ALLOW_MFT0_LOAD) && defined (MFT_UNIQUE_METHOD_NAMES)
@@ -2127,110 +2031,3 @@ done:
 }
 
 
-
-
-
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-/*
-Desciption:
-This function will be called by the preview pin to execute the photo confirmation stored with the
-MFT.
-*/
-
-STDMETHODIMP CMultipinMft::ProcessCapturePhotoConfirmationCallBack(
-    _In_ IMFMediaType* pMediaType,
-    _In_ IMFSample*    pSample
-    )
-{
-    //
-    //PhotoConfirmation Implementation
-    //Note this function doesn't scan the metadata as the pipeline does to find out which buffer is the photoconfirmation buffer
-    //The pipeline treats the preview buffer as the photo confirmation buffer and the driver marks the metadata on the buffer as being so.
-    //This example treats every buffer coming on the pin as the confirmation buffer.
-    //
-
-    HRESULT hr = S_OK;
-    ComPtr<IMFMediaType> spMediaType = nullptr;
-    LONGLONG timeStamp = 0;
-
-    DMFTCHECKHR_GOTO(MFCreateMediaType(&spMediaType), done);
-    DMFTCHECKHR_GOTO(pMediaType->CopyAllItems(spMediaType.Get()), done);
-
-    DMFTCHECKHR_GOTO(pSample->SetUnknown(MFSourceReader_SampleAttribute_MediaType_priv, spMediaType.Get()), done);
-
-    DMFTCHECKHR_GOTO(pSample->GetSampleTime(&timeStamp), done);
-    DMFTCHECKHR_GOTO(pSample->SetUINT64(MFSampleExtension_DeviceReferenceSystemTime, timeStamp), done);
-
-    if (m_spPhotoConfirmationCallback)
-    {
-
-        //
-        //We are directly sending the photo sample over to the consumers of the photoconfirmation interface.
-        //
-        ComPtr<IMFAsyncResult> spResult;
-        DMFTCHECKHR_GOTO(MFCreateAsyncResult(pSample, m_spPhotoConfirmationCallback.Get(), NULL, &spResult), done);
-        DMFTCHECKHR_GOTO(MFInvokeCallback(spResult.Get()), done);
-    }
-done:
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-}
-
-#endif
-
-//
-// Only worry about this if you have customs pins defined in the driver
-//
-
-HRESULT CMultipinMft::SetStreamingStateCustomPins(
-    DeviceStreamState State
-    )
-{
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetStreamingStateCustomPins");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetStreamingStateCustomPins State: %d", State);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetStreamingStateCustomPins E_NOTIMPL");
-    return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    
-    if ( m_CustomPinCount > 0 )
-    {
-        DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Custom Pin State changing to %d", State);
-
-        for (ULONG ulIndex = 0; ulIndex < m_InPins.size(); ulIndex++)
-        {
-            BOOL isCustom = false;
-            CInPin* pInPin = static_cast<CInPin*>(m_InPins[ulIndex]);
-
-            if ( SUCCEEDED( CheckCustomPin(pInPin, &isCustom) )
-                && ( isCustom ) )
-            {
-                // Start the custom stream here. This will involve sending an event to the pipeline about the stream needing a state change
-                ComPtr<IMFMediaType> spMediaType;
-                if ( State == DeviceStreamState_Run )
-                {
-                    // Only get the media type if we are going into run state
-                    DMFTCHECKHR_GOTO(pInPin->GetMediaTypeAt(0, spMediaType.GetAddressOf()), done);
-                }
-                pInPin->SetState(DeviceStreamState_Disabled);
-                pInPin->setPreferredMediaType(spMediaType.Get());
-                pInPin->setPreferredStreamState(State);
-                //
-                // Let the pipline know that the input needs to be changed on the custom pin
-                //
-                SendEventToManager(METransformInputStreamStateChanged, GUID_NULL, pInPin->streamId());
-                //
-                // The media type will be set on the input pin by the time we return from the wait.
-                // For a custom pin, which is often the stats pin we can skip the wait as this will 
-                // simply make the pipeline wait
-                //
-                DMFTCHECKHR_GOTO(pInPin->WaitForSetInputPinMediaChange(), done);
-              }
-        }
-    }
-done:
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-#endif
-}
