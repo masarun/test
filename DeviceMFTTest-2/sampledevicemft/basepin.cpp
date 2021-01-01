@@ -209,6 +209,230 @@ done:
     return hr;
 }
 
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::KsProperty(PKSPROPERTY pProperty, ULONG ulPropertyLength, LPVOID pPropertyData, ULONG ulDataLength, ULONG* pBytesReturned)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::KsProperty -----");
+
+    if (m_spIkscontrol != nullptr)
+    {
+        return m_spIkscontrol->KsProperty(pProperty,
+            ulPropertyLength,
+            pPropertyData,
+            ulDataLength,
+            pBytesReturned);
+    }
+    else
+    {
+        return E_NOTIMPL;
+    }
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::KsMethod(PKSMETHOD pMethod, ULONG ulMethodLength, LPVOID pMethodData, ULONG ulDataLength, ULONG* pBytesReturned)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::KsMethod -----");
+
+    UNREFERENCED_PARAMETER(pBytesReturned);
+    UNREFERENCED_PARAMETER(ulDataLength);
+    UNREFERENCED_PARAMETER(pMethodData);
+    UNREFERENCED_PARAMETER(pMethod);
+    UNREFERENCED_PARAMETER(ulMethodLength);
+    return S_OK;
+
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::KsEvent(PKSEVENT pEvent, ULONG ulEventLength, LPVOID pEventData, ULONG ulDataLength, ULONG* pBytesReturned)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::KsEvent -----");
+
+    UNREFERENCED_PARAMETER(pBytesReturned);
+    UNREFERENCED_PARAMETER(ulDataLength);
+    UNREFERENCED_PARAMETER(pEventData);
+    UNREFERENCED_PARAMETER(pEvent);
+    UNREFERENCED_PARAMETER(ulEventLength);
+    return S_OK;
+
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetItem(REFGUID guidKey, PROPVARIANT* pValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetItem -----");
+    return m_spAttributes->GetItem(guidKey, pValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetItemType(REFGUID guidKey, MF_ATTRIBUTE_TYPE* pType)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetItemType -----");
+    return m_spAttributes->GetItemType(guidKey, pType);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::CompareItem(REFGUID guidKey, REFPROPVARIANT Value, BOOL* pbResult)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::CompareItem -----");
+    return m_spAttributes->CompareItem(guidKey, Value, pbResult);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::Compare(IMFAttributes* pTheirs, MF_ATTRIBUTES_MATCH_TYPE MatchType, BOOL* pbResult)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::Compare -----");
+    return m_spAttributes->Compare(pTheirs, MatchType, pbResult);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetUINT32(REFGUID guidKey, UINT32* punValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetUINT32 -----");
+    return m_spAttributes->GetUINT32(guidKey, punValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetUINT64(REFGUID guidKey, UINT64* punValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetUINT64 -----");
+    return m_spAttributes->GetUINT64(guidKey, punValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetDouble(REFGUID guidKey, double* pfValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetDouble -----");
+    return m_spAttributes->GetDouble(guidKey, pfValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetGUID(REFGUID guidKey, GUID* pguidValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetGUID -----");
+    return m_spAttributes->GetGUID(guidKey, pguidValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetStringLength(REFGUID guidKey, UINT32* pcchLength)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetStringLength -----");
+    return m_spAttributes->GetStringLength(guidKey, pcchLength);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetString(REFGUID guidKey, LPWSTR pwszValue, UINT32 cchBufSize, UINT32* pcchLength)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetString -----");
+    return m_spAttributes->GetString(guidKey, pwszValue, cchBufSize, pcchLength);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetAllocatedString(REFGUID guidKey, LPWSTR* ppwszValue, UINT32* pcchLength)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetAllocatedString -----");
+    return m_spAttributes->GetAllocatedString(guidKey, ppwszValue, pcchLength);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetBlobSize(REFGUID guidKey, UINT32* pcbBlobSize)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetBlobSize -----");
+    return m_spAttributes->GetBlobSize(guidKey, pcbBlobSize);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetBlob(REFGUID guidKey, UINT8* pBuf, UINT32 cbBufSize, UINT32* pcbBlobSize)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetBlob -----");
+    return m_spAttributes->GetBlob(guidKey, pBuf, cbBufSize, pcbBlobSize);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetAllocatedBlob(REFGUID guidKey, UINT8** ppBuf, UINT32* pcbSize)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetAllocatedBlob -----");
+    return m_spAttributes->GetAllocatedBlob(guidKey, ppBuf, pcbSize);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetUnknown(REFGUID guidKey, REFIID riid, LPVOID* ppv)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetUnknown -----");
+    return m_spAttributes->GetUnknown(guidKey, riid, ppv);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::SetItem(REFGUID guidKey, REFPROPVARIANT Value)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetItem -----");
+    return m_spAttributes->SetItem(guidKey, Value);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::DeleteItem(REFGUID guidKey)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::DeleteItem -----");
+    return m_spAttributes->DeleteItem(guidKey);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::DeleteAllItems()
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::DeleteAllItems -----");
+    return m_spAttributes->DeleteAllItems();
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::SetUINT32(REFGUID guidKey, UINT32 unValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetUINT32 -----");
+    return m_spAttributes->SetUINT32(guidKey, unValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::SetUINT64(REFGUID guidKey, UINT64 unValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetUINT64 -----");
+    return m_spAttributes->SetUINT64(guidKey, unValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::SetDouble(REFGUID guidKey, double fValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetDouble -----");
+    return m_spAttributes->SetDouble(guidKey, fValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::SetGUID(REFGUID guidKey, REFGUID guidValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetGUID -----");
+    return m_spAttributes->SetGUID(guidKey, guidValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::SetString(REFGUID guidKey, LPCWSTR wszValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetString -----");
+    return m_spAttributes->SetString(guidKey, wszValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::SetBlob(REFGUID guidKey, const UINT8* pBuf, UINT32 cbBufSize)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetBlob -----");
+    return m_spAttributes->SetBlob(guidKey, pBuf, cbBufSize);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::SetUnknown(REFGUID guidKey, IUnknown* pUnknown)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetUnknown -----");
+    return m_spAttributes->SetUnknown(guidKey, pUnknown);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::LockStore()
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::LockStore -----");
+    return m_spAttributes->LockStore();
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::UnlockStore()
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::UnlockStore -----");
+    return m_spAttributes->UnlockStore();
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetCount(UINT32* pcItems)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetCount -----");
+    return m_spAttributes->GetCount(pcItems);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::GetItemByIndex(UINT32 unIndex, GUID* pguidKey, PROPVARIANT* pValue)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetItemByIndex -----");
+    return m_spAttributes->GetItemByIndex(unIndex, pguidKey, pValue);
+}
+
+STDMETHODIMP_(HRESULT __stdcall) CBasePin::CopyAllItems(IMFAttributes* pDest)
+{
+    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::CopyAllItems -----");
+    return m_spAttributes->CopyAllItems(pDest);
+}
+
 //
 //Input Pin implementation
 //

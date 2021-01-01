@@ -60,27 +60,14 @@ public:
     // IKsControl Interface functions
     //
   
-  STDMETHOD(KsProperty)(
-      _In_reads_bytes_(ulPropertyLength) PKSPROPERTY pProperty,
-      _In_ ULONG ulPropertyLength,
-      _Inout_updates_bytes_(ulDataLength) LPVOID pPropertyData,
-      _In_ ULONG ulDataLength,
-      _Out_opt_ ULONG* pBytesReturned
-      )
-  {
-      if ( m_spIkscontrol!=nullptr )
-      {
-          return m_spIkscontrol->KsProperty(pProperty,
-              ulPropertyLength,
-              pPropertyData,
-              ulDataLength,
-              pBytesReturned);
-      }
-      else
-      {
-          return E_NOTIMPL;
-      }
-  }
+    STDMETHOD(KsProperty)(
+        _In_reads_bytes_(ulPropertyLength) PKSPROPERTY pProperty,
+        _In_ ULONG ulPropertyLength,
+        _Inout_updates_bytes_(ulDataLength) LPVOID pPropertyData,
+        _In_ ULONG ulDataLength,
+        _Out_opt_ ULONG* pBytesReturned
+        );
+
   virtual STDMETHODIMP FlushQueues(
   )
   {
@@ -95,15 +82,7 @@ public:
       _Inout_updates_bytes_(ulDataLength) LPVOID pMethodData,
       _In_ ULONG ulDataLength,
       _Out_opt_ ULONG* pBytesReturned
-      )
-  {
-      UNREFERENCED_PARAMETER(pBytesReturned);
-      UNREFERENCED_PARAMETER(ulDataLength);
-      UNREFERENCED_PARAMETER(pMethodData);
-      UNREFERENCED_PARAMETER(pMethod);
-      UNREFERENCED_PARAMETER(ulMethodLength);
-      return S_OK;
-  }
+      );
   
   STDMETHOD(KsEvent)(
       _In_reads_bytes_(ulEventLength) PKSEVENT pEvent,
@@ -111,257 +90,159 @@ public:
       _Inout_updates_bytes_opt_(ulDataLength) LPVOID pEventData,
       _In_ ULONG ulDataLength,
       _Out_opt_ ULONG* pBytesReturned
-      )
-  {
-      UNREFERENCED_PARAMETER(pBytesReturned);
-      UNREFERENCED_PARAMETER(ulDataLength);
-      UNREFERENCED_PARAMETER(pEventData);
-      UNREFERENCED_PARAMETER(pEvent);
-      UNREFERENCED_PARAMETER(ulEventLength);
-      return S_OK;
-  }
+      );
 
     //
     //IMFAttributes implementation
     //
-    STDMETHOD(GetItem)(
-        _In_ REFGUID guidKey,
-        _Inout_opt_  PROPVARIANT* pValue
-        )
-    {
-        return m_spAttributes->GetItem(guidKey, pValue);
-    }
+  STDMETHOD(GetItem)(
+      _In_ REFGUID guidKey,
+      _Inout_opt_  PROPVARIANT* pValue
+      );
 
-    STDMETHOD(GetItemType)(
-        _In_ REFGUID guidKey,
-        _Out_ MF_ATTRIBUTE_TYPE* pType
-        )
-    {
-        return m_spAttributes->GetItemType(guidKey, pType);
-    }
+  STDMETHOD(GetItemType)(
+      _In_ REFGUID guidKey,
+      _Out_ MF_ATTRIBUTE_TYPE* pType
+      );
 
-    STDMETHOD(CompareItem)(
-        _In_ REFGUID guidKey,
-        _In_ REFPROPVARIANT Value,
-        _Out_ BOOL* pbResult
-        )
-    {
-        return m_spAttributes->CompareItem(guidKey, Value, pbResult);
-    }
+  STDMETHOD(CompareItem)(
+      _In_ REFGUID guidKey,
+      _In_ REFPROPVARIANT Value,
+      _Out_ BOOL* pbResult
+      );
 
-    STDMETHOD(Compare)(
-        _In_ IMFAttributes* pTheirs,
-        _In_ MF_ATTRIBUTES_MATCH_TYPE MatchType,
-        _Out_ BOOL* pbResult
-        )
-    {
-        return m_spAttributes->Compare(pTheirs, MatchType, pbResult);
-    }
+  STDMETHOD(Compare)(
+      _In_ IMFAttributes* pTheirs,
+      _In_ MF_ATTRIBUTES_MATCH_TYPE MatchType,
+      _Out_ BOOL* pbResult
+      );
 
-    STDMETHOD(GetUINT32)(
-        _In_ REFGUID guidKey,
-        _Out_ UINT32* punValue
-        )
-    {
-        return m_spAttributes->GetUINT32(guidKey, punValue);
-    }
+  STDMETHOD(GetUINT32)(
+      _In_ REFGUID guidKey,
+      _Out_ UINT32* punValue
+      );
 
-    STDMETHOD(GetUINT64)(
-        _In_ REFGUID guidKey,
-        _Out_ UINT64* punValue
-        )
-    {
-        return m_spAttributes->GetUINT64(guidKey, punValue);
-    }
+  STDMETHOD(GetUINT64)(
+      _In_ REFGUID guidKey,
+      _Out_ UINT64* punValue
+      );
 
-    STDMETHOD(GetDouble)(
-        _In_ REFGUID guidKey,
-        _Out_ double* pfValue
-        )
-    {
-        return m_spAttributes->GetDouble(guidKey, pfValue);
-    }
+  STDMETHOD(GetDouble)(
+      _In_ REFGUID guidKey,
+      _Out_ double* pfValue
+      );
 
-    STDMETHOD(GetGUID)(
-        _In_ REFGUID guidKey,
-        _Out_ GUID* pguidValue
-        )
-    {
-        return m_spAttributes->GetGUID(guidKey, pguidValue);
-    }
+  STDMETHOD(GetGUID)(
+      _In_ REFGUID guidKey,
+      _Out_ GUID* pguidValue
+      );
 
-    STDMETHOD(GetStringLength)(
-        _In_ REFGUID guidKey,
-        _Out_ UINT32* pcchLength
-        )
-    {
-        return m_spAttributes->GetStringLength(guidKey, pcchLength);
-    }
+  STDMETHOD(GetStringLength)(
+      _In_ REFGUID guidKey,
+      _Out_ UINT32* pcchLength
+      );
 
-    STDMETHOD(GetString)(
-        _In_ REFGUID guidKey,
-        _Out_writes_(cchBufSize) LPWSTR pwszValue,
-        _In_ UINT32 cchBufSize,
-        _Inout_opt_ UINT32* pcchLength
-        )
-    {
-        return m_spAttributes->GetString(guidKey, pwszValue, cchBufSize, pcchLength);
-    }
+  STDMETHOD(GetString)(
+      _In_ REFGUID guidKey,
+      _Out_writes_(cchBufSize) LPWSTR pwszValue,
+      _In_ UINT32 cchBufSize,
+      _Inout_opt_ UINT32* pcchLength
+      );
 
-    STDMETHOD(GetAllocatedString)(
-        _In_ REFGUID guidKey,
-        _Out_writes_(*pcchLength + 1) LPWSTR* ppwszValue,
-        _Inout_  UINT32* pcchLength
-        )
-    {
-        return m_spAttributes->GetAllocatedString(guidKey, ppwszValue, pcchLength);
-    }
+  STDMETHOD(GetAllocatedString)(
+      _In_ REFGUID guidKey,
+      _Out_writes_(*pcchLength + 1) LPWSTR* ppwszValue,
+      _Inout_  UINT32* pcchLength
+      );
 
-    STDMETHOD(GetBlobSize)(
-        _In_ REFGUID guidKey,
-        _Out_ UINT32* pcbBlobSize
-        )
-    {
-        return m_spAttributes->GetBlobSize(guidKey, pcbBlobSize);
-    }
+  STDMETHOD(GetBlobSize)(
+      _In_ REFGUID guidKey,
+      _Out_ UINT32* pcbBlobSize
+      );
 
-    STDMETHOD(GetBlob)(
-        _In_                    REFGUID  guidKey,
-        _Out_writes_(cbBufSize) UINT8* pBuf,
-        UINT32 cbBufSize,
-        _Inout_  UINT32* pcbBlobSize
-        )
-    {
-        return m_spAttributes->GetBlob(guidKey, pBuf, cbBufSize, pcbBlobSize);
-    }
+  STDMETHOD(GetBlob)(
+      _In_                    REFGUID  guidKey,
+      _Out_writes_(cbBufSize) UINT8* pBuf,
+      UINT32 cbBufSize,
+      _Inout_  UINT32* pcbBlobSize
+      );
 
-    STDMETHOD(GetAllocatedBlob)(
-        __RPC__in REFGUID guidKey,
-        __RPC__deref_out_ecount_full_opt(*pcbSize) UINT8** ppBuf,
-        __RPC__out UINT32* pcbSize
-        )
-    {
-        return m_spAttributes->GetAllocatedBlob(guidKey, ppBuf, pcbSize);
-    }
+  STDMETHOD(GetAllocatedBlob)(
+      __RPC__in REFGUID guidKey,
+      __RPC__deref_out_ecount_full_opt(*pcbSize) UINT8** ppBuf,
+      __RPC__out UINT32* pcbSize
+      );
 
-    STDMETHOD(GetUnknown)(
-        __RPC__in REFGUID guidKey,
-        __RPC__in REFIID riid,
-        __RPC__deref_out_opt LPVOID *ppv
-        )
-    {
-        return m_spAttributes->GetUnknown(guidKey, riid, ppv);
-    }
+  STDMETHOD(GetUnknown)(
+      __RPC__in REFGUID guidKey,
+      __RPC__in REFIID riid,
+      __RPC__deref_out_opt LPVOID* ppv
+      );
 
-    STDMETHOD(SetItem)(
-        _In_ REFGUID guidKey,
-        _In_ REFPROPVARIANT Value
-        )
-    {
-        return m_spAttributes->SetItem(guidKey, Value);
-    }
+  STDMETHOD(SetItem)(
+      _In_ REFGUID guidKey,
+      _In_ REFPROPVARIANT Value
+      );
 
-    STDMETHOD(DeleteItem)(
-        _In_ REFGUID guidKey
-        )
-    {
-        return m_spAttributes->DeleteItem(guidKey);
-    }
+  STDMETHOD(DeleteItem)(
+      _In_ REFGUID guidKey
+      );
 
-    STDMETHOD(DeleteAllItems)()
-    {
-        return m_spAttributes->DeleteAllItems();
-    }
+  STDMETHOD(DeleteAllItems)();
 
-    STDMETHOD(SetUINT32)(
-        _In_ REFGUID guidKey,
-        _In_ UINT32  unValue
-        )
-    {
-        return m_spAttributes->SetUINT32(guidKey, unValue);
-    }
+  STDMETHOD(SetUINT32)(
+      _In_ REFGUID guidKey,
+      _In_ UINT32  unValue
+      );
 
-    STDMETHOD(SetUINT64)(
-        _In_ REFGUID guidKey,
-        _In_ UINT64  unValue
-        )
-    {
-        return m_spAttributes->SetUINT64(guidKey, unValue);
-    }
+  STDMETHOD(SetUINT64)(
+      _In_ REFGUID guidKey,
+      _In_ UINT64  unValue
+      );
 
-    STDMETHOD(SetDouble)(
-        _In_ REFGUID guidKey,
-        _In_ double  fValue
-        )
-    {
-        return m_spAttributes->SetDouble(guidKey, fValue);
-    }
+  STDMETHOD(SetDouble)(
+      _In_ REFGUID guidKey,
+      _In_ double  fValue
+      );
 
-    STDMETHOD(SetGUID)(
-        _In_ REFGUID guidKey,
-        _In_ REFGUID guidValue
-        )
-    {
-        return m_spAttributes->SetGUID(guidKey, guidValue);
-    }
+  STDMETHOD(SetGUID)(
+      _In_ REFGUID guidKey,
+      _In_ REFGUID guidValue
+      );
 
-    STDMETHOD(SetString)(
-        _In_ REFGUID guidKey,
-        _In_ LPCWSTR wszValue
-        )
-    {
-        return m_spAttributes->SetString(guidKey, wszValue);
-    }
+  STDMETHOD(SetString)(
+      _In_ REFGUID guidKey,
+      _In_ LPCWSTR wszValue
+      );
 
-    STDMETHOD(SetBlob)(
-        _In_ REFGUID guidKey,
-        _In_reads_(cbBufSize) const UINT8* pBuf,
-        UINT32 cbBufSize
-        )
-    {
-        return m_spAttributes->SetBlob(guidKey, pBuf, cbBufSize);
-    }
+  STDMETHOD(SetBlob)(
+      _In_ REFGUID guidKey,
+      _In_reads_(cbBufSize) const UINT8* pBuf,
+      UINT32 cbBufSize
+      );
 
-    STDMETHOD(SetUnknown)(
-        _In_ REFGUID guidKey,
-        _In_ IUnknown* pUnknown
-        )
-    {
-        return m_spAttributes->SetUnknown(guidKey, pUnknown);
-    }
+  STDMETHOD(SetUnknown)(
+      _In_ REFGUID guidKey,
+      _In_ IUnknown* pUnknown
+      );
 
-    STDMETHOD(LockStore)()
-    {
-        return m_spAttributes->LockStore();
-    }
+  STDMETHOD(LockStore)();
 
-    STDMETHOD(UnlockStore)()
-    {
-        return m_spAttributes->UnlockStore();
-    }
+  STDMETHOD(UnlockStore)();
 
-    STDMETHOD(GetCount)(
-        _Out_ UINT32* pcItems
-        )
-    {
-        return m_spAttributes->GetCount(pcItems);
-    }
+  STDMETHOD(GetCount)(
+      _Out_ UINT32* pcItems
+      );
 
-    STDMETHOD(GetItemByIndex)(
-        UINT32 unIndex,
-        _Out_ GUID* pguidKey,
-        _Inout_ PROPVARIANT* pValue
-        )
-    {
-        return m_spAttributes->GetItemByIndex(unIndex, pguidKey, pValue);
-    }
+  STDMETHOD(GetItemByIndex)(
+      UINT32 unIndex,
+      _Out_ GUID* pguidKey,
+      _Inout_ PROPVARIANT* pValue
+      );
 
-    STDMETHOD(CopyAllItems)(
-        _In_ IMFAttributes* pDest
-        )
-    {
-        return m_spAttributes->CopyAllItems(pDest);
-    }
+  STDMETHOD(CopyAllItems)(
+      _In_ IMFAttributes* pDest
+      );
 
     //
     //Helper Functions
