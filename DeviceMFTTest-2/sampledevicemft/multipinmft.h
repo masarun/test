@@ -304,15 +304,6 @@ protected:
     HRESULT BridgeInputPinOutputPin(
         _In_ CInPin* pInPin,
         _In_ COutPin* pOutPin);
-#if defined (MF_DEVICEMFT_WARMSTART_HANDLING)
-    HRESULT CMultipinMft::WarmStartHandler(
-        _In_    PKSPROPERTY Property,
-        _In_    ULONG       ulPropertyLength,
-        _In_    LPVOID      pData,
-        _In_    ULONG       ulOutputBufferLength,
-        _Inout_   PULONG      pulBytesReturned
-        );
-#endif
 #if defined (MF_DEVICEMFT_ALLOW_MFT0_LOAD) && defined (MFT_UNIQUE_METHOD_NAMES)
     STDMETHODIMP CMultipinMft::GetAttributes(
         _COM_Outptr_opt_result_maybenull_ IMFAttributes** ppAttributes
@@ -367,18 +358,6 @@ private:
     ComPtr<IMFAttributes>        m_spAttributes;
     map<int, int>                m_outputPinMap;                      // How output pins are connected to input pins i-><0..outpins>
     PWCHAR                       m_SymbolicLink;
-
-#if defined (MF_DEVICEMFT_WARMSTART_HANDLING)
-    VOID SetWarmStart(DWORD dwPinId, BOOL state)
-    {
-        m_dwWarmStartMask ^= (-state ^ m_dwWarmStartMask) & (1UL << dwPinId);
-    }
-    BOOLEAN GetWarmStart(_In_ DWORD dwPinId)
-    {
-        return ((m_dwWarmStartMask >> dwPinId) & 1UL);
-    }
-    DWORD                      m_dwWarmStartMask;
-#endif
 
 };
 

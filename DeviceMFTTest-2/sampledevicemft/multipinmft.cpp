@@ -33,10 +33,6 @@ CMultipinMft::CMultipinMft()
     m_spAttributes( nullptr ),
     m_spSourceTransform( nullptr ),
     m_SymbolicLink(nullptr)
-#if defined (MF_DEVICEMFT_WARMSTART_HANDLING)
-    , m_dwWarmStartMask(0)
-#endif
-
 {
     HRESULT hr = S_OK;
     ComPtr<IMFAttributes> pAttributes = nullptr;
@@ -161,12 +157,6 @@ STDMETHODIMP CMultipinMft::InitializeTransform (
     _In_ IMFAttributes *pAttributes
     )
 {
-#if 0
-    UNREFERENCED_PARAMETER(pAttributes);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::InitializeTransform -----");
-    return E_NOTIMPL;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::InitializeTransform -----");
 
     HRESULT                 hr              = S_OK;
@@ -341,13 +331,6 @@ STDMETHODIMP CMultipinMft::SetWorkQueueEx(
 
 --*/
 {
-#if 0
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetWorkQueueEx -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetWorkQueueEx dwWorkQueueId: %d", dwWorkQueueId);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetWorkQueueEx lWorkItemBasePriority: %d", lWorkItemBasePriority);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetWorkQueueEx E_NOTIMPL -----");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetWorkQueueEx -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetWorkQueueEx dwWorkQueueId: %d", dwWorkQueueId);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetWorkQueueEx lWorkItemBasePriority: %d", lWorkItemBasePriority);
@@ -383,13 +366,6 @@ STDMETHODIMP  CMultipinMft::GetStreamCount(
     Description:    Implements IMFTransform::GetStreamCount function
 --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(pdwInputStreams);
-    UNREFERENCED_PARAMETER(pdwOutputStreams);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetStreamCount -----");
-
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetStreamCount -----");
 
     HRESULT hr = S_OK;
@@ -419,15 +395,6 @@ STDMETHODIMP  CMultipinMft::GetStreamIDs(
         Implements IMFTransform::GetStreamIDs function
 --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(pdwInputIDs);
-    UNREFERENCED_PARAMETER(pdwOutputIDs);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetStreamIDs -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetStreamIDs dwInputIDArraySize: %d", dwInputIDArraySize);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetStreamIDs dwOutputIDArraySize: %d", dwOutputIDArraySize);
-
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetStreamIDs -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetStreamIDs dwInputIDArraySize: %d", dwInputIDArraySize);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetStreamIDs dwOutputIDArraySize: %d", dwOutputIDArraySize);
@@ -478,14 +445,6 @@ STDMETHODIMP  CMultipinMft::GetInputAvailableType(
     _Out_ IMFMediaType**        ppMediaType
     )
 {
-#if 0
-    UNREFERENCED_PARAMETER(ppMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputAvailableType -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputAvailableType dwInputStreamID: %d", dwInputStreamID);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputAvailableType dwTypeIndex: %d", dwTypeIndex);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputAvailableType E_NOTIMPL -----");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputAvailableType -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputAvailableType dwInputStreamID: %d", dwInputStreamID);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputAvailableType dwTypeIndex: %d", dwTypeIndex);
@@ -529,14 +488,6 @@ STDMETHODIMP CMultipinMft::GetOutputAvailableType(
 
 --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(ppMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType dwOutputStreamID: %d", dwOutputStreamID);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType dwTypeIndex: %d", dwTypeIndex);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType E_NOTIMPL -----");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType dwOutputStreamID: %d", dwOutputStreamID);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputAvailableType dwTypeIndex: %d", dwTypeIndex);
@@ -601,13 +552,6 @@ STDMETHODIMP  CMultipinMft::GetOutputCurrentType(
 
 --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(ppMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputCurrentType -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputCurrentType dwOutputStreamID: %d", dwOutputStreamID);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputCurrentType E_NOTIMPL -----");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputCurrentType -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputCurrentType dwOutputStreamID: %d", dwOutputStreamID);
 
@@ -672,105 +616,6 @@ STDMETHODIMP  CMultipinMft::ProcessMessage(
     printMessageEvent(eMessage);
 
     return S_OK;
-#if 0
-    HRESULT hr = S_OK;
-
-    UNREFERENCED_PARAMETER(ulParam);
-    
-    CAutoLock _lock( m_critSec );
-    
-    printMessageEvent( eMessage );
-
-    switch ( eMessage )
-    {
-    case MFT_MESSAGE_COMMAND_FLUSH:
-        //
-        // This is MFT wide flush.. Flush all output pins
-        //
-        (VOID)FlushAllStreams();
-        break;
-    case MFT_MESSAGE_COMMAND_DRAIN:
-        //
-        // There is no draining for Device MFT. Just kept here for reference
-        //
-        break;
-    case MFT_MESSAGE_NOTIFY_START_OF_STREAM:
-        //
-        // No op for device MFTs
-        //
-        break;
-    case MFT_MESSAGE_SET_D3D_MANAGER:
-        {
-           if ( ulParam )
-           {
-               ComPtr< IDirect3DDeviceManager9 >   spD3D9Manager;
-               ComPtr< IMFDXGIDeviceManager >      spDXGIManager;
-
-               hr = ( ( IUnknown* ) ulParam )->QueryInterface( IID_PPV_ARGS( &spD3D9Manager ) );
-               if ( SUCCEEDED( hr ) )
-               {
-                   m_spDeviceManagerUnk = ( IUnknown* )ulParam;
-                   DMFTRACE( DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! IDirect3DDeviceManager9 %p, is passed", spD3D9Manager.Get() );
-               }
-               else
-               {
-                   hr = ( ( IUnknown* ) ulParam )->QueryInterface( IID_PPV_ARGS( &spDXGIManager ) );
-                   if ( SUCCEEDED(hr) )
-                   {
-                       m_spDeviceManagerUnk = (IUnknown*)ulParam;
-                       DMFTRACE( DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! IMFDXGIDeviceManager %p, is passed", spDXGIManager.Get());
-                  }
-               }
-           }
-           else
-           {
-               m_spDeviceManagerUnk = nullptr;
-               hr = S_OK;
-               DMFTRACE( DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC!IDirect3DDeviceManager9 was not passed in");
-           }
-           //
-           // set it on the pins. Can happen anytime
-           //
-           for (DWORD dwIndex = 0; dwIndex < (DWORD)m_InPins.size(); dwIndex++)
-           {
-               m_InPins[dwIndex]->SetD3DManager(m_spDeviceManagerUnk.Get());
-           }
-           for (DWORD dwIndex = 0; dwIndex < (DWORD)m_OutPins.size(); dwIndex++)
-           {
-               m_OutPins[dwIndex]->SetD3DManager(m_spDeviceManagerUnk.Get());
-           }
-        }
-        break;
-    case MFT_MESSAGE_NOTIFY_BEGIN_STREAMING:
-    {
-        SetStreamingState( DeviceStreamState_Run );
-        //
-        // Start Streaming custom pins if the device transfrom has any
-        //
-        SetStreamingStateCustomPins( DeviceStreamState_Run );
-    }
-        break;
-    case MFT_MESSAGE_NOTIFY_END_STREAMING:
-    {
-        SetStreamingState(DeviceStreamState_Stop);
-        //
-        // Stop streaming custom pins if the device transform has any
-        //
-        SetStreamingStateCustomPins( DeviceStreamState_Stop );
-    }
-        break;
-    case MFT_MESSAGE_NOTIFY_END_OF_STREAM:
-    {
-        SetStreamingState(DeviceStreamState_Stop);
-    }
-        break;
-    default:
-        ;
-    }
-
-    DMFTRACE( DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr );
-    return hr;
-#endif
 }
 
 STDMETHODIMP  CMultipinMft::ProcessInput(
@@ -794,29 +639,6 @@ STDMETHODIMP  CMultipinMft::ProcessInput(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ProcessInput dwFlags: %d", dwFlags);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ProcessInput E_NOTIMPL -----");
     return E_NOTIMPL;
-#if 0
-    HRESULT     hr = S_OK;
-    UNREFERENCED_PARAMETER( dwFlags );
-    
-    ComPtr<CInPin> spInPin = GetInPin( dwInputStreamID );
-    DMFTCHECKNULL_GOTO(spInPin, done, MF_E_INVALIDSTREAMNUMBER);
-
-    if ( !IsStreaming() )
-    {
-        goto done;
-    }
-
-    DMFTCHECKHR_GOTO(spInPin->SendSample( pSample ), done );
-done:
-    DMFTRACE( DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr );
-    //
-    //@@@@ README : There is a bug in the sample that the device transform manager which manages the
-    // device MFT does not release the sample after passing it to Device MFT in processInput like it should. The
-    // Device MFT therefore unfortunately has to make sure that the sample that leaves processoutput has a reference count of 1
-    // 
-    SAFE_RELEASE(pSample);
-    return hr;
-#endif
 }
 
 STDMETHODIMP  CMultipinMft::ProcessOutput(
@@ -842,62 +664,6 @@ output pins and populate the corresponding MFT_OUTPUT_DATA_BUFFER with the sampl
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ProcessOutput cOutputBufferCount: %d", cOutputBufferCount);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ProcessOutput E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT     hr      = S_OK;
-    BOOL       gotOne   = false;
-    ComPtr<COutPin> spOpin;
-    UNREFERENCED_PARAMETER( dwFlags );
-
-    if (cOutputBufferCount > m_OutputPinCount )
-    {
-        DMFTCHECKHR_GOTO( E_INVALIDARG, done );
-    }
-    *pdwStatus = 0;
-
-    for ( DWORD i = 0; i < cOutputBufferCount; i++ )
-    {
-        DWORD dwStreamID = pOutputSamples[i].dwStreamID;
-        {
-            CAutoLock _lock(m_critSec);
-            spOpin = nullptr;
-            spOpin = GetOutPin(dwStreamID);
-            GUID     pinGuid = GUID_NULL;
-            DMFTCHECKNULL_GOTO(spOpin.Get(), done, E_INVALIDARG);
-        }
-        if ( SUCCEEDED(spOpin->ProcessOutput( dwFlags, &pOutputSamples[i],
-            pdwStatus ) ) )
-        {
-            gotOne = true;
-            // Do photo confirmation if enabled from the preview stream only
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-            BOOL pIsPreviewPin = FALSE;
-            if (pOutputSamples[i].pSample &&
-                IsPhotoConfirmationEnabled() &&
-                ((SUCCEEDED(CheckPreviewPin(static_cast<IMFAttributes*>(spOpin.Get()), &pIsPreviewPin)) && pIsPreviewPin) &&
-                    InterlockedCompareExchange(reinterpret_cast<PLONG>(&m_firePhotoConfirmation), FALSE, TRUE)))
-            {
-                // Please note photo confirmation should always be fired from the preview stream.
-                ComPtr<IMFMediaType> spMediaType;
-                if (SUCCEEDED(spOpin->getMediaType(spMediaType.GetAddressOf())))
-                {
-                    // Do Photo confirmation
-                    ProcessCapturePhotoConfirmationCallBack(spMediaType.Get(), pOutputSamples[i].pSample);
-                    m_firePhotoConfirmation = FALSE;
-                }
-            }
-#endif
-        }
-    }
-    if (gotOne)
-    {
-        hr = S_OK;
-    }
-     
-done:
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-#endif
 }
 
 STDMETHODIMP  CMultipinMft::GetInputStreamAttributes(
@@ -912,13 +678,6 @@ STDMETHODIMP  CMultipinMft::GetInputStreamAttributes(
 
 --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(ppAttributes);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamAttributes -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamAttributes dwInputStreamID: %d", dwInputStreamID);
-
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamAttributes -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamAttributes dwInputStreamID: %d", dwInputStreamID);
 
@@ -952,12 +711,6 @@ STDMETHODIMP  CMultipinMft::GetOutputStreamAttributes(
 
 --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(ppAttributes);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputStreamAttributes -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputStreamAttributes dwOutputStreamID: %d", dwOutputStreamID);
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputStreamAttributes -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputStreamAttributes dwOutputStreamID: %d", dwOutputStreamID);
 
@@ -976,7 +729,6 @@ STDMETHODIMP  CMultipinMft::GetOutputStreamAttributes(
 done:
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-
 }
 
 _Requires_no_locks_held_
@@ -999,15 +751,6 @@ STDMETHODIMP CMultipinMft::SetInputStreamState(
 
     --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(pMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState dwStreamID: %d", dwStreamID);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState value: %d", value);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState dwFlags: %d", dwFlags);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState E_NOTIMPL -----");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState dwStreamID: %d", dwStreamID);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetInputStreamState value: %d", value);
@@ -1035,19 +778,6 @@ STDMETHODIMP CMultipinMft::GetInputStreamState(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamState dwStreamID: %d", dwStreamID);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamState E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    ComPtr<CInPin> piPin = GetInPin(dwStreamID);
-
-    DMFTCHECKNULL_GOTO(piPin, done, MF_E_INVALIDSTREAMNUMBER);
-    
-    *value =  piPin->GetState();
-
-done:
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-#endif
 }
 
 
@@ -1073,15 +803,6 @@ STDMETHODIMP CMultipinMft::SetOutputStreamState(
     connected to it
     --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(pMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetOutputStreamState -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetOutputStreamState dwStreamID: %d", dwStreamID);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetOutputStreamState state: %d", state);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetOutputStreamState dwFlags: %d", dwFlags);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetOutputStreamState E_NOTIMPL -----");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetOutputStreamState -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetOutputStreamState dwStreamID: %d", dwStreamID);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetOutputStreamState state: %d", state);
@@ -1096,7 +817,6 @@ STDMETHODIMP CMultipinMft::SetOutputStreamState(
 done:    
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-
 }
 
 STDMETHODIMP CMultipinMft::GetOutputStreamState(
@@ -1116,19 +836,6 @@ STDMETHODIMP CMultipinMft::GetOutputStreamState(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputStreamState dwStreamID: %d", dwStreamID);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutputStreamState E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    CAutoLock lock(m_critSec);
-
-    ComPtr<COutPin> spoPin = GetOutPin(dwStreamID);
-    DMFTCHECKNULL_GOTO(pState, done, E_INVALIDARG);
-    DMFTCHECKNULL_GOTO(spoPin, done, MF_E_INVALIDSTREAMNUMBER);
-    *pState = spoPin->GetState();
-done:
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-#endif
 }
 
 STDMETHODIMP CMultipinMft::GetInputStreamPreferredState(
@@ -1146,14 +853,6 @@ STDMETHODIMP CMultipinMft::GetInputStreamPreferredState(
     happening on the output pin
     --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(value);
-    UNREFERENCED_PARAMETER(ppMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamPreferredState -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamPreferredState dwStreamID: %d", dwStreamID);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamPreferredState E_NOTIMPL -----");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamPreferredState -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInputStreamPreferredState dwStreamID: %d", dwStreamID);
 
@@ -1165,7 +864,6 @@ STDMETHODIMP CMultipinMft::GetInputStreamPreferredState(
 done:
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
    return hr;
-
 }
 
 STDMETHODIMP CMultipinMft::FlushInputStream(
@@ -1183,14 +881,6 @@ STDMETHODIMP CMultipinMft::FlushInputStream(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::FlushInputStream dwFlags: %d", dwFlags);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::FlushInputStream E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    UNREFERENCED_PARAMETER(dwStreamIndex);
-    UNREFERENCED_PARAMETER(dwFlags);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-#endif
 }
 
 STDMETHODIMP CMultipinMft::FlushOutputStream(
@@ -1208,21 +898,6 @@ STDMETHODIMP CMultipinMft::FlushOutputStream(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::FlushOutputStream dwStreamIndex: %d", dwStreamIndex);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::FlushOutputStream dwFlags: %d", dwFlags);
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    UNREFERENCED_PARAMETER(dwFlags);
-    CAutoLock Lock(m_critSec);
-
-    ComPtr<COutPin> spoPin = GetOutPin(dwStreamIndex);
-    DMFTCHECKNULL_GOTO(spoPin, done, E_INVALIDARG);
-    DeviceStreamState oldState = spoPin->SetState(DeviceStreamState_Disabled);
-    DMFTCHECKHR_GOTO(spoPin->FlushQueues(),done);
-    spoPin->SetState(oldState);
-done:
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-#endif
 }
 
 
@@ -1237,21 +912,6 @@ STDMETHODIMP_(VOID) CMultipinMft::FlushAllStreams(
     )
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::FlushAllStreams -----");
-
-#if 0
-    DeviceStreamState oldState;
-    CAutoLock Lock(m_critSec);
-    for ( DWORD dwIndex = 0, dwSize = (DWORD)m_OutPins.size(); dwIndex < dwSize; dwIndex++ )
-    {
-        ComPtr<COutPin> spoPin = (COutPin *)m_OutPins[dwIndex];
-        oldState = spoPin->SetState(DeviceStreamState_Disabled);
-        spoPin->FlushQueues();
-        //
-        //Restore state
-        //
-        spoPin->SetState(oldState);
-    }
-#endif
 }
 
 
@@ -1274,17 +934,6 @@ STDMETHODIMP CMultipinMft::KsProperty(
     if it needs to be propogated to the driver or not
     --*/
 {
-#if 0
-    UNREFERENCED_PARAMETER(pProperty);
-    UNREFERENCED_PARAMETER(pvPropertyData);
-    UNREFERENCED_PARAMETER(pulBytesReturned);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsProperty -----");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsProperty ulPropertyLength: %d", ulPropertyLength);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsProperty ulDataLength: %d", ulDataLength);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsProperty E_NOTIMPL -----");
-    return E_NOTIMPL;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsProperty -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsProperty ulPropertyLength: %d", ulPropertyLength);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsProperty ulDataLength: %d", ulDataLength);
@@ -1302,11 +951,6 @@ STDMETHODIMP CMultipinMft::KsProperty(
     if (IsEqualCLSID(pProperty->Set, KSPROPERTYSETID_ExtendedCameraControl)
         && (pProperty->Id == KSPROPERTY_CAMERACONTROL_EXTENDED_WARMSTART))
     {
-#if MF_DEVICEMFT_WARMSTART_HANDLING
-        DMFTCHECKHR_GOTO(WarmStartHandler(pProperty,
-            ulPropertyLength, pvPropertyData, ulDataLength, pulBytesReturned),done);
-        goto done;
-#endif
         DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Warm Start Control %d Passed ", pProperty->Id);
     }
 
@@ -1373,16 +1017,6 @@ STDMETHODIMP CMultipinMft::KsMethod(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsMethod ulDataLength: %d", ulDataLength);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsMethod E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    return m_spIkscontrol->KsMethod(
-        pMethod,
-        ulPropertyLength,
-        pvPropertyData,
-        ulDataLength,
-        pulBytesReturned
-        );
-#endif
 }
 
 STDMETHODIMP CMultipinMft::KsEvent(
@@ -1406,40 +1040,6 @@ STDMETHODIMP CMultipinMft::KsEvent(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsEvent ulDataLength: %d", ulDataLength);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::KsEvent E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-#if MF_DEVICEMFT_WARMSTART_HANDLING
-    if (pEvent && (pEvent->Set == KSEVENTSETID_ExtendedCameraControl) &&
-        (pEvent->Id == KSPROPERTY_CAMERACONTROL_EXTENDED_WARMSTART))
-    {
-        DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Acquiring Event for Async Extended Control");
-        //
-        // For the Sample the warmstate handlers are supported by Device MFT and not passed to driver
-        //
-       hr = m_eventHandler.KSEvent(pEvent,
-            ulEventLength,
-            pEventData,
-            ulDataLength,
-            pBytesReturned
-            );
-    }
-    else
-#endif
-    {
-
-        //
-        // All the Events we don't handle should be sent to the driver!
-        //
-        hr = m_spIkscontrol->KsEvent(pEvent,
-            ulEventLength,
-            pEventData,
-            ulDataLength,
-            pBytesReturned);
-    }
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-#endif
 }
 
 
@@ -1467,26 +1067,6 @@ STDMETHODIMP CMultipinMft::GetAttributes(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetAttributes -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetAttributes E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    CAutoLock Lock(m_critSec);
-    DMFTCHECKNULL_GOTO(ppAttributes, done, E_INVALIDARG);
-    
-    *ppAttributes = nullptr;
-
-    if (m_spAttributes != nullptr)
-    {
-        m_spAttributes.CopyTo(ppAttributes);
-    }
-    else
-    {
-        hr = E_OUTOFMEMORY;
-    }
-
-done:
-    return hr;
-#endif
 }
 #endif
 
@@ -1505,21 +1085,6 @@ STDMETHODIMP CMultipinMft::SetDefaultAllocator(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetDefaultAllocator dwOutputStreamID: %d", dwOutputStreamID);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SetDefaultAllocator E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    CAutoLock Lock(m_critSec);
-    
-    // SetAllocator will be called on the streamId that returns MFSampleAllocatorMode_Default
-    wil::com_ptr_nothrow<COutPin> outPin = GetOutPin(dwOutputStreamID);
-    RETURN_HR_IF_NULL(E_INVALIDARG, outPin);
-    RETURN_HR_IF_NULL(E_INVALIDARG, pAllocator);
-
-    wil::com_ptr_nothrow<IMFVideoSampleAllocator> defaultAllocator;
-    RETURN_IF_FAILED(pAllocator->QueryInterface(&defaultAllocator));
-    outPin->SetAllocator(defaultAllocator.get());
-
-    return S_OK;
-#endif
 }
 
 STDMETHODIMP CMultipinMft::GetAllocatorUsage(
@@ -1534,25 +1099,8 @@ STDMETHODIMP CMultipinMft::GetAllocatorUsage(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetAllocatorUsage dwOutputStreamID: %d", dwOutputStreamID);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetAllocatorUsage E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    CAutoLock Lock(m_critSec);
-
-    RETURN_HR_IF_NULL(E_INVALIDARG, peUsage);
-
-    wil::com_ptr_nothrow<COutPin> outPin = GetOutPin(dwOutputStreamID);
-    RETURN_HR_IF_NULL(MF_E_INVALIDSTREAMNUMBER, outPin);
-    *peUsage = outPin->GetSampleAllocatorUsage();
-
-    if (*peUsage == MFSampleAllocatorUsage_DoesNotAllocate)
-    {
-        RETURN_HR_IF_NULL(E_INVALIDARG, pdwInputStreamID);
-        RETURN_IF_FAILED(GetConnectedInpin((ULONG)dwOutputStreamID, *(ULONG*)pdwInputStreamID));
-    }
-
-    return S_OK;
-#endif
 }
+
 #endif // ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
 
 //
@@ -1567,12 +1115,6 @@ CInPin* CMultipinMft::GetInPin(
     _In_ DWORD dwStreamId
 )
 {
-#if 0
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInPin");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInPin dwStreamId: %d", dwStreamId);
-    return NULL;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetInPin dwStreamId: %d", dwStreamId);
 
@@ -1594,11 +1136,6 @@ COutPin* CMultipinMft::GetOutPin(
     _In_ DWORD dwStreamId
     )
 {
-#if 0
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutPin");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutPin dwStreamId: %d", dwStreamId);
-    return NULL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetOutPin dwStreamId: %d", dwStreamId);
 
@@ -1622,14 +1159,6 @@ COutPin* CMultipinMft::GetOutPin(
 _Requires_lock_held_(m_Critsec)
 HRESULT CMultipinMft::GetConnectedInpin(_In_ ULONG ulOutpin, _Out_ ULONG &ulInPin)
 {
-#if 0
-    UNREFERENCED_PARAMETER(ulInPin);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetConnectedInpin");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetConnectedInpin ulOutpin: %d", ulOutpin);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetConnectedInpin E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetConnectedInpin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::GetConnectedInpin ulOutpin: %d", ulOutpin);
 
@@ -1659,15 +1188,6 @@ HRESULT CMultipinMft::ChangeMediaTypeEx(
     _In_        DeviceStreamState  reqState
 )
 {
-#if 0
-    UNREFERENCED_PARAMETER(pMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ChangeMediaTypeEx");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ChangeMediaTypeEx pinId: %d", pinId);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ChangeMediaTypeEx reqState: %d", reqState);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ChangeMediaTypeEx E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
-
     UNREFERENCED_PARAMETER(pMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ChangeMediaTypeEx");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::ChangeMediaTypeEx pinId: %d", pinId);
@@ -1776,14 +1296,6 @@ HRESULT CMultipinMft::SendEventToManager(
     {
     string str = guidToString2(pGuid);
 
-#if 0
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SendEventToManager");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SendEventToManager eventType: %d", eventType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SendEventToManager pGuid: %s", str.c_str());
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SendEventToManager context: %d", context);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SendEventToManager E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SendEventToManager");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SendEventToManager eventType: %d", eventType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::SendEventToManager pGuid: %s", str.c_str());
@@ -1811,12 +1323,6 @@ HRESULT CMultipinMft::BridgeInputPinOutputPin(
     _In_ COutPin* poPin
     )
 {
-#if 0
-    UNREFERENCED_PARAMETER(piPin);
-    UNREFERENCED_PARAMETER(poPin);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::BridgeInputPinOutputPin");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::BridgeInputPinOutputPin");
 
     HRESULT hr                      = S_OK;
@@ -1875,99 +1381,8 @@ done:
 
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_ERROR, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
-
 }
 
-//
-// Look at the below code only if we need to handle an extended property in Device MFT
-//
-#if defined (MF_DEVICEMFT_WARMSTART_HANDLING)
-HRESULT CMultipinMft::WarmStartHandler(
-    _In_       PKSPROPERTY Property,
-    _In_       ULONG       ulPropertyLength,
-    _In_       LPVOID      pData,
-    _In_       ULONG       ulOutputBufferLength,
-    _Inout_    PULONG      pulBytesReturned
-    )
-{
-    
-    HRESULT hr = S_OK;
-    UNREFERENCED_PARAMETER( ulPropertyLength );
-    *pulBytesReturned = 0;
-
-    if ( Property->Flags & KSPROPERTY_TYPE_SET )
-    {
-        if ( ulOutputBufferLength == 0 )
-        {
-            *pulBytesReturned = sizeof( KSCAMERA_EXTENDEDPROP_HEADER )+sizeof( KSCAMERA_EXTENDEDPROP_VALUE );
-            DMFTCHECKHR_GOTO( HRESULT_FROM_WIN32( ERROR_MORE_DATA ), done);
-        }
-        else if (ulOutputBufferLength < sizeof( KSCAMERA_EXTENDEDPROP_HEADER )+sizeof( KSCAMERA_EXTENDEDPROP_VALUE ))
-        {
-            DMFTCHECKHR_GOTO( HRESULT_FROM_WIN32( ERROR_MORE_DATA ), done);
-        }
-        else if ( pData && ulOutputBufferLength >= sizeof( KSCAMERA_EXTENDEDPROP_HEADER )+sizeof( KSCAMERA_EXTENDEDPROP_VALUE ))
-        {
-            PBYTE pPayload = ( PBYTE )pData;
-            PKSCAMERA_EXTENDEDPROP_HEADER pExtendedHeader = ( PKSCAMERA_EXTENDEDPROP_HEADER )pPayload;
-            //
-            //Use the extended value to make changes to the property.. refer documentation
-            //PKSCAMERA_EXTENDEDPROP_VALUE pExtendedValue = (PKSCAMERA_EXTENDEDPROP_VALUE)(pPayload + sizeof(KSCAMERA_EXTENDEDPROP_HEADER));
-            //
-            SetWarmStart(pExtendedHeader->PinId, (pExtendedHeader->Flags & KSCAMERA_EXTENDEDPROP_WARMSTART_MODE_ENABLED));
-
-            *pulBytesReturned = sizeof( PKSCAMERA_EXTENDEDPROP_HEADER )+sizeof( KSCAMERA_EXTENDEDPROP_VALUE );
-            m_eventHandler.SetOneShot(KSPROPERTY_CAMERACONTROL_EXTENDED_WARMSTART);
-        }
-        else
-        {
-            hr = S_OK;
-        }
-    }
-    else if (Property->Flags & KSPROPERTY_TYPE_GET)
-    {
-        if (ulOutputBufferLength == 0)
-        {
-            *pulBytesReturned = sizeof( KSCAMERA_EXTENDEDPROP_HEADER )+sizeof( KSCAMERA_EXTENDEDPROP_VALUE );
-            DMFTCHECKHR_GOTO(HRESULT_FROM_WIN32(ERROR_MORE_DATA), done);
-        }
-        else if (ulOutputBufferLength < sizeof( KSCAMERA_EXTENDEDPROP_HEADER )+sizeof( KSCAMERA_EXTENDEDPROP_VALUE ))
-        {
-            DMFTCHECKHR_GOTO( HRESULT_FROM_WIN32( ERROR_MORE_DATA ), done );
-        }
-        else if (pData && ulOutputBufferLength >= sizeof( KSCAMERA_EXTENDEDPROP_HEADER )+sizeof( KSCAMERA_EXTENDEDPROP_VALUE ))
-        {
-            PBYTE pPayload =  ( PBYTE )pData;
-            PKSCAMERA_EXTENDEDPROP_HEADER pExtendedHeader = ( PKSCAMERA_EXTENDEDPROP_HEADER )( pPayload );
-            //
-            //Use the extended value to make changes to the property.. refer documentation
-            //PKSCAMERA_EXTENDEDPROP_VALUE pExtendedValue = (PKSCAMERA_EXTENDEDPROP_VALUE)(pPayload  +sizeof(KSCAMERA_EXTENDEDPROP_HEADER));
-            //
-            pExtendedHeader->Capability = KSCAMERA_EXTENDEDPROP_CAPS_ASYNCCONTROL | KSCAMERA_EXTENDEDPROP_WARMSTART_MODE_ENABLED;
-            pExtendedHeader->Flags = 0;
-
-            if (GetWarmStart(pExtendedHeader->PinId))
-y
-            {
-                pExtendedHeader->Flags |= KSCAMERA_EXTENDEDPROP_WARMSTART_MODE_ENABLED;
-            }
-
-            pExtendedHeader->Result = 0;
-            pExtendedHeader->Size = sizeof( KSCAMERA_EXTENDEDPROP_HEADER )+sizeof( KSCAMERA_EXTENDEDPROP_VALUE );
-            pExtendedHeader->Version = 1;
-            *pulBytesReturned = sizeof( KSCAMERA_EXTENDEDPROP_HEADER )+sizeof( KSCAMERA_EXTENDEDPROP_VALUE );
-            hr = S_OK;
-        }
-        else
-        {
-            hr = S_OK;
-        }
-    }
-done:
-    DMFTRACE( DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr );
-    return hr;
-}
-#endif
 
 //
 // IMFShutdown interface functions
@@ -1984,26 +1399,6 @@ STDMETHODIMP CMultipinMft::Shutdown(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::Shutdown -----");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CMultipinMft::Shutdown E_NOTIMPL -----");
     return E_NOTIMPL;
-
-#if 0
-    CAutoLock Lock(m_critSec);
-    (VOID) m_eventHandler.Clear();
-
-    for (ULONG ulIndex = 0, ulSize = (ULONG)m_InPins.size(); ulIndex < ulSize; ulIndex++ )
-    {
-        CInPin *pInPin = static_cast<CInPin *>(m_InPins[ulIndex]);
-
-        // Deref on the connected outpins to break reference loop
-        (VOID)pInPin->ShutdownPin();
-    }
-#if defined (MF_DEVICEMFT_ALLOW_MFT0_LOAD) && defined (MFT_UNIQUE_METHOD_NAMES)
-    for (ULONG ulIndex = 0, ulSize = (ULONG)m_OutPins.size(); ulIndex < ulSize; ulIndex++)
-    {
-        (VOID) m_OutPins[ulIndex]->DeleteItem(MF_DEVICESTREAM_EXTENSION_PLUGIN_CONNECTION_POINT);
-    }
-#endif
-    return ShutdownEventGenerator();
-#endif
 }
 
 //

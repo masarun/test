@@ -417,7 +417,6 @@ public:
         _In_ DWORD dwTypeIndex,
         _Out_opt_ IMFMediaType **ppType);
 
-    VOID SetD3DManager(_In_opt_ IUnknown* pManager);
     VOID SetWorkQueue(_In_ DWORD dwQueueId)
     {
         m_dwWorkQueueId = dwQueueId;

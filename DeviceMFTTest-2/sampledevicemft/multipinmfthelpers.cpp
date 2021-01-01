@@ -44,11 +44,6 @@ Description:
 --*/
 VOID CPinQueue::Clear( )
 {
-#if 0
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Clear");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Clear E_NOTIMPL");
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::Clear");
 
     //
@@ -76,16 +71,6 @@ STDMETHODIMP CPinQueue::RecreateTeeByAllocatorMode(
     _In_ MFSampleAllocatorUsage allocatorUsage,
     _In_opt_ IMFVideoSampleAllocator* pAllocator)
 {
-#if 0
-    UNREFERENCED_PARAMETER(inMediatype);
-    UNREFERENCED_PARAMETER(outMediatype);
-    UNREFERENCED_PARAMETER(punkManager);
-    UNREFERENCED_PARAMETER(allocatorUsage);
-    UNREFERENCED_PARAMETER(pAllocator);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CPinQueue::RecreateTeeByAllocatorMode E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
     UNREFERENCED_PARAMETER(inMediatype);
     UNREFERENCED_PARAMETER(outMediatype);
 
@@ -219,11 +204,7 @@ HRESULT CPinCreationFactory::CreatePin(_In_ ULONG ulInputStreamId, /* The Input 
         }
         else
         {
-#if defined MF_DEVICEMFT_ASYNCPIN_NEEDED
             spInPin = new (std::nothrow) CAsyncInPin(spAttributes.Get(), ulInputStreamId, m_spDeviceTransform.Get()); // Asynchronous PIn, if you need it
-#else
-            spInPin = new (std::nothrow) CInPin(spAttributes.Get(), ulInputStreamId, m_spDeviceTransform.Get());
-#endif
         }
         DMFTCHECKNULL_GOTO(spInPin.Get(), done, E_OUTOFMEMORY);
         *ppPin = spInPin.Detach();
@@ -242,15 +223,9 @@ HRESULT CPinCreationFactory::CreatePin(_In_ ULONG ulInputStreamId, /* The Input 
         DMFTCHECKHR_GOTO(spInPin.As(&spKscontrol), done);   // Grab the IKSControl off the input pin
         DMFTCHECKHR_GOTO(spInPin->GetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, &pinGuid), done);         // Get the Stream Category. Advertise on the output pin
 
-#if defined MF_DEVICEMFT_DECODING_MEDIATYPE_NEEDED
-
-#else
         spOutPin = new (std::nothrow) COutPin(ulOutStreamId, m_spDeviceTransform.Get(), spKscontrol.Get()
-#if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
             , MFSampleAllocatorUsage_DoesNotAllocate
-#endif
         );         // Create the output pin
-#endif
         DMFTCHECKNULL_GOTO(spOutPin.Get(), done, E_OUTOFMEMORY);
         
         DMFTCHECKHR_GOTO(spOutPin->SetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, pinGuid), done);         // Advertise the Stream category to the Pipeline
@@ -263,9 +238,6 @@ HRESULT CPinCreationFactory::CreatePin(_In_ ULONG ulInputStreamId, /* The Input 
         //
         if (SUCCEEDED(spInPin->GetUINT32(MF_DEVICESTREAM_ATTRIBUTE_FRAMESOURCE_TYPES, &uiFrameSourceType)))
         {
-#if defined MF_DEVICEMFT_DECODING_MEDIATYPE_NEEDED
-            uiFrameSourceType = (uiFrameSourceType == MFFrameSourceTypes_Custom) ? MFFrameSourceTypes_Color : uiFrameSourceType;
-#endif
             DMFTCHECKHR_GOTO(spOutPin->SetUINT32(MF_DEVICESTREAM_ATTRIBUTE_FRAMESOURCE_TYPES, uiFrameSourceType),done);   // Copy over the Frame Source Type.
         }
 

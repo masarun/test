@@ -65,13 +65,6 @@ STDMETHODIMP_(DeviceStreamState) CBasePin::SetState(_In_ DeviceStreamState state
 
 HRESULT CBasePin::AddMediaType( _Inout_ DWORD *pos, _In_ IMFMediaType *pMediaType)
 {
-#if 0
-    UNREFERENCED_PARAMETER(pos);
-    UNREFERENCED_PARAMETER(pMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::AddMediaType");
-    return E_NOTIMPL;
-#endif
-
     UNREFERENCED_PARAMETER(pos);
     UNREFERENCED_PARAMETER(pMediaType);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::AddMediaType");
@@ -99,12 +92,6 @@ done:
 
 HRESULT CBasePin::GetMediaTypeAt( _In_ DWORD pos, _Outptr_result_maybenull_ IMFMediaType **ppMediaType )
 {
-#if 0
-    UNREFERENCED_PARAMETER(ppMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetMediaTypeAt");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetMediaTypeAt pos: %d", pos);
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetMediaTypeAt");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetMediaTypeAt pos: %d", pos);
 
@@ -133,15 +120,6 @@ STDMETHODIMP_(BOOL) CBasePin::IsMediaTypeSupported
      IMFMediaType **ppIMFMediaTypeFull
 )
 {
-#if 0
-    UNREFERENCED_PARAMETER(pMediaType);
-    UNREFERENCED_PARAMETER(ppIMFMediaTypeFull);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::IsMediaTypeSupported");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::IsMediaTypeSupported E_NOTIMPL");
-
-    return FALSE;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::IsMediaTypeSupported");
 
     HRESULT hr = S_OK;
@@ -191,13 +169,6 @@ STDMETHODIMP CBasePin::GetOutputAvailableType(
     _In_ DWORD dwTypeIndex,
     _Out_opt_ IMFMediaType** ppType)
 {
-#if 0
-    UNREFERENCED_PARAMETER(ppType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType dwTypeIndex: %d", dwTypeIndex);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::GetOutputAvailableType dwTypeIndex: %d", dwTypeIndex);
 
@@ -237,22 +208,7 @@ HRESULT CBasePin::QueryInterface(
 done:
     return hr;
 }
-VOID CBasePin::SetD3DManager(_In_opt_ IUnknown* pManager)
-{
-    UNREFERENCED_PARAMETER(pManager);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetD3DManager");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CBasePin::SetD3DManager E_NOTIMPL");
-#if 0
-    //
-    // Should release the old dxgi manager.. We will not invalidate the pins or allocators
-    // We will recreate all allocator when the media types are set, so we should be fine
-    // And the pipeline will not set the dxgimanager when the pipeline is already built
-    //
-    CAutoLock Lock(lock());
-    m_spDxgiManager = pManager;
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! Setting D3DManager on pin %d", m_StreamId);
-#endif
-}
+
 //
 //Input Pin implementation
 //
@@ -266,13 +222,6 @@ CInPin::CInPin(
     m_waitInputMediaTypeWaiter(NULL),
     m_preferredStreamState(DeviceStreamState_Stop)
 {
-#if 0
-    UNREFERENCED_PARAMETER(pAttributes);
-    UNREFERENCED_PARAMETER(pParent);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::CInPin");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::CInPin ulPinId: %d", ulPinId);
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::CInPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::CInPin ulPinId: %d", ulPinId);
     setAttributes(pAttributes);
@@ -297,12 +246,6 @@ STDMETHODIMP CInPin::Init(
     _In_ IMFTransform* pTransform
     )
 {
-#if 0
-    UNREFERENCED_PARAMETER(pTransform);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::Init");
-    return E_NOTIMPL;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::Init");
 
     HRESULT hr = S_OK;
@@ -349,12 +292,6 @@ HRESULT CInPin::GenerateMFMediaTypeListFromDevice(
     _In_ UINT uiStreamId
     )
 {
-#if 0
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GenerateMFMediaTypeListFromDevice");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GenerateMFMediaTypeListFromDevice uiStreamId: %d", uiStreamId);
-    return E_NOTIMPL;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GenerateMFMediaTypeListFromDevice");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GenerateMFMediaTypeListFromDevice uiStreamId: %d", uiStreamId);
 
@@ -391,44 +328,16 @@ STDMETHODIMP CInPin::SendSample(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SendSample");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SendSample E_NOTIMPL");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    CAutoLock Lock(lock());
-    if (FAILED(Active()))
-    {
-        goto done;
-    }
-    COutPin *poPin = static_cast<COutPin*>(m_outpin.Get());
-    DMFTCHECKNULL_GOTO(pSample, done, S_OK);
-    DMFTCHECKHR_GOTO(poPin->AddSample(pSample, this), done);
-    
- done: 
-    return hr;
-#endif
 }
 
 STDMETHODIMP_(VOID) CInPin::ConnectPin( _In_ CBasePin * poPin )
 {
     UNREFERENCED_PARAMETER(poPin);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::ConnectPin");
-
-#if 0
-    CAutoLock Lock(lock());
-    if (poPin!=nullptr)
-    {
-        m_outpin = poPin;
-    }
-#endif
 }
 
 STDMETHODIMP CInPin::WaitForSetInputPinMediaChange()
 {
-#if 0
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::WaitForSetInputPinMediaChange");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::WaitForSetInputPinMediaChange E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::WaitForSetInputPinMediaChange");
 
 
@@ -453,13 +362,6 @@ HRESULT CInPin::GetInputStreamPreferredState(
     _Outptr_opt_result_maybenull_  IMFMediaType**      ppMediaType
     )
 {
-#if 0
-    UNREFERENCED_PARAMETER(value);
-    UNREFERENCED_PARAMETER(ppMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GetInputStreamPreferredState");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GetInputStreamPreferredState E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::GetInputStreamPreferredState");
 
     HRESULT hr = S_OK;
@@ -490,15 +392,6 @@ HRESULT CInPin::SetInputStreamState(
     _In_ DWORD              dwFlags
     )
 {
-#if 0
-    UNREFERENCED_PARAMETER(pMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState value: %d", value);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState dwFlags: %d", dwFlags);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState value: %d", value);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::SetInputStreamState dwFlags: %d", dwFlags);
@@ -529,10 +422,6 @@ STDMETHODIMP_(VOID) CInPin::ShutdownPin()
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::ShutdownPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::ShutdownPin E_NOTIMPL");
-#if 0
-    m_spSourceTransform = nullptr;
-    m_outpin = nullptr;
-#endif
 }
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
 //
@@ -560,36 +449,6 @@ HRESULT CInPin::ForwardSecureBuffer(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::ForwardSecureBuffer");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CInPin::ForwardSecureBuffer E_NOTIMPL");
     return E_NOTIMPL;
-
-#if 0
-    DWORD   bytesReturned = 0;
-    CONTOSODEVICE_PROCESSBUFFER_PAYLOAD payload = { 0 };
-    KSPROPERTY  property = { 0 };
-
-    wil::com_ptr_nothrow<IMFMediaBuffer> mediaBuffer;
-    wil::com_ptr_nothrow<IMFSecureBuffer> secureBuffer;
-
-    //  Set up our private KSPROPERTY to some sample avstream driver.
-    property.Set = PROPSETID_CONTOSODEVICE;
-    property.Id = KSPROPERTY_CONTOSODEVICE_PROCESSBUFFER;
-    property.Flags = KSPROPERTY_TYPE_SET;
-
-    //  Set up the payload for that property.  Includes the secure buffer ID and buffer length.
-    RETURN_IF_FAILED(sample->GetBufferByIndex(0, &mediaBuffer));
-    //  Forward the buffer if it is secure.
-    if (mediaBuffer.try_query_to(&secureBuffer))
-    {
-        RETURN_IF_FAILED(secureBuffer->GetIdentifier(&payload.identifier));
-        RETURN_IF_FAILED(mediaBuffer->GetMaxLength(&payload.size));
-
-        //  Log the buffer's secure ID and size for debugging.
-        DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! identifier=%!GUID!, length=%d", &payload.identifier, payload.size);
-
-        //  Send the KSPROPERTY synchronously to the driver.
-        RETURN_IF_FAILED(KsProperty(&property, sizeof(property), &payload, sizeof(payload), &bytesReturned));
-    }
-    return S_OK;
-#endif
 }
 #endif // ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
 //
@@ -610,12 +469,6 @@ COutPin::COutPin(
     , m_allocatorUsage(allocatorUsage)
 #endif
 {
-#if 0
-    UNREFERENCED_PARAMETER(pIksControl);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::COutPin");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::COutPin ulPinId: %d", ulPinId);
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::COutPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::COutPin ulPinId: %d", ulPinId);
 
@@ -641,14 +494,6 @@ done:
 COutPin::~COutPin()
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::~COutPin");
-
-#if 0
-    m_spAttributes = nullptr;
-    if (m_queue)
-    {
-        SAFE_DELETE(m_queue);
-    }
-#endif
 }
 
 /*++
@@ -661,12 +506,6 @@ STDMETHODIMP COutPin::AddPin(
     _In_ DWORD inputPinId
     )
 {
-#if 0
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddPin");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddPin inputPinId: %d", inputPinId);
-    return E_NOTIMPL;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddPin inputPinId: %d", inputPinId);
 
@@ -708,29 +547,6 @@ STDMETHODIMP COutPin::AddSample(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddSample");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::AddSample E_NOTIMPL");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    UNREFERENCED_PARAMETER(pPin);
-
-    CAutoLock Lock(lock()); // Serialize
-
-    DMFTCHECKNULL_GOTO(pSample, done, E_INVALIDARG);
-    if (FAILED(Active()))
-    {
-        goto done;
-    }
-    DMFTCHECKHR_GOTO(m_queue->Insert(pSample), done);
-done:
-    if (FAILED(hr))
-    {
-        // @@@@ Readme : This is how to throw error to the pipeline and inform it that there is an Error.
-        // This will destroy the pipeline and the App will need to recreate the source
-        //
-        DMFTCHECKHR_GOTO(Parent()->QueueEvent(MEError, GUID_NULL, hr, NULL), done);
-    }
-    return hr;
-#endif
 }
 
 /*++
@@ -744,9 +560,6 @@ STDMETHODIMP_(VOID) COutPin::SetFirstSample(
     UNREFERENCED_PARAMETER(fisrtSample);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::SetFirstSample");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::SetFirstSample E_NOTIMPL");
-#if 0
-    m_firstSample = fisrtSample;
-#endif
 }
 
 STDMETHODIMP_(VOID) COutPin::SetAllocator(
@@ -756,10 +569,6 @@ STDMETHODIMP_(VOID) COutPin::SetAllocator(
     UNREFERENCED_PARAMETER(pAllocator);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::SetAllocator");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::SetAllocator E_NOTIMPL");
-#if 0
-    CAutoLock Lock(lock());
-    m_spDefaultAllocator = pAllocator;
-#endif
 }
 
 /*++
@@ -770,12 +579,6 @@ Called from the device Transform when the output queues have to be flushed
 --*/
 HRESULT COutPin::FlushQueues()
 {
-#if 0
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::FlushQueues");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::FlushQueues E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
-    
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::FlushQueues");
 
     HRESULT hr = S_OK;
@@ -797,15 +600,6 @@ HRESULT COutPin::ChangeMediaTypeFromInpin(
     _In_ IMFMediaType* pOutMediaType,
     _In_ DeviceStreamState state)
 {
-#if 0
-    UNREFERENCED_PARAMETER(pInMediatype);
-    UNREFERENCED_PARAMETER(pOutMediaType);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin");
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin state: %d", state);
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin E_NOTIMPL");
-    return E_NOTIMPL;
-#endif
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ChangeMediaTypeFromInpin state: %d", state);
 
@@ -818,11 +612,7 @@ HRESULT COutPin::ChangeMediaTypeFromInpin(
     SetState(DeviceStreamState_Disabled); 
     DMFTCHECKHR_GOTO(FlushQueues(),done);  
     DMFTCHECKNULL_GOTO(m_queue,done, E_UNEXPECTED); // The queue should alwaye be set
-#if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
     hr = m_queue->RecreateTeeByAllocatorMode(pInMediatype, pOutMediaType, m_spDxgiManager.Get(), m_allocatorUsage, m_spDefaultAllocator.get());
-#else
-    hr = m_queue->RecreateTee(pInMediatype, pOutMediaType, m_spDxgiManager.Get());
-#endif // ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
     if ( SUCCEEDED( hr ) )
     {
         (VOID)setMediaType( pOutMediaType );
@@ -856,45 +646,6 @@ STDMETHODIMP COutPin::ProcessOutput(_In_  DWORD dwFlags,
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ProcessOutput dwFlags: %d", dwFlags);
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::ProcessOutput E_NOTIMPL");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT             hr          = S_OK;
-    ComPtr<IMFSample>   spSample;
-    MFTIME              llTime      = 0L;
-    UNREFERENCED_PARAMETER(pdwStatus);
-    UNREFERENCED_PARAMETER(dwFlags);
-    CAutoLock lock(lock());
-    
-    if (FAILED(Active()))
-    {
-        goto done;
-    }
-    DMFTCHECKNULL_GOTO(m_queue, done, MF_E_INVALID_STREAM_STATE);
-    pOutputSample->dwStatus = S_OK;
-
-    DMFTCHECKHR_GOTO(m_queue->Remove(spSample.GetAddressOf()), done);
-    
-    if (FAILED(spSample->GetSampleTime(&llTime)))
-    {
-        llTime = MFGetSystemTime();
-        spSample->SetSampleTime(llTime);
-    }
-    if (m_firstSample)
-    {
-        spSample->SetUINT32(MFSampleExtension_Discontinuity,TRUE);
-        SetFirstSample(FALSE);
-    }
-    //
-    // Any processing before we pass the sample to further in the pipeline should be done here
-    // PROCESSSAMPLE(pSample); There is a bug in the pipeline and to circumvent that we have to
-    // keep a reference on the sample. The pipeline is not releasing a reference when the sample
-    // is fed in ProcessInput. We are explicitly releasing it for the pipeline.
-    //
-    pOutputSample->pSample = spSample.Detach();
-    pOutputSample->dwStatus = S_OK;
-done:
-    return hr;
-#endif
 }
 
 /*++
@@ -918,17 +669,6 @@ STDMETHODIMP COutPin::KsProperty(
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::KsProperty");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::KsProperty E_NOTIMPL");
     return E_NOTIMPL;
-
-#if 0
-    //
-    //Route it to input pin
-    //
-    return m_spIkscontrol->KsProperty(pProperty,
-        ulPropertyLength,
-        pPropertyData,
-        ulDataLength,
-        pBytesReturned);
-#endif
 }
 
 //
@@ -941,30 +681,12 @@ STDMETHODIMP CAsyncInPin::SendSample(_In_ IMFSample *pSample)
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::SendSample");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::SendSample E_NOTIMPL");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    CAutoLock Lock(lock());
-    if (SUCCEEDED(Active()))
-    {
-        DMFTCHECKHR_GOTO(MFPutWorkItem(m_dwWorkQueueId, static_cast<IMFAsyncCallback*>(m_asyncCallback.Get()), pSample), done);
-    }
-done:
-    return hr;
-#endif
 }
 
 STDMETHODIMP CAsyncInPin::Init()
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::Init");
     return E_NOTIMPL;
-
-#if 0
-    m_asyncCallback = new (std::nothrow) CDMFTAsyncCallback<CAsyncInPin, &CAsyncInPin::Invoke>(this, m_dwWorkQueueId);
-    if (!m_asyncCallback)
-        throw bad_alloc();
-    return S_OK;
-#endif
 }
 
 //  Pass a secure frame buffer to our AVstream driver.
@@ -974,44 +696,11 @@ HRESULT CAsyncInPin::Invoke( _In_ IMFAsyncResult* pResult )
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::Invoke");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::Invoke E_NOTIMPL");
     return E_NOTIMPL;
-
-#if 0
-    HRESULT hr = S_OK;
-    ComPtr<IUnknown> spUnknown;
-    ComPtr<IMFSample> spSample;
-
-    DMFTCHECKHR_GOTO(Active(), done);
-    DMFTCHECKNULL_GOTO(pResult, done, E_UNEXPECTED);
-    DMFTCHECKHR_GOTO(pResult->GetState(&spUnknown), done);
-
-    DMFTCHECKHR_GOTO(spUnknown->QueryInterface(__uuidof(IMFSample), reinterpret_cast<PVOID*>(spSample.GetAddressOf())), done);
-
-    DMFTCHECKNULL_GOTO(spSample.Get(), done, E_INVALIDARG);
-
-#if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
-    //
-    //  Do secure buffer post-processing.
-    //
-    RETURN_IF_FAILED(ForwardSecureBuffer(spSample.Get()));
-#endif // ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
-    COutPin *poPin = static_cast<COutPin*>(m_outpin.Get());
-    DMFTCHECKHR_GOTO(poPin->AddSample(spSample.Get(), this), done);
-done:
-    return hr;
-#endif
 }
 
 STDMETHODIMP_(VOID) CAsyncInPin::ShutdownPin()
 {
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::ShutdownPin");
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "CAsyncInPin::ShutdownPin E_NOTIMPL");
-#if 0
-    CAutoLock Lock(lock());
-    if (m_asyncCallback.Get())
-    {
-        (VOID)m_asyncCallback->Shutdown(); //Break reference with the parent
-    }
-    CInPin::ShutdownPin();
-#endif
 }
 
