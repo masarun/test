@@ -237,30 +237,7 @@ typedef  std::pair< std::multimap<int, int>::iterator, std::multimap<int, int>::
 
 
 
-STDMETHODIMP   IsOptimizedPlanarVideoInputImageOutputPair(
-    _In_        IMFMediaType *inMediaType,
-    _In_        IMFMediaType *outMediaType,
-    _Out_       bool *optimized,
-    _Out_       bool *optimizedxvpneeded
-    );
 
-STDMETHODIMP CompareMediaTypesForConverter(_In_opt_ IMFMediaType *inMediaType,
-    _In_        IMFMediaType                *newMediaType,
-    _Inout_     PDMFT_conversion_type       operation
-    );
-
-HRESULT IsInputDxSample(
-    _In_ IMFSample* pSample,
-    _Inout_ BOOL *isDxSample
-    );
-
-STDMETHODIMP_(BOOL) IsPinStateInActive(
-    _In_ DeviceStreamState state
-    );
-
-STDMETHODIMP_(BOOL) IsKnownUncompressedVideoType(
-    _In_ GUID guidSubType
-    );
 LPSTR DumpGUIDA(
     _In_ REFGUID guid
     );
@@ -633,46 +610,12 @@ private:
 };
 
 // Decoding and Allocator specific
-HRESULT CreateDecoderHW(    _In_ IMFDXGIDeviceManager* pManager,
-                            _In_ IMFMediaType* inType,
-                            _In_ IMFMediaType* outType,
-                            _Outptr_ IMFTransform** ppTransform,
-                            _Inout_ BOOL&);
 
-HRESULT EnumSWDecoder(      _Outptr_ IMFTransform** ppTransform,
-                            _In_ GUID subType);
-
-HRESULT SetDX11BindFlags(   _In_  IUnknown *pUnkManager,
-                            _In_ GUID guidPinCategory,
-                            _Inout_ DWORD &dwBindFlags);
-
-HRESULT IsDXFormatSupported(
-    _In_ IMFDXGIDeviceManager* pDeviceManager,
-    _In_ GUID subType,
-    _Outptr_opt_ ID3D11Device** ppDevice,
-    _In_opt_ PUINT32 pSupportedFormat);
-
-HRESULT ConfigureAllocator(
-    _In_ IMFMediaType* pOutputMediaType,
-    _In_ GUID streamCategory,
-    _In_ IUnknown* pDeviceManagerUnk,
-    _In_ BOOL &isDxAllocator,
-    _In_ IMFVideoSampleAllocator* pAllocator);
-
-HRESULT CreateAllocator( _In_ IMFMediaType* pOutputMediaType,
-    _In_ GUID streamCategory,
-    _In_ IUnknown* pDeviceManagerUnk,
-    _In_ BOOL &isDxAllocator,      
-    _Outptr_ IMFVideoSampleAllocatorEx** ppAllocator);
 
 HRESULT GetDXGIAdapterLuid( _In_ IMFDXGIDeviceManager *pDXManager,
     _Out_ LUID *pAdapterLuid);
 
-HRESULT MergeSampleAttributes(_In_ IMFSample* pInSample, _Inout_ IMFSample* pOutSample);
 
-HRESULT CheckPassthroughMediaType( _In_ IMFMediaType *pMediaType1,
-    _In_ IMFMediaType *pMediaType2,
-    _Out_ BOOL& pfPassThrough);
 //
 // Internal attribute
 //

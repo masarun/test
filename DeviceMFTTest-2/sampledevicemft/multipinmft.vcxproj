@@ -131,17 +131,6 @@
       <PreCompiledHeaderOutputFile>$(IntDir)\stdafx.h.pch</PreCompiledHeaderOutputFile>
       <WppScanConfigurationData>common.h</WppScanConfigurationData>
     </ClCompile>
-    <ClCompile Include="custompin.cpp">
-      <WppEnabled>true</WppEnabled>
-      <WppDllMacro>true</WppDllMacro>
-      <WppTraceFunction>DMFTRACE(FLAG,LEVEL,MSG,...)</WppTraceFunction>
-      <WppGenerateUsingTemplateFile>{um-default.tpl}*.tmh</WppGenerateUsingTemplateFile>
-      <AdditionalIncludeDirectories>;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreCompiledHeaderFile>stdafx.h</PreCompiledHeaderFile>
-      <PreCompiledHeader>Use</PreCompiledHeader>
-      <PreCompiledHeaderOutputFile>$(IntDir)\stdafx.h.pch</PreCompiledHeaderOutputFile>
-      <WppScanConfigurationData>common.h</WppScanConfigurationData>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <WppEnabled>true</WppEnabled>
       <WppDllMacro>true</WppDllMacro>
@@ -261,7 +250,6 @@
     <ClInclude Include="basepin.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="contosodevice.h" />
-    <ClInclude Include="custompin.h" />
     <ClInclude Include="mftpeventgenerator.h" />
     <ClInclude Include="multipinmft.h" />
     <ClInclude Include="multipinmfthelpers.h" />

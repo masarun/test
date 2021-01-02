@@ -10,7 +10,6 @@
 #include "common.h"
 #include "mftpeventgenerator.h"
 #include "basepin.h"
-#include "custompin.h"
 #include "multipinmfthelpers.h"
 
 //
@@ -43,10 +42,6 @@ class CMultipinMft :
     , public CMediaEventGenerator
     , public IMFRealTimeClientEx
     , public IKsControl
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-    , public IMFCapturePhotoConfirmation
-    , public IMFGetService
-#endif
     , public CDMFTModuleLifeTimeManager
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
     , public IMFSampleAllocatorControl
@@ -239,45 +234,6 @@ public:
         _In_ ULONG ulDataLength,
         _Inout_ ULONG* pBytesReturned
         );
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-    //
-    // The Below functions are needed for photoconfirmation
-    //
-    //
-    STDMETHOD(GetService)(
-        __in REFGUID guidService,
-        __in REFIID riid,
-        __deref_out LPVOID* ppvObject
-        );
-    //
-    //IMFCapturePhotoConfirmation Inferface function declarations
-    //
-    STDMETHOD(SetPhotoConfirmationCallback)(
-        _In_ IMFAsyncCallback* pNotificationCallback
-        );
-    STDMETHOD(SetPixelFormat)(
-        _In_ GUID subtype
-        );
-    STDMETHOD(GetPixelFormat)(
-        _Out_ GUID* subtype
-        );
-
-    __inline BOOL IsPhotoConfirmationEnabled()
-    {
-        return (m_spPhotoConfirmationCallback != nullptr);
-    }
-
-    STDMETHODIMP ProcessCapturePhotoConfirmationCallBack(
-        _In_ IMFMediaType* pMediaType,
-        _In_ IMFSample*    pSample
-        );
-
-    __inline VOID SetPhotoConfirmationCallBack(_In_ IMFAsyncCallback *Callback)
-    {
-        m_spPhotoConfirmationCallback = Callback;
-    }
-
-#endif
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
     //
     // IMFSampleAllocatorControl Inferface function declarations
@@ -329,10 +285,6 @@ protected:
     //Helper functions
     //
 
-    HRESULT SetStreamingStateCustomPins(
-        _In_ DeviceStreamState
-        );
-
     CInPin* GetInPin(
         _In_ DWORD dwStreamID
         );
@@ -352,15 +304,6 @@ protected:
     HRESULT BridgeInputPinOutputPin(
         _In_ CInPin* pInPin,
         _In_ COutPin* pOutPin);
-#if defined (MF_DEVICEMFT_WARMSTART_HANDLING)
-    HRESULT CMultipinMft::WarmStartHandler(
-        _In_    PKSPROPERTY Property,
-        _In_    ULONG       ulPropertyLength,
-        _In_    LPVOID      pData,
-        _In_    ULONG       ulOutputBufferLength,
-        _Inout_   PULONG      pulBytesReturned
-        );
-#endif
 #if defined (MF_DEVICEMFT_ALLOW_MFT0_LOAD) && defined (MFT_UNIQUE_METHOD_NAMES)
     STDMETHODIMP CMultipinMft::GetAttributes(
         _COM_Outptr_opt_result_maybenull_ IMFAttributes** ppAttributes
@@ -414,25 +357,7 @@ private:
     ComPtr<IKsControl>           m_spIkscontrol;
     ComPtr<IMFAttributes>        m_spAttributes;
     map<int, int>                m_outputPinMap;                      // How output pins are connected to input pins i-><0..outpins>
-    CDMFTEventHandler            m_eventHandler;
     PWCHAR                       m_SymbolicLink;
-
-#if defined (MF_DEVICEMFT_PHTOTOCONFIRMATION)
-    ComPtr<IMFAsyncCallback>    m_spPhotoConfirmationCallback;  //Photo Confirmation related definitions
-    GUID                        m_guidPhotoConfirmationSubtype;
-    BOOL                        m_firePhotoConfirmation;
-#endif
-#if defined (MF_DEVICEMFT_WARMSTART_HANDLING)
-    VOID SetWarmStart(DWORD dwPinId, BOOL state)
-    {
-        m_dwWarmStartMask ^= (-state ^ m_dwWarmStartMask) & (1UL << dwPinId);
-    }
-    BOOLEAN GetWarmStart(_In_ DWORD dwPinId)
-    {
-        return ((m_dwWarmStartMask >> dwPinId) & 1UL);
-    }
-    DWORD                      m_dwWarmStartMask;
-#endif
 
 };
 

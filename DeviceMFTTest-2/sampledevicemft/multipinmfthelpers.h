@@ -114,110 +114,7 @@ protected:
 };
 
 
-class CPinQueue: public IUnknown{
-public:
-    CPinQueue(_In_ DWORD _inPinId, _In_ IMFDeviceTransform* pTransform=nullptr);
-    ~CPinQueue();
 
-    STDMETHODIMP_(VOID) InsertInternal  ( _In_  IMFSample *pSample = nullptr );
-    STDMETHODIMP Insert                 ( _In_ IMFSample *pSample );
-    STDMETHODIMP Remove                 (_Outptr_result_maybenull_ IMFSample **pSample);
-    virtual STDMETHODIMP RecreateTee    (
-        _In_  IMFMediaType *inMediatype,
-        _In_ IMFMediaType *outMediatype,
-        _In_opt_ IUnknown* punkManager);
-#if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
-    STDMETHODIMP RecreateTeeByAllocatorMode(
-        _In_  IMFMediaType* inMediatype,
-        _In_ IMFMediaType* outMediatype,
-        _In_opt_ IUnknown* punkManager,
-        _In_ MFSampleAllocatorUsage allocatorUsage,
-        _In_opt_ IMFVideoSampleAllocator* pAllcoator);
-#endif
-    STDMETHODIMP_(VOID) Clear();
-  
-    //
-    //Inline functions
-    //
-    __inline BOOL Empty()
-    {
-        return (!m_sampleList.size());
-    }
-    __inline DWORD pinStreamId()
-    {
-        return m_dwInPinId;
-    }
-    __inline GUID pinCategory()
-    {
-        if (IsEqualCLSID(m_streamCategory, GUID_NULL))
-        {
-            ComPtr<IMFAttributes> spAttributes;
-            if (SUCCEEDED(m_pTransform->GetOutputStreamAttributes(pinStreamId(), spAttributes.ReleaseAndGetAddressOf())))
-            {
-                (VOID)spAttributes->GetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, &m_streamCategory);
-
-            }
-        }
-        return m_streamCategory;
-    }
-
-    STDMETHODIMP QueryInterface(REFIID riid, void** ppv)
-    {
-        HRESULT hr = S_OK;
-        if (ppv != nullptr)
-        {
-            *ppv = nullptr;
-            if (riid == __uuidof(IUnknown))
-            {
-                AddRef();
-                *ppv = static_cast<IUnknown*>(this);
-            }
-            else
-            {
-                hr = E_NOINTERFACE;
-            }
-        }
-        else
-        {
-            hr = E_POINTER;
-        }
-        return hr;
-    }
-
-    STDMETHODIMP_(ULONG) AddRef()
-    {
-        return InterlockedIncrement(&m_cRef);
-    }
-    STDMETHODIMP_(ULONG) Release()
-    {
-        long cRef = InterlockedDecrement(&m_cRef);
-        if (cRef == 0)
-        {
-            delete this;
-        }
-        return cRef;
-    }
-
-private:
-    DWORD                m_dwInPinId;           /* This is the input pin       */
-    IMFSampleList        m_sampleList;          /* List storing the samples    */
-    IMFDeviceTransform*  m_pTransform;         /* Weak reference to the the device MFT */
-    GUID                 m_streamCategory;
-    ULONG                m_cRef;
-protected:
-    ComPtr<Ctee>         m_spTeer;                /*Tee that acts as a passthrough or an XVP  */
- };
-
-
-#ifdef MF_DEVICEMFT_ADD_GRAYSCALER_
-class CPinQueueWithGrayScale:public  CPinQueue{
-public:
-    CPinQueueWithGrayScale(_In_ DWORD dwPinId, _In_ IMFDeviceTransform* pParent) :CPinQueue(dwPinId,pParent)
-    {
-    }
-    STDMETHODIMP RecreateTee(_In_  IMFMediaType *inMediatype, _In_ IMFMediaType *outMediatype, _In_opt_ IUnknown* punkManager);
-};
-#endif
 //
 // Define these in different components
 // The below classes are used to add the
@@ -245,7 +142,6 @@ public:
     {
         return S_OK;
     }
-   virtual STDMETHODIMP PassThrough( _In_ IMFSample * ) = 0;
 
    STDMETHOD_(VOID, ShutdownTee)()
    {
@@ -297,20 +193,6 @@ protected:
 };
 
 
-class CNullTee:public Ctee{
-public:
-    CNullTee(_In_ CPinQueue* q)
-        : m_Queue(q)
-    {
-    }
-    STDMETHODIMP PassThrough( _In_ IMFSample* );
-
-protected:
-    // Store the queue here for simplicity
-    ComPtr<CPinQueue> m_Queue;
-};
-
-
 class CWrapTee : public Ctee
 {
 public:
@@ -325,9 +207,6 @@ public:
     {
     }
 
-    STDMETHODIMP PassThrough        ( _In_ IMFSample* );
-    virtual STDMETHODIMP Do         ( _In_ IMFSample* pSample, _Out_ IMFSample ** , _Inout_ bool &newSample) = 0;
-    STDMETHODIMP SetMediaTypes(_In_ IMFMediaType* pInMediaType, _In_ IMFMediaType* pOutMediaType);
     //
     // Inline functions
     //
@@ -380,21 +259,6 @@ public:
         m_spDeviceManagerUnk = pUnk;
     }
 
-    STDMETHODIMP SetMediaTypes(_In_ IMFMediaType* pInMediaType, _In_ IMFMediaType* pOutMediaType);
-    virtual STDMETHODIMP Configure(_In_ IMFMediaType *, _In_ IMFMediaType *, _Inout_ IMFTransform**) = 0;
-    STDMETHOD(CreateAllocator)();
-    STDMETHOD(Stop)()
-    {
-        HRESULT hr = S_OK;
-        if (SUCCEEDED(hr = StopStreaming()))
-        {
-            if (m_spObjectWrapped)
-            {
-                hr = m_spObjectWrapped->Stop();
-            }
-        }
-        return hr;
-    }
     virtual ~CVideoProcTee()
     {}
 protected:
@@ -407,8 +271,6 @@ protected:
     {
         return InterlockedCompareExchange(&m_asyncHresult, S_OK, S_OK);
     }
-    STDMETHOD(StartStreaming)() = 0;
-    STDMETHOD(StopStreaming)()  = 0;
     HRESULT              m_asyncHresult;
     ComPtr< IMFTransform > m_spVideoProcessor;
     ComPtr<IUnknown>       m_spDeviceManagerUnk;
@@ -424,10 +286,6 @@ class CXvptee :public CVideoProcTee{
 public:
     CXvptee( _In_ Ctee *, _In_ GUID category = PINNAME_PREVIEW );
     virtual ~CXvptee();
-    STDMETHOD(StartStreaming)();
-    STDMETHOD(StopStreaming)();
-    STDMETHODIMP Do             (   _In_ IMFSample* pSample, _Outptr_ IMFSample **, _Inout_ bool &newSample);
-    STDMETHODIMP Configure      (   _In_opt_ IMFMediaType *, _In_opt_ IMFMediaType *, _Outptr_ IMFTransform** );
 
 };
 
@@ -439,7 +297,6 @@ public:
         , m_fAsyncMFT(FALSE)
         , m_D3daware(FALSE)
         , m_hwMFT(FALSE)
-        , m_asyncCallback(nullptr)
         , m_asyncHresult(S_OK)
         , m_lNeedInputRequest(0)
         , m_streamCategory(category)
@@ -453,23 +310,12 @@ public:
     }
     virtual ~CDecoderTee();
 
-    STDMETHODIMP Do(_In_ IMFSample* pSample, _Outptr_ IMFSample **, _Inout_ bool &newSample);
-    STDMETHODIMP Configure(_In_opt_ IMFMediaType *, _In_opt_ IMFMediaType *, _Outptr_ IMFTransform**);
-    STDMETHODIMP Invoke(_In_ IMFAsyncResult*);
 protected:
-    STDMETHODIMP StartStreaming();
-    STDMETHODIMP StopStreaming();
-    HRESULT GetSample( _Outptr_result_maybenull_ IMFSample**);
-    HRESULT ConfigDecoder( _In_ IMFTransform* ,_In_ GUID guidSubType = GUID_NULL);
-    HRESULT ConfigRealTimeMFT(_In_ IMFTransform* );
-    HRESULT ProcessOutputSync( _COM_Outptr_opt_ IMFSample** );
-    HRESULT ProcessFormatChange();
     STDMETHOD_(VOID, ShutdownTee)();
 
     BOOL                 m_fAsyncMFT;
     BOOL                 m_D3daware;
     BOOL                 m_hwMFT;
-    ComPtr<CDMFTAsyncCallback<CDecoderTee, &CDecoderTee::Invoke> >     m_asyncCallback;
     HRESULT              m_asyncHresult;
     DWORD                m_lNeedInputRequest;
     GUID                 m_streamCategory; // Needed for bind flags
@@ -489,10 +335,6 @@ public:
         , _In_ IMFVideoSampleAllocator* sampleAllocator = nullptr
     );
     ~CSampleCopytee();
-    STDMETHOD(StartStreaming)();
-    STDMETHOD(StopStreaming)();
-    STDMETHODIMP Do(_In_ IMFSample* pSample, _Outptr_ IMFSample **, _Inout_ bool &newSample);
-    STDMETHODIMP Configure(_In_opt_ IMFMediaType *, _In_opt_ IMFMediaType *, _Outptr_ IMFTransform**);
 };
 
 #ifdef MF_DEVICEMFT_ADD_GRAYSCALER_
@@ -573,25 +415,6 @@ typedef struct _DMFTEventEntry{
 //
 // Handler for one shot events and Normal events
 //
-class CDMFTEventHandler{
-public:
-    //
-    // Handle the events here
-    //
-    HRESULT KSEvent( _In_reads_bytes_(ulEventLength) PKSEVENT pEvent,
-        _In_ ULONG ulEventLength,
-        _Inout_updates_bytes_opt_(ulDataLength) LPVOID pEventData,
-        _In_ ULONG ulDataLength,
-        _Inout_ ULONG* pBytesReturned);
-    HRESULT SetOneShot(ULONG);
-    HRESULT SetRegularEvent(ULONG);
-    HRESULT Clear();
-protected:
-    HRESULT Dupe (_In_ HANDLE hEventHandle, _Outptr_ LPHANDLE lpTargetHandle);
-private:
-    map< ULONG, HANDLE >        m_OneShotEventMap;
-    vector< PDMFTEventEntry >   m_RegularEventList;
-};
 
 class CMultipinMft;
 class CInPin;
@@ -612,8 +435,5 @@ public:
     CPinCreationFactory(_In_ CMultipinMft* pDeviceTransform):m_spDeviceTransform(pDeviceTransform){
     }
 };
-HRESULT CheckPinType(_In_ IMFAttributes* pAttributes, _In_ GUID pinType, _Out_ PBOOL pbIsImagePin);
-BOOL    CheckImagePin(_In_ IMFAttributes* pAttributes, _Out_ PBOOL pbIsImagePin);
-HRESULT CheckPreviewPin(_In_ IMFAttributes* pAttributes, _Out_ PBOOL pbIsPreviewPin);
 
 
