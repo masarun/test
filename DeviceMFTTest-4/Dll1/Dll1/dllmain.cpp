@@ -2,6 +2,9 @@
 #include "pch.h"
 #include "dllmain.tmh"
 
+#include "common.h"
+volatile long CDMFTModuleLifeTimeManager::s_lObjectCount = 0;
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -12,7 +15,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     case DLL_PROCESS_ATTACH:
         // https://monoist.atmarkit.co.jp/mn/articles/1310/10/news001_2.html
         WPP_INIT_TRACING(L"Dll1");
-        TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DLL Loaded");
+        //TraceEvents(TRACE_LEVEL_INFORMATION, DMFT_INIT, "DLL Loaded");
         break;
     case DLL_THREAD_ATTACH:
         break;

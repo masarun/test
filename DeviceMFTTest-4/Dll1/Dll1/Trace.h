@@ -18,5 +18,5 @@
 // Trace function.
 // begin_wpp config
 // FUNC Trace{FLAG=DMFT_INIT}(LEVEL, MSG, ...);
-// FUNC TraceEvents(LEVEL, FLAGS, MSG, ...);
+// FUNC DMFTRACE(LEVEL, FLAGS, MSG, ...);
 // end_wpp

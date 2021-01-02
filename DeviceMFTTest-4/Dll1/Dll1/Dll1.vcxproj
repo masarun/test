@@ -23,7 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{91a6282f-db14-48ee-b387-2a1567b411bd}</ProjectGuid>
     <RootNamespace>Dll1</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -78,6 +78,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\..\wil\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -122,19 +123,21 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;DLL1_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;DLL1_EXPORTS;_WINDOWS;_USRDLL;MF_WPP;MFT_UNIQUE_METHOD_NAMES;MF_DEVICEMFT_ALLOW_MFT0_LOAD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WppEnabled>true</WppEnabled>
       <WppRecorderEnabled>true</WppRecorderEnabled>
-      <WppScanConfigurationData>Trace.h</WppScanConfigurationData>
+      <WppScanConfigurationData>
+      </WppScanConfigurationData>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
+      <AdditionalDependencies>D2d1.lib;mf.lib;mfplat.lib;mfuuid.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,6 +161,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="basepin.h" />
+    <ClInclude Include="common.h" />
     <ClInclude Include="Counts.h" />
     <ClInclude Include="CRegistry.h" />
     <ClInclude Include="Factory2.h" />
@@ -165,16 +170,36 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="GUIDs.h" />
     <ClInclude Include="IFortune.h" />
+    <ClInclude Include="multipinmft.h" />
+    <ClInclude Include="multipinmfthelpers.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="stdafx.h" />
     <ClInclude Include="Trace.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="basepin.cpp">
+      <WppTraceFunction Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">DMFTRACE(FLAG,LEVEL,MSG,...)</WppTraceFunction>
+    </ClCompile>
     <ClCompile Include="Counts.cpp" />
     <ClCompile Include="CRegistry.cpp" />
-    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="dllmain.cpp">
+      <WppTraceFunction Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">DMFTRACE(FLAG,LEVEL,MSG,...)</WppTraceFunction>
+    </ClCompile>
     <ClCompile Include="DllServ.cpp" />
     <ClCompile Include="Factory2.cpp" />
     <ClCompile Include="Fortune2.cpp" />
+    <ClCompile Include="mftpeventgenerator.cpp">
+      <WppTraceFunction Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">DMFTRACE(FLAG,LEVEL,MSG,...)</WppTraceFunction>
+    </ClCompile>
+    <ClCompile Include="multipinmft.cpp">
+      <WppTraceFunction Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">DMFTRACE(FLAG,LEVEL,MSG,...)</WppTraceFunction>
+    </ClCompile>
+    <ClCompile Include="multipinmfthelpers.cpp">
+      <WppTraceFunction Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">DMFTRACE(FLAG,LEVEL,MSG,...)</WppTraceFunction>
+    </ClCompile>
+    <ClCompile Include="multipinmftutils.cpp">
+      <WppTraceFunction Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">DMFTRACE(FLAG,LEVEL,MSG,...)</WppTraceFunction>
+    </ClCompile>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
