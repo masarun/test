@@ -688,7 +688,6 @@ COutPin::COutPin(
     )
     : CBasePin(ulPinId, pparent)
     , m_firstSample(false)
-    , m_queue(nullptr)
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
     , m_allocatorUsage(allocatorUsage)
 #endif
@@ -739,18 +738,6 @@ STDMETHODIMP COutPin::AddPin(
     HRESULT hr = S_OK;
     CAutoLock Lock(lock());
 
-    if (m_queue != NULL)
-    {
-        // This pin is alreaqdy connected.. This sample only supports a one on one pin mapping
-        DMFTCHECKHR_GOTO(E_UNEXPECTED, done);
-
-    }
-
-    m_queue = new (std::nothrow) CPinQueue(inputPinId,Parent());
-    DMFTCHECKNULL_GOTO(m_queue, done, E_OUTOFMEMORY );
-
-done:
-
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return S_OK;
 
@@ -796,23 +783,6 @@ STDMETHODIMP_(VOID) COutPin::SetAllocator(
 }
 
 /*++
-COutPin::FlushQueues
-Description:
-Called from the device Transform when the output queues have to be flushed
-
---*/
-HRESULT COutPin::FlushQueues()
-{
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "COutPin::FlushQueues");
-
-    HRESULT hr = S_OK;
-    CAutoLock Lock( lock() );
-    (VOID)m_queue->Clear();
-    DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
-    return hr;
-
-}
-/*++
 COutPin::ChangeMediaTypeFromInpin
 Description:
 called from the Device Transform when the input media type is changed. This will result in 
@@ -834,15 +804,14 @@ HRESULT COutPin::ChangeMediaTypeFromInpin(
     //Flush so that we drop any samples we have in store!!
     //
     SetState(DeviceStreamState_Disabled); 
-    DMFTCHECKHR_GOTO(FlushQueues(),done);  
-    DMFTCHECKNULL_GOTO(m_queue,done, E_UNEXPECTED); // The queue should alwaye be set
-    hr = m_queue->RecreateTeeByAllocatorMode(pInMediatype, pOutMediaType, m_spDxgiManager.Get(), m_allocatorUsage, m_spDefaultAllocator.get());
+    pInMediatype;
+    hr = S_OK;
     if ( SUCCEEDED( hr ) )
     {
         (VOID)setMediaType( pOutMediaType );
         (VOID)SetState( state );
     }
-done:
+
     DMFTRACE(DMFT_GENERAL, TRACE_LEVEL_INFORMATION, "%!FUNC! exiting %x = %!HRESULT!", hr, hr);
     return hr;
 

@@ -1240,8 +1240,6 @@ HRESULT CMultipinMft::ChangeMediaTypeEx(
     (VOID)spinPin->getMediaType(&pInputMediaType);
     oldInputStreamState = spinPin->SetState(DeviceStreamState_Disabled); // Disable input pin
     oldOutPinState      = spoPin->SetState(DeviceStreamState_Disabled);  // Disable output pin
-    (void)spoPin->FlushQueues();  // Flush the output queues
-    (void)spinPin->FlushQueues(); // Flush the input queues
     newOutStreamState = pinStateTransition[oldOutPinState][reqState];  // New state needed  
     
     // The Old input and the output pin states should be the same

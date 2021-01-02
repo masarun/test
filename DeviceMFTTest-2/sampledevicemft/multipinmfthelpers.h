@@ -114,93 +114,6 @@ protected:
 };
 
 
-class CPinQueue: public IUnknown{
-public:
-    CPinQueue(_In_ DWORD _inPinId, _In_ IMFDeviceTransform* pTransform=nullptr);
-    ~CPinQueue();
-
-#if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
-    STDMETHODIMP RecreateTeeByAllocatorMode(
-        _In_  IMFMediaType* inMediatype,
-        _In_ IMFMediaType* outMediatype,
-        _In_opt_ IUnknown* punkManager,
-        _In_ MFSampleAllocatorUsage allocatorUsage,
-        _In_opt_ IMFVideoSampleAllocator* pAllcoator);
-#endif
-    STDMETHODIMP_(VOID) Clear();
-  
-    //
-    //Inline functions
-    //
-    __inline BOOL Empty()
-    {
-        return (!m_sampleList.size());
-    }
-    __inline DWORD pinStreamId()
-    {
-        return m_dwInPinId;
-    }
-    __inline GUID pinCategory()
-    {
-        if (IsEqualCLSID(m_streamCategory, GUID_NULL))
-        {
-            ComPtr<IMFAttributes> spAttributes;
-            if (SUCCEEDED(m_pTransform->GetOutputStreamAttributes(pinStreamId(), spAttributes.ReleaseAndGetAddressOf())))
-            {
-                (VOID)spAttributes->GetGUID(MF_DEVICESTREAM_STREAM_CATEGORY, &m_streamCategory);
-
-            }
-        }
-        return m_streamCategory;
-    }
-
-    STDMETHODIMP QueryInterface(REFIID riid, void** ppv)
-    {
-        HRESULT hr = S_OK;
-        if (ppv != nullptr)
-        {
-            *ppv = nullptr;
-            if (riid == __uuidof(IUnknown))
-            {
-                AddRef();
-                *ppv = static_cast<IUnknown*>(this);
-            }
-            else
-            {
-                hr = E_NOINTERFACE;
-            }
-        }
-        else
-        {
-            hr = E_POINTER;
-        }
-        return hr;
-    }
-
-    STDMETHODIMP_(ULONG) AddRef()
-    {
-        return InterlockedIncrement(&m_cRef);
-    }
-    STDMETHODIMP_(ULONG) Release()
-    {
-        long cRef = InterlockedDecrement(&m_cRef);
-        if (cRef == 0)
-        {
-            delete this;
-        }
-        return cRef;
-    }
-
-private:
-    DWORD                m_dwInPinId;           /* This is the input pin       */
-    IMFSampleList        m_sampleList;          /* List storing the samples    */
-    IMFDeviceTransform*  m_pTransform;         /* Weak reference to the the device MFT */
-    GUID                 m_streamCategory;
-    ULONG                m_cRef;
-protected:
-    ComPtr<Ctee>         m_spTeer;                /*Tee that acts as a passthrough or an XVP  */
- };
-
 
 //
 // Define these in different components
@@ -277,19 +190,6 @@ public:
 
 protected:
     ULONG m_cRef = 0;
-};
-
-
-class CNullTee:public Ctee{
-public:
-    CNullTee(_In_ CPinQueue* q)
-        : m_Queue(q)
-    {
-    }
-
-protected:
-    // Store the queue here for simplicity
-    ComPtr<CPinQueue> m_Queue;
 };
 
 

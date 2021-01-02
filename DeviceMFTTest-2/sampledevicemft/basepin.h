@@ -14,7 +14,6 @@
 extern DeviceStreamState pinStateTransition[][4];
 
 
-class CPinQueue;
 class CPinState;
 class CMultipinMft;
 
@@ -68,11 +67,6 @@ public:
         _Out_opt_ ULONG* pBytesReturned
         );
 
-  virtual STDMETHODIMP FlushQueues(
-  )
-  {
-      return S_OK;
-  }
   //
   // NOOPs for this iteration..
   //
@@ -367,10 +361,6 @@ public:
         _In_ DWORD dwFlags
         );
 
-    virtual STDMETHODIMP FlushQueues()
-    {
-        return S_OK;
-    }
     //
     //Inline functions
     //
@@ -422,7 +412,6 @@ public:
 #endif
     );
     ~COutPin();
-    STDMETHODIMP FlushQueues();
     STDMETHODIMP AddPin(
         _In_ DWORD pinId
         );
@@ -465,7 +454,6 @@ public:
     }
     
 protected:
-    CPinQueue *               m_queue;           /* Queue where the sample will be stored*/
     BOOL                      m_firstSample;
 #if ((defined NTDDI_WIN10_VB) && (NTDDI_VERSION >= NTDDI_WIN10_VB))
     MFSampleAllocatorUsage    m_allocatorUsage;
@@ -498,7 +486,6 @@ public:
     STDMETHOD_(VOID, ShutdownPin)();
     ~CAsyncInPin()
     {
-        FlushQueues();
     }
 
 
