@@ -68,7 +68,7 @@ STDAPI DllRegisterServer()
         return hr;
     }
 
-    result = AddRegistryValue(CLSID_PATH L"\\InprocServer32", L"ThreadingModel", L"Apartment");
+    result = AddRegistryValue(CLSID_PATH L"\\InprocServer32", L"ThreadingModel", L"Both");
     if (result)
     {
         result = AddRegistryValue(CLSID_PATH L"\\InprocServer32", NULL, szPath);

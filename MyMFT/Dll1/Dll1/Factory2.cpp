@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "MyMFT.h"
 #include "Factory2.h"
 #include "Fortune2.h"
 #include "Counts.h"
@@ -54,7 +55,8 @@ STDMETHODIMP_(ULONG __stdcall) ComFortuneTellerFactory::Release()
 
 STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::CreateInstance(LPUNKNOWN pUnkOuter, REFIID rIID, VOID** ppInterface)
 {
-    PComFortuneTeller pObj;
+    //PComFortuneTeller pObj;
+    MyMFT* pObj;
     HRESULT hr;
 
     *ppInterface = NULL;
@@ -64,7 +66,8 @@ STDMETHODIMP_(HRESULT __stdcall) ComFortuneTellerFactory::CreateInstance(LPUNKNO
         return CLASS_E_NOAGGREGATION;
     }
 
-    pObj = new ComFortuneTeller();
+    //pObj = new ComFortuneTeller();
+    pObj = new MyMFT();
 
     if (!pObj)
     {
