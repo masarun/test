@@ -167,6 +167,7 @@
     <ClInclude Include="IFortune.h" />
     <ClInclude Include="MyMFT.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Pin.h" />
     <ClInclude Include="Trace.h" />
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +184,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Pin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source.def" />
